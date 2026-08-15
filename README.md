@@ -74,3 +74,14 @@ In Firebase Console:
 5. Keep the Firestore and Storage rules restricted to the admin UID.
 
 The editor also checks the email client-side before loading the admin interface. The Firebase Security Rules remain the real protection for writes.
+
+
+### Blocking admin sign-in modal
+
+The admin sign-in is now a true blocking modal:
+
+- Background cannot be clicked.
+- Background scrolling is disabled.
+- Clicking outside the modal does not close it.
+- Pressing Escape does not bypass authentication.
+- The editor remains locked until an authorized account signs in.

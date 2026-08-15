@@ -8,6 +8,35 @@
 
 .authbar{display:flex;gap:7px;align-items:center;margin-top:12px}.auth-email{font-size:11px;color:#8e8e97;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.btn.small{padding:8px 10px;font-size:11px}.btn.success{background:#d9ffdd;color:#07110a;border-color:#d9ffdd}.btn.warn{background:#2a2413;color:#ffd978;border-color:#55471c}
 .upload-row{display:grid;grid-template-columns:1fr auto;gap:7px}.publish-state{font-size:11px;color:#8c8c96;margin-top:8px}.locked{opacity:.55;pointer-events:none}
+
+/* Blocking authentication modal */
+#authModal{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  pointer-events:auto;
+}
+#authModal.show{display:flex}
+#authModal .modal-card{
+  position:relative;
+  z-index:100000;
+  width:min(420px,100%);
+  max-height:calc(100vh - 40px);
+  overflow:auto;
+  pointer-events:auto;
+}
+body.auth-locked{overflow:hidden}
+body.auth-locked > *:not(#authModal){
+  pointer-events:none;
+}
+
 </style><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -140,7 +169,25 @@ async function loadRemote(){
     }else setPublishState("Firebase connected. No saved portfolio yet.");
   }catch(err){setPublishState("Could not load Firebase: "+err.message)}
 }
-function openAuth(){$("#authModal").classList.add("show");$("#authEmailInput").focus()}
+function openAuth(){
+  $("#authModal").classList.add("show");
+  document.body.classList.add("auth-locked");
+  $("#authEmailInput").focus();
+}
+function closeAuth(){
+  $("#authModal").classList.remove("show");
+  document.body.classList.remove("auth-locked");
+}
+$("#authModal").addEventListener("mousedown",e=>{
+  // Keep the modal blocking; clicking the backdrop never closes it.
+  if(e.target===$("#authModal")) e.preventDefault();
+});
+document.addEventListener("keydown",e=>{
+  if($("#authModal").classList.contains("show") && e.key==="Escape"){
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
 $("#frame").addEventListener("load",()=>send());
 $("#save").onclick=saveDraft;
 $("#publish").onclick=publish;
@@ -152,7 +199,7 @@ $("#import").onclick=()=>{$("#modal").classList.add("show");$("#json").value=JSO
 $("#close").onclick=()=>$("#modal").classList.remove("show");
 $("#apply").onclick=()=>{try{c=merge(D,JSON.parse($("#json").value));saveLocal();render();send();$("#modal").classList.remove("show")}catch(e){alert("Invalid JSON")}};
 $("#signIn").onclick=openAuth;
-$("#authClose").onclick=()=>$("#authModal").classList.remove("show");
+$("#authClose").onclick=()=>closeAuth();
 $("#googleSignIn").onclick=async()=>{
   try{
     const result=await window.YUJIN_FIREBASE.signInWithPopup(
@@ -165,7 +212,7 @@ $("#googleSignIn").onclick=async()=>{
       alert("This Google account is not authorized to access the admin editor.");
       return;
     }
-    $("#authModal").classList.remove("show");
+    closeAuth();
   }catch(err){
     console.error(err);
     alert("Google sign-in failed: "+err.message);
