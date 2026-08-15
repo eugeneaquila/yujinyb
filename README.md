@@ -1,20 +1,27 @@
-# Yujin Portfolio — Vercel Ready
+# Yujin Portfolio — No-Code Editor
 
 ## Files
 
 - `index.html` — public portfolio
-- `editor.html` — no-code editor
-- `vercel.json` — Vercel routing and headers
+- `editor.html` — visual no-code editor
+- `vercel.json` — Vercel routing
 - `yujin-portfolio-default.json` — starter configuration
+- `builder-config.json` — builder metadata
 
-## Deploy to Vercel
+## Use locally
 
-This is a static site and does not require a build command or framework. Import this folder into Vercel as a project and deploy from the project root.
+Open `editor.html` in a browser. Edit the portfolio using the controls and use the live preview.
 
-The public page is `/`. The no-code editor is `/editor` (with `/admin` as an alias).
+## Vercel
 
-## Important about saving
+Upload this folder/project to Vercel.
 
-The current editor stores customizations in the browser's `localStorage`. That means it is excellent for local editing and previews, but it does **not** create a shared database or publish changes to every visitor automatically. A Vercel deployment is static unless you add a persistence layer.
+- `/` → public portfolio
+- `/editor` → visual editor
+- `/admin` → visual editor
 
-For a true multi-device CMS where you change the site once and every visitor sees the update, the next step is a Vercel/Supabase-backed editor.
+## Important
+
+The editor stores the current configuration in the browser's localStorage. This means the editor is completely static and requires no backend, but changes made in one browser are not automatically published to other visitors.
+
+For a shared production CMS, replace the localStorage layer with a persistent database such as Supabase.
