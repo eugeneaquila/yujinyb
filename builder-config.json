@@ -1,7 +1,0 @@
-{
-  "version": 1,
-  "storage": "localStorage",
-  "key": "yujinPortfolioConfigV1",
-  "editor": "/editor.html",
-  "public": "/index.html"
-}
