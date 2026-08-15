@@ -47,3 +47,15 @@ firebase deploy --only firestore:rules
 ```
 
 Firebase Storage is intentionally not included. Image fields should use external image URLs.
+
+
+## Editor improvements
+
+The editor now supports:
+- Profile name / logo editing
+- Footer name editing
+- Per-project descriptions
+- Per-project YouTube URLs
+- Click-to-preview YouTube videos in a glassmorphism modal
+- Showreel YouTube preview
+- Image URLs without Firebase Storage

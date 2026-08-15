@@ -57,6 +57,16 @@ footer{padding:25px 0 40px;color:#777;font-size:12px;display:flex;justify-conten
  .section-head{display:block}.section-desc{margin-top:20px}
 }
 @media(max-width:520px){section{padding:80px 0}.hero{min-height:auto;padding-bottom:90px}h1{font-size:62px}.services{grid-template-columns:1fr}.service,.service:nth-child(odd){border-right:0}.process{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.contact h2{font-size:64px}footer{display:block}footer span{display:block;margin-top:8px}}
+
+.work-description{margin:9px 0 0;color:#c7c7ce;font-size:13px;line-height:1.45;max-width:520px}
+.work-preview{cursor:pointer}
+.video-modal{position:fixed;inset:0;z-index:1000;display:none;place-items:center;background:rgba(0,0,0,.84);backdrop-filter:blur(18px);padding:20px}
+.video-modal.show{display:grid}
+.video-modal-card{width:min(1000px,100%);background:rgba(17,17,20,.88);border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:14px;box-shadow:0 30px 100px rgba(0,0,0,.5)}
+.video-modal-head{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 12px}
+.video-modal-head b{font-size:14px}
+.video-close{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;border-radius:999px;width:36px;height:36px;cursor:pointer}
+.video-frame{width:100%;aspect-ratio:16/9;border:0;border-radius:16px;background:#000}
 </style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -305,10 +315,10 @@ img:hover{
  <div class="container reveal">
   <div class="section-head"><div><div class="kicker">02 / Selected work</div><h2 class="section-title">Things I've made.</h2></div><p class="section-desc">A curated selection is stronger than a giant archive. Lead with your best work.</p></div>
   <div class="work-grid">
-   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">MV · Motion Design</div><h3>Music Visual</h3></div></a>
-   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">VTuber · Promotional</div><h3>Debut Trailer</h3></div></a>
-   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">Anime · Compositing</div><h3>Post-Shiage</h3></div></a>
-   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">Music · Visualizer</div><h3>Visual Experience</h3></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">MV · Motion Design</div><h3>Music Visual</h3><p class="work-description"></p></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">VTuber · Promotional</div><h3>Debut Trailer</h3><p class="work-description"></p></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">Anime · Compositing</div><h3>Post-Shiage</h3><p class="work-description"></p></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">Music · Visualizer</div><h3>Visual Experience</h3><p class="work-description"></p></div></a>
   </div>
  </div>
 </section>
@@ -389,10 +399,10 @@ const YUJIN_DEFAULT={
   hero:{eyebrow:"Motion Designer · MV Animator · Compositor",title:"I make motion feel alive.",description:"I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.",primary:"View selected work ↗",primaryLink:"#work",secondary:"Start a project",secondaryLink:"#contact",noteTitle:"Yujin — Visual Creator",noteText:"Focused on motion design, MV production, anime compositing and creator-focused visuals. Available for remote projects worldwide."},
   reel:{title:"Selected motion.",desc:"Replace this visual with your latest reel, then let the work do the talking.",label:"SHOWREEL 2024 — 2026",url:""},
   work:{title:"Things I've made.",desc:"A curated selection is stronger than a giant archive. Lead with your best work.",items:[
-    {tag:"MV · Motion Design",title:"Music Visual",image:"",url:"#contact"},
-    {tag:"VTuber · Promotional",title:"Debut Trailer",image:"",url:"#contact"},
-    {tag:"Anime · Compositing",title:"Post-Shiage",image:"",url:"#contact"},
-    {tag:"Music · Visualizer",title:"Visual Experience",image:"",url:"#contact"}]},
+    {tag:"MV · Motion Design",title:"Music Visual",description:"Music-driven motion design and cinematic visual treatment.",image:"",url:"#contact",youtube:""},
+    {tag:"VTuber · Promotional",title:"Debut Trailer",description:"Character-focused promotional animation for VTuber launches.",image:"",url:"#contact",youtube:""},
+    {tag:"Anime · Compositing",title:"Post-Shiage",description:"Anime compositing, effects, lighting and final visual polish.",image:"",url:"#contact",youtube:""},
+    {tag:"Music · Visualizer",title:"Visual Experience",description:"Atmospheric visualizer work built around rhythm, light and movement.",image:"",url:"#contact",youtube:""}]},
   case:{title:"Show the thinking.",desc:"The next version of your portfolio should prove not only what you made, but what you contributed.",cards:[
     {kicker:"01 — The brief",title:"Turn a song into a visual identity.",text:"Start with the artist's concept, references and music. Define the visual language before opening After Effects."},
     {kicker:"02 — The craft",title:"Animation → effects → compositing.",text:"Break down your contribution: camera movement, typography, FX, transitions, lighting, color and final polish."}]},
@@ -415,7 +425,29 @@ function yujinApply(c){
  const hero=document.querySelector(".hero"); if(hero)hero.querySelector("h1").style.fontSize=`clamp(58px,${c.theme.heroScale}vw,128px)`;
  const hs=document.querySelector(".hero"); if(hs){const e=hs.querySelector(".eyebrow"),h=hs.querySelector("h1"),p=hs.querySelector(".hero-copy"),links=hs.querySelectorAll(".actions a"),note=hs.querySelector(".hero-note");e.textContent=c.hero.eyebrow;h.innerHTML=c.hero.title;p.innerHTML=c.hero.description;if(links[0]){links[0].textContent=c.hero.primary;links[0].href=c.hero.primaryLink}if(links[1]){links[1].textContent=c.hero.secondary;links[1].href=c.hero.secondaryLink}if(note){note.querySelector("strong").textContent=c.hero.noteTitle;note.lastChild.textContent=c.hero.noteText}}
  const reel=document.querySelector("#reel"); if(reel){reel.querySelector(".section-title").textContent=c.reel.title;reel.querySelector(".section-desc").textContent=c.reel.desc;reel.querySelector(".reel-label").textContent=c.reel.label;const box=reel.querySelector(".reel");box.onclick=()=>c.reel.url?window.open(c.reel.url,"_blank","noopener"):null}
- const work=document.querySelector("#work"); if(work){work.querySelector(".section-title").textContent=c.work.title;work.querySelector(".section-desc").textContent=c.work.desc;const cards=work.querySelectorAll(".work");c.work.items.forEach((x,i)=>{if(!cards[i])return;cards[i].querySelector(".work-tag").textContent=x.tag;cards[i].querySelector("h3").textContent=x.title;cards[i].href=x.url||"#";const v=cards[i].querySelector(".work-visual");v.style.backgroundImage=x.image?`url("${x.image}")`:"";v.style.backgroundSize="cover";v.style.backgroundPosition="center"})}
+ const work=document.querySelector("#work"); if(work){
+  work.querySelector(".section-title").textContent=c.work.title;
+  work.querySelector(".section-desc").textContent=c.work.desc;
+  const cards=work.querySelectorAll(".work");
+  c.work.items.forEach((x,i)=>{
+    if(!cards[i])return;
+    cards[i].querySelector(".work-tag").textContent=x.tag||"";
+    cards[i].querySelector("h3").textContent=x.title||"";
+    const desc=cards[i].querySelector(".work-description");
+    if(desc) desc.textContent=x.description||"";
+    const v=cards[i].querySelector(".work-visual");
+    v.style.backgroundImage=x.image?`url("${x.image}")`:"";
+    v.style.backgroundSize="cover";
+    v.style.backgroundPosition="center";
+    cards[i].href=x.youtube||x.url||"#";
+    cards[i].onclick=(e)=>{
+      if(x.youtube){
+        e.preventDefault();
+        openVideo(x.youtube,x.title||"Project preview");
+      }
+    };
+  });
+}
  const sections=document.querySelectorAll("main>section");
  const caseSec=sections[2]; if(caseSec){caseSec.querySelector(".section-title").textContent=c.case.title;caseSec.querySelector(".section-desc").textContent=c.case.desc;caseSec.querySelectorAll(".case-card").forEach((card,i)=>{const x=c.case.cards[i];if(!x)return;card.querySelector(".kicker").textContent=x.kicker;card.querySelector("h3").textContent=x.title;card.querySelector("p").textContent=x.text})}
  const serv=document.querySelector("#services"); if(serv){serv.querySelector(".section-title").textContent=c.services.title;serv.querySelector(".section-desc").textContent=c.services.desc;serv.querySelectorAll(".service h3").forEach((h,i)=>h.textContent=c.services.items[i]||"")}
@@ -448,7 +480,7 @@ async function loadPublishedConfig(){
 loadPublishedConfig();
 
 window.addEventListener("message",e=>{
-  if(e.data?.type==="YUJIN_PREVIEW") yujinApply(yujinMerge(YUJIN_DEFAULT,e.data.config));
+  if(e.data?.type==="YUJIN_PREVIEW"){YUJIN_CONFIG=yujinMerge(YUJIN_DEFAULT,e.data.config);yujinApply(YUJIN_CONFIG);}
 });
 </script>
 
@@ -465,6 +497,56 @@ window.addEventListener("message",e=>{
     requestAnimationFrame(tick);
   }
   tick();
+})();
+</script>
+
+
+<div class="video-modal" id="videoModal" aria-hidden="true">
+  <div class="video-modal-card">
+    <div class="video-modal-head">
+      <b id="videoModalTitle">Project preview</b>
+      <button class="video-close" id="videoModalClose" aria-label="Close preview">×</button>
+    </div>
+    <iframe class="video-frame" id="videoFrame" title="YouTube preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  const modal=document.getElementById("videoModal");
+  const frame=document.getElementById("videoFrame");
+  const title=document.getElementById("videoModalTitle");
+  const close=()=>{modal.classList.remove("show");modal.setAttribute("aria-hidden","true");frame.src="";};
+  window.openVideo=function(url,label){
+    if(!url){return;}
+    let id="";
+    try{
+      const u=new URL(url);
+      if(u.hostname.includes("youtu.be")) id=u.pathname.slice(1).split("/")[0];
+      else if(u.hostname.includes("youtube.com")){
+        id=u.searchParams.get("v")||u.pathname.split("/").filter(Boolean).pop();
+        if(u.pathname.includes("/shorts/")) id=u.pathname.split("/shorts/")[1].split("/")[0];
+        if(u.pathname.includes("/embed/")) id=u.pathname.split("/embed/")[1].split("/")[0];
+      }
+    }catch(e){}
+    if(!id){window.open(url,"_blank","noopener");return;}
+    title.textContent=label||"Project preview";
+    frame.src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&rel=0";
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+  };
+  document.getElementById("videoModalClose").onclick=close;
+  modal.addEventListener("click",e=>{if(e.target===modal)close()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("show"))close()});
+  const reel=document.querySelector("#reel .reel");
+  if(reel){
+    reel.onclick=()=>{
+      const c=window.YUJIN_CONFIG||null;
+      const url=c?.reel?.url;
+      if(url) openVideo(url,c.reel.title||"Showreel");
+    };
+  }
 })();
 </script>
 
