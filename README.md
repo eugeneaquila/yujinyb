@@ -34,3 +34,30 @@ loads the published portfolio configuration.
 ## Deploy
 
 Upload this folder to Vercel. No build step is required.
+
+
+## Ambient Light + Glassmorphism
+
+Added to both the public portfolio and editor:
+- Multi-color ambient light gradients
+- Soft animated light orbs
+- Frosted glass surfaces
+- Glass borders and highlights
+- Backdrop blur/saturation
+- Glass-style buttons
+- Reduced-motion support
+- Live ambient-color and blur controls inside the editor
+
+
+## Advanced effects
+
+Added a cinematic visual layer:
+- Cursor-following ambient light
+- Aurora ribbon glow
+- Floating light particles
+- Animated glass shimmer
+- Neon hover glow on cards and buttons
+- Elevated glass hover movement
+- Soft heading/accent glow
+- Cinematic image hover treatment
+- Reduced-motion accessibility support

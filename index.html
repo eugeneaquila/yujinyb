@@ -67,8 +67,212 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 window.YUJIN_FIREBASE = { firebaseApp, db, doc, getDoc };
 </script>
+<style>
+/* Ambient Light + Glassmorphism */
+:root{
+  --ambient-1: rgba(117,88,255,.22);
+  --ambient-2: rgba(0,214,255,.14);
+  --ambient-3: rgba(255,104,183,.11);
+  --glass-blur: 22px;
+}
+body{
+  position:relative;
+  isolation:isolate;
+  background:
+    radial-gradient(700px 500px at 8% 4%,var(--ambient-1),transparent 68%),
+    radial-gradient(650px 520px at 92% 14%,var(--ambient-2),transparent 66%),
+    radial-gradient(700px 600px at 50% 88%,var(--ambient-3),transparent 70%),
+    #08080a;
+}
+body::before,body::after{
+  content:"";
+  position:fixed;
+  pointer-events:none;
+  z-index:-1;
+  border-radius:999px;
+  filter:blur(90px);
+  opacity:.65;
+  mix-blend-mode:screen;
+  animation:ambientFloat 16s ease-in-out infinite alternate;
+}
+body::before{
+  width:420px;height:420px;left:-130px;top:18%;
+  background:rgba(130,105,255,.16);
+}
+body::after{
+  width:520px;height:520px;right:-190px;bottom:5%;
+  background:rgba(0,210,255,.11);
+  animation-delay:-6s;
+}
+@keyframes ambientFloat{
+  from{transform:translate3d(0,0,0) scale(1)}
+  to{transform:translate3d(35px,-25px,0) scale(1.12)}
+}
+.glass,nav,header,.card,.project,.work-card,.service,.process-card,
+.modal-card,.panel,.sidebar,.toolbar,footer{
+  background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.025)) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  box-shadow:0 18px 60px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.18) !important;
+  backdrop-filter:blur(var(--glass-blur)) saturate(135%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(135%);
+}
+button,.btn{
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 30px rgba(0,0,0,.18);
+}
+::selection{background:rgba(150,125,255,.32);color:#fff}
+@media(prefers-reduced-motion:reduce){
+  body::before,body::after{animation:none}
+}
+</style>
+<style>
+/* Advanced ambient glow + interaction effects */
+:root{
+  --glow-purple: rgba(139,92,246,.42);
+  --glow-cyan: rgba(34,211,238,.30);
+  --glow-pink: rgba(244,114,182,.25);
+  --glow-white: rgba(255,255,255,.12);
+}
+body::marker{display:none}
+body::after{
+  animation:ambientFloat 16s ease-in-out infinite alternate, ambientPulse 7s ease-in-out infinite;
+}
+@keyframes ambientPulse{
+  0%,100%{opacity:.45}
+  50%{opacity:.82}
+}
+/* Cursor-following light */
+body .cursor-glow{
+  position:fixed;
+  width:420px;height:420px;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(139,92,246,.13) 0%,rgba(34,211,238,.06) 28%,transparent 68%);
+  filter:blur(18px);
+  mix-blend-mode:screen;
+  opacity:0;
+  transition:opacity .35s ease;
+}
+body:hover .cursor-glow{opacity:1}
+
+/* Shimmer on glass */
+.glass,.card,.project,.work-card,.service,.process-card,.modal-card,.panel,.sidebar,footer{
+  position:relative;
+  overflow:hidden;
+}
+.glass::before,.card::before,.project::before,.work-card::before,.service::before,.process-card::before,.panel::before{
+  content:"";
+  position:absolute;
+  inset:-120% 35%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.075),transparent);
+  transform:rotate(18deg) translateX(-80%);
+  pointer-events:none;
+  animation:glassShimmer 9s ease-in-out infinite;
+}
+@keyframes glassShimmer{
+  0%,55%{transform:rotate(18deg) translateX(-90%)}
+  72%,100%{transform:rotate(18deg) translateX(220%)}
+}
+
+/* Elevated hover glow */
+.card,.project,.work-card,.service,.process-card,button,.btn{
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease,background .35s ease;
+}
+.card:hover,.project:hover,.work-card:hover,.service:hover,.process-card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(255,255,255,.22)!important;
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.30),
+    0 0 38px var(--glow-purple),
+    inset 0 1px 0 rgba(255,255,255,.20)!important;
+}
+button:hover,.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.24),
+    0 0 24px var(--glow-cyan),
+    inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+/* Gradient text glow for major headings */
+h1,h2{
+  text-shadow:0 0 34px rgba(139,92,246,.12);
+}
+
+/* Glowing accent links */
+a:hover{
+  text-shadow:0 0 18px rgba(34,211,238,.30);
+}
+
+/* Image cinematic glow */
+img:hover{
+  filter:saturate(1.06) brightness(1.035);
+}
+
+/* Floating decorative particles */
+.ambient-particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.ambient-particles i{
+  position:absolute;
+  width:3px;height:3px;
+  border-radius:50%;
+  background:rgba(255,255,255,.5);
+  box-shadow:0 0 12px rgba(255,255,255,.55);
+  animation:particleFloat linear infinite;
+}
+@keyframes particleFloat{
+  from{transform:translate3d(0,110vh,0);opacity:0}
+  12%{opacity:.65}
+  85%{opacity:.35}
+  to{transform:translate3d(40px,-15vh,0);opacity:0}
+}
+
+/* Aurora ribbon */
+.aurora-glow{
+  position:fixed;
+  width:55vw;height:18vw;
+  left:22%;top:42%;
+  pointer-events:none;
+  z-index:0;
+  opacity:.14;
+  filter:blur(70px);
+  background:linear-gradient(90deg,transparent,#8b5cf6,#22d3ee,#f472b6,transparent);
+  transform:rotate(-12deg);
+  animation:aurora 12s ease-in-out infinite alternate;
+}
+@keyframes aurora{
+  from{transform:translateX(-8%) rotate(-12deg) scale(.9)}
+  to{transform:translateX(8%) rotate(-7deg) scale(1.1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .glass::before,.card::before,.project::before,.work-card::before,.service::before,.process-card::before,
+  .ambient-particles i,.aurora-glow,body::after{animation:none!important}
+}
+</style>
 </head>
 <body>
+
+<div class="aurora-glow" aria-hidden="true"></div>
+<div class="ambient-particles" aria-hidden="true">
+  <i style="left:8%;animation-duration:13s;animation-delay:-4s"></i>
+  <i style="left:19%;animation-duration:18s;animation-delay:-11s"></i>
+  <i style="left:31%;animation-duration:15s;animation-delay:-7s"></i>
+  <i style="left:46%;animation-duration:21s;animation-delay:-14s"></i>
+  <i style="left:61%;animation-duration:16s;animation-delay:-3s"></i>
+  <i style="left:74%;animation-duration:19s;animation-delay:-12s"></i>
+  <i style="left:88%;animation-duration:14s;animation-delay:-8s"></i>
+</div>
+<div class="cursor-glow" aria-hidden="true"></div>
+
 <nav>
   <a class="logo" href="#top">YUJIN.</a>
   <div class="navlinks">
@@ -246,6 +450,22 @@ loadPublishedConfig();
 window.addEventListener("message",e=>{
   if(e.data?.type==="YUJIN_PREVIEW") yujinApply(yujinMerge(YUJIN_DEFAULT,e.data.config));
 });
+</script>
+
+
+<script>
+(function(){
+  const glow=document.querySelector('.cursor-glow');
+  if(!glow || !window.matchMedia('(pointer:fine)').matches) return;
+  let tx=innerWidth/2,ty=innerHeight/2,x=tx,y=ty;
+  addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY});
+  function tick(){
+    x+=(tx-x)*.12;y+=(ty-y)*.12;
+    glow.style.left=x+'px';glow.style.top=y+'px';
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
 </script>
 
 </body>
