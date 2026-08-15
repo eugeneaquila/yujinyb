@@ -270,7 +270,19 @@ img:hover{
 .editor-section-anchor{scroll-margin-top:100px}
 </style>
 
-</head><body>
+<style id="editor-edit-feedback">
+.field input.edited,.field textarea.edited{
+  border-color:rgba(139,92,246,.9)!important;
+  box-shadow:0 0 0 3px rgba(139,92,246,.12),0 0 22px rgba(139,92,246,.12);
+}
+.field input,.field textarea{font-size:14px!important;min-height:44px}
+.field textarea{min-height:100px!important}
+.editor-help{
+  margin:10px 0 14px;padding:11px 13px;border-radius:13px;
+  background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);
+  color:#bdb8d7;font-size:12px;line-height:1.45
+}
+</style></head><body>
 
 <div id="sectionQuickNav" aria-label="Jump to section">
   <button type="button" data-jump="identity">Identity</button>
@@ -315,15 +327,42 @@ img:hover{
 const KEY="yujinPortfolioVisualConfig";
 const D={nav:{logo:"YUJIN.",cta:"Let's talk ↗"},hero:{eyebrow:"Motion Designer · MV Animator · Compositor",title:"I make motion feel alive.",description:"I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.",primary:"View selected work ↗",primaryLink:"#work",secondary:"Start a project",secondaryLink:"#contact",noteTitle:"Yujin — Visual Creator",noteText:"Focused on motion design, MV production, anime compositing and creator-focused visuals. Available for remote projects worldwide."},reel:{title:"Selected motion.",desc:"Replace this visual with your latest reel, then let the work do the talking.",label:"SHOWREEL 2024 — 2026",url:""},work:{title:"Things I've made.",desc:"A curated selection is stronger than a giant archive. Lead with your best work.",items:[{tag:"MV · Motion Design",title:"Music Visual",description:"Music-driven motion design and cinematic visual treatment.",image:"",url:"#contact",youtube:""},{tag:"VTuber · Promotional",title:"Debut Trailer",description:"Character-focused promotional animation for VTuber launches.",image:"",url:"#contact",youtube:""},{tag:"Anime · Compositing",title:"Post-Shiage",description:"Anime compositing, effects, lighting and final visual polish.",image:"",url:"#contact",youtube:""},{tag:"Music · Visualizer",title:"Visual Experience",description:"Atmospheric visualizer work built around rhythm, light and movement.",image:"",url:"#contact",youtube:""}]},case:{title:"Show the thinking.",desc:"The next version of your portfolio should prove not only what you made, but what you contributed.",cards:[{kicker:"01 — The brief",title:"Turn a song into a visual identity.",text:"Start with the artist's concept, references and music. Define the visual language before opening After Effects."},{kicker:"02 — The craft",title:"Animation → effects → compositing.",text:"Break down your contribution: camera movement, typography, FX, transitions, lighting, color and final polish."}]},services:{title:"What I do.",desc:"Focused services built around motion, music and character-driven visuals.",items:["Motion Design","MV Production","VTuber Visuals","Anime Compositing","Video Editing"]},process:{title:"Simple. Clear. Collaborative.",items:[{title:"Brief",text:"Goals, references, assets, music and timeline."},{title:"Direction",text:"Visual concept, mood and motion language."},{title:"Production",text:"Animation, compositing, editing and polish."},{title:"Delivery",text:"Final exports, revisions and organized files."}]},about:{title:"Meet Yujin.",text:"I'm a motion designer and visual creator obsessed with <em>movement, atmosphere and music.</em><br><br>I turn static artwork and ideas into visuals that feel cinematic, energetic and alive.",facts:[["Specialization","Anime · VTuber · Music"],["Core tools","After Effects · Premiere"],["Based in","Indonesia"],["Availability","Remote · Worldwide"]]},contact:{title:"Have a project in mind?",desc:"Tell me what you're creating, what you need, and when you need it.",email:"hello@yujinyb.com",primary:"Start a project",instagram:"Instagram ↗",instagramUrl:"https://www.instagram.com/yujinaquila/"},footer:{name:"Yujin",tag:"Motion Designer · Visual Creator"},theme:{bg:"#09090b",panel:"#111114",text:"#f5f5f5",muted:"#a1a1aa",accent:"#ffffff",accentText:"#09090b",radius:22,sectionSpace:110,maxWidth:1180,heroScale:9}};
 function merge(a,b){const o=structuredClone(a);const m=(x,y)=>Object.keys(y||{}).forEach(k=>{if(y[k]&&typeof y[k]=="object"&&!Array.isArray(y[k])&&x[k]&&typeof x[k]=="object"&&!Array.isArray(x[k]))m(x[k],y[k]);else x[k]=y[k]});m(o,b);return o}
-let c=merge(D,JSON.parse(localStorage.getItem(KEY)||"null"));
+let c;
+try{
+  const saved=localStorage.getItem(KEY);
+  c=merge(D,saved?JSON.parse(saved):null);
+}catch(err){
+  console.warn("Invalid saved editor data. Restoring defaults.",err);
+  localStorage.removeItem(KEY);
+  c=structuredClone(D);
+}
 let currentUser=null;
 let firebaseReady=false;
 let remoteDraft=null;
 let remotePublished=null;
 const $=s=>document.querySelector(s), esc=s=>String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-function get(path){return path.split(".").reduce((o,k)=>o[k],c)}
-function set(path,v){let o=c,p=path.split(".");p.slice(0,-1).forEach(k=>o=o[k]);o[p.at(-1)]=v}
-function F(path,label,type="text"){let v=get(path);return `<div class="field"><label>${label}</label>${type=="textarea"?`<textarea data-p="${path}">${esc(v)}</textarea>`:type=="color"?`<div class="color"><input data-p="${path}" value="${esc(v)}"><input type="color" data-c="${path}" value="${esc(v)}"></div>`:`<input data-p="${path}" type="${type}" value="${esc(v)}">`}</div>`}
+function get(path){
+  return path.split(".").reduce((o,k)=>o==null?undefined:o[k],c);
+}
+function set(path,v){
+  let o=c,p=path.split(".");
+  p.slice(0,-1).forEach(k=>{
+    if(!o[k] || typeof o[k]!=="object") o[k]={};
+    o=o[k];
+  });
+  o[p.at(-1)]=v;
+}
+function F(path,label,type="text"){
+  let v=get(path);
+  if(v==null)v="";
+  return `<div class="field"><label>${label}</label>${
+    type=="textarea"
+      ? `<textarea data-p="${path}" placeholder="Enter ${esc(label.toLowerCase())}">${esc(v)}</textarea>`
+      : type=="color"
+        ? `<div class="color"><input data-p="${path}" value="${esc(v)}"><input type="color" data-c="${path}" value="${esc(v||"#ffffff")}"></div>`
+        : `<input data-p="${path}" type="${type}" value="${esc(v)}" placeholder="Enter ${esc(label.toLowerCase())}">`
+  }</div>`;
+}
 function G(title,html,open=false){return `<div class="group"><button class="group-title">${title}<span>${open?"−":"+"}</span></button><div class="group-content" style="display:${open?"block":"none"}">${html}</div></div>`}
 function render(){
 let x="";
@@ -337,15 +376,41 @@ x+=G("Process",F("process.title","Title")+c.process.items.map((v,i)=>G("Step "+(
 x+=G("About",F("about.title","Title")+F("about.text","Body (HTML emphasis supported)","textarea")+c.about.facts.map((v,i)=>G("Fact "+(i+1),F(`about.facts.${i}.0`,"Label")+F(`about.facts.${i}.1`,"Value"),i==0)).join(""));
 x+=G("Contact",F("contact.title","Title")+F("contact.desc","Description","textarea")+F("contact.email","Email")+F("contact.primary","CTA")+F("contact.instagram","Instagram button")+F("contact.instagramUrl","Instagram URL"));
 x+=G("Footer",F("footer.name","Name")+F("footer.tag","Tagline"));
-$("#content").innerHTML=x;
+$("#content").innerHTML=`<div class="editor-help">Tap a section to open it, then type directly into any field. Changes update the live preview automatically. Use <b>Save Draft</b> to store them in Firestore.</div>`+x;
 $("#design").innerHTML=G("Colors",F("theme.bg","Background","color")+F("theme.panel","Cards","color")+F("theme.text","Text","color")+F("theme.muted","Muted","color")+F("theme.accent","Accent","color")+F("theme.accentText","Accent text","color"),true)+G("Layout",F("theme.radius","Card radius","number")+F("theme.sectionSpace","Section spacing","number")+F("theme.maxWidth","Content width","number")+F("theme.heroScale","Hero scale","number"));
 $("#sections").innerHTML=G("Visibility","<p class='hint'>The current portfolio has Hero, Showreel, Work, Case Study, Services, Process, About and Contact sections. This editor preserves that exact design while making its content and styling editable.</p>",true);
 bind();
 }
 function bind(){
-document.querySelectorAll("[data-p]").forEach(e=>e.addEventListener("input",()=>{set(e.dataset.p,e.type=="number"?Number(e.value):e.value);preview()}));
-document.querySelectorAll("[data-c]").forEach(e=>e.addEventListener("input",()=>{set(e.dataset.c,e.value);const t=document.querySelector(`[data-p="${e.dataset.c}"]`);if(t)t.value=e.value;preview()}));
-document.querySelectorAll(".group-title").forEach(b=>b.onclick=()=>{let q=b.nextElementSibling;q.style.display=q.style.display=="none"?"block":"none";b.querySelector("span").textContent=q.style.display=="none"?"+":"−"});
+  document.querySelectorAll("[data-p]").forEach(e=>{
+    const handler=()=>{
+      let value=e.type==="number"?Number(e.value):e.value;
+      set(e.dataset.p,value);
+      saveLocal();
+      preview();
+      e.classList.add("edited");
+      clearTimeout(e._editedTimer);
+      e._editedTimer=setTimeout(()=>e.classList.remove("edited"),450);
+      status("Editing — preview updated");
+    };
+    e.addEventListener("input",handler);
+    e.addEventListener("change",handler);
+  });
+  document.querySelectorAll("[data-c]").forEach(e=>{
+    const handler=()=>{
+      set(e.dataset.c,e.value);
+      const target=document.querySelector(`[data-p="${e.dataset.c}"]`);
+      if(target)target.value=e.value;
+      saveLocal();preview();
+    };
+    e.addEventListener("input",handler);
+    e.addEventListener("change",handler);
+  });
+  document.querySelectorAll(".group-title").forEach(b=>b.onclick=()=>{
+    const q=b.nextElementSibling;
+    q.style.display=q.style.display==="none"?"block":"none";
+    b.querySelector("span").textContent=q.style.display==="none"?"+":"−";
+  });
 }
 let timer;
 function saveLocal(){localStorage.setItem(KEY,JSON.stringify(c));}
@@ -594,6 +659,9 @@ render();
     prepare();
     const el=document.getElementById("section-"+key);
     if(el){
+      const title=el.querySelector(".group-title");
+      const body=el.querySelector(".group-content");
+      if(body && getComputedStyle(body).display==="none" && title) title.click();
       el.scrollIntoView({behavior:"smooth",block:"start"});
       history.replaceState(null,"","#section-"+key);
     }
