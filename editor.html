@@ -32,11 +32,6 @@
   overflow:auto;
   pointer-events:auto;
 }
-body.auth-locked{overflow:hidden}
-body.auth-locked > *:not(#authModal){
-  pointer-events:none;
-}
-
 </style><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -459,12 +454,10 @@ async function loadRemote(){
 }
 function openAuth(){
   $("#authModal").classList.add("show");
-  document.body.classList.add("auth-locked");
   $("#authEmailInput").focus();
 }
 function closeAuth(){
   $("#authModal").classList.remove("show");
-  document.body.classList.remove("auth-locked");
 }
 $("#authModal").addEventListener("mousedown",e=>{
   // Keep the modal blocking; clicking the backdrop never closes it.
@@ -554,8 +547,7 @@ window.YUJIN_FIREBASE.onAuthStateChanged(window.YUJIN_FIREBASE.auth,async user=>
       $("#authEmail").textContent="Unauthorized account";
       $("#signIn").style.display="block";
       $("#signOut").style.display="none";
-      setPublishState("This Google account is not authorized.");
-      openAuth();
+      setPublishState("This Google account is not authorized. You can keep editing locally.");
       return;
     }
 
@@ -563,7 +555,6 @@ window.YUJIN_FIREBASE.onAuthStateChanged(window.YUJIN_FIREBASE.auth,async user=>
     $("#signIn").style.display="none";
     $("#signOut").style.display="block";
     $("#authModal").classList.remove("show");
-    document.body.classList.remove("auth-locked");
     setPublishState("Signed in as "+(user.email||"admin")+" — loading portfolio…");
 
     try{
@@ -577,8 +568,7 @@ window.YUJIN_FIREBASE.onAuthStateChanged(window.YUJIN_FIREBASE.auth,async user=>
     $("#authEmail").textContent="Not signed in";
     $("#signIn").style.display="block";
     $("#signOut").style.display="none";
-    setPublishState("Sign in to save and publish with Firebase.");
-    openAuth();
+    setPublishState("Editing locally. Sign in to save and publish with Firebase.");
   }
 });
 render();
