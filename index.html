@@ -275,6 +275,10 @@
   .accordion summary::after{content:'+';font-family:'IBM Plex Mono',monospace;color:var(--accent-moon);font-size:1.2rem;}
   .accordion details[open] summary::after{content:'–';}
   .accordion p{color:var(--text-muted);padding-bottom:1.5rem;max-width:60ch;font-size:.92rem;}
+  .accordion ul{color:var(--text-muted);padding-bottom:1.5rem;max-width:60ch;font-size:.92rem;padding-left:1.1rem;}
+  .accordion ul li{list-style:disc;margin-bottom:.5rem;line-height:1.55;}
+  .accordion ul li:last-child{margin-bottom:0;}
+  .tos-intro{color:var(--text-muted);max-width:66ch;margin:-1.5rem 0 2.5rem;font-size:.98rem;}
 
   /* ---------- contact ---------- */
   .contact{background:var(--bg-panel);}
@@ -428,27 +432,57 @@
 <section id="tos" class="tos">
   <div class="section-inner">
     <h2 class="section-title" data-i18n="tos_title">Terms of Service</h2>
-    <p class="tos-flag">Draft placeholder — swap in your real terms before publishing</p>
+    <p class="tos-intro">By commissioning me, you agree to the following terms of service! Failure to follow said TOS will result in a block &amp; you will no longer be able to commission me for future projects.</p>
     <div class="accordion">
       <details>
-        <summary>Payment &amp; deposits</summary>
-        <p>A non-refundable deposit is required to secure a slot; the remaining balance is due on delivery. Work begins once the deposit is received.</p>
+        <summary>Payments</summary>
+        <ul>
+          <li>Payments are accepted via PayPal, SWIFT, or International Bank Transfer.</li>
+          <li>A 50% deposit is required to secure a project slot. Work will not begin until this is received.</li>
+          <li>All payments are final. Deposits are non-refundable under any circumstances.</li>
+          <li>Chargebacks/disputes are not allowed. If a chargeback occurs, all rights to the work are revoked.</li>
+        </ul>
       </details>
       <details>
         <summary>Revisions</summary>
-        <p>Each package includes a set number of revision rounds. Additional revisions or scope changes outside the original brief are billed separately.</p>
+        <ul>
+          <li>The commission includes a maximum of 2 rounds of revisions.</li>
+          <li>Minor revisions (e.g. text timing, small adjustments) are free.</li>
+          <li>Major revisions (e.g. scene restructuring, new typography, re-compositions) are subject to an additional fee of +50% or more, depending on complexity.</li>
+        </ul>
       </details>
       <details>
-        <summary>Delivery &amp; turnaround</summary>
-        <p>ETAs listed per package are estimates starting from final asset/brief handoff, and may shift depending on current queue and project complexity.</p>
+        <summary>Deadlines &amp; Delays</summary>
+        <ul>
+          <li>Standard delivery timelines will be discussed and agreed upon before starting.</li>
+          <li>Deadlines may be adjusted if the client delays in providing assets, approvals, or payments, or if technical issues arise (render crashes, software/hardware failure).</li>
+          <li>I am not responsible for delays, platform issues (e.g. YouTube takedowns), or damages resulting from usage outside the agreed scope.</li>
+        </ul>
       </details>
       <details>
-        <summary>Usage rights</summary>
-        <p>Finished work is licensed to the client for personal or channel use. Reselling, redistributing, or claiming the raw project files as your own is not permitted without prior agreement.</p>
+        <summary>Rights &amp; Usage</summary>
+        <ul>
+          <li>Unless otherwise specified in writing, I retain copyright over all commissioned works.</li>
+          <li>Clients are granted a license to use the commissioned video for its intended purpose (e.g. YouTube, streaming).</li>
+          <li>Commercial use (e.g. company projects, monetization, ads, branding, merchandise) requires an additional +100% commercial fee.</li>
+          <li>Credit is required wherever the work is used — please credit as: @yujinyb (X/Twitter). Failure to credit may result in a penalty fee of +$100.</li>
+          <li>By default, I may include commissioned works in my portfolio, social media, or promotional use.</li>
+          <li>If you require a strict NDA, this must be agreed upon in advance and may include an additional fee.</li>
+        </ul>
       </details>
       <details>
-        <summary>Cancellations &amp; refunds</summary>
-        <p>Cancelling after work has started forfeits the deposit; any completed milestones may be billed at the applicable partial rate.</p>
+        <summary>Client Responsibility</summary>
+        <ul>
+          <li>The client guarantees that all provided assets (music, illustrations, logos, etc.) are properly licensed and free to use.</li>
+          <li>I am not liable for copyright disputes caused by client-provided materials.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Termination</summary>
+        <ul>
+          <li>If the client cancels after work has begun, there is no refund of the deposit, and additional charges may apply based on progress made.</li>
+          <li>If I cancel the project, a full refund will be issued.</li>
+        </ul>
       </details>
     </div>
   </div>
