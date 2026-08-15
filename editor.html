@@ -242,7 +242,48 @@ img:hover{
   .ambient-particles i,.aurora-glow,body::after{animation:none!important}
 }
 </style>
+
+<style id="editor-section-nav-style">
+#sectionQuickNav{
+  position:sticky;top:12px;z-index:100;
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin:0 0 16px;padding:10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  background:rgba(18,18,22,.68);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 14px 50px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.12);
+}
+#sectionQuickNav button{
+  appearance:none;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.055);color:inherit;
+  border-radius:12px;padding:9px 13px;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:650;
+  transition:.25s ease;
+}
+#sectionQuickNav button:hover,#sectionQuickNav button.active{
+  background:rgba(139,92,246,.18);
+  border-color:rgba(139,92,246,.42);
+  box-shadow:0 0 22px rgba(139,92,246,.2);
+  transform:translateY(-1px);
+}
+.editor-section-anchor{scroll-margin-top:100px}
+</style>
+
 </head><body>
+
+<div id="sectionQuickNav" aria-label="Jump to section">
+  <button type="button" data-jump="identity">Identity</button>
+  <button type="button" data-jump="hero">Hero</button>
+  <button type="button" data-jump="about">About</button>
+  <button type="button" data-jump="work">Works</button>
+  <button type="button" data-jump="services">Services</button>
+  <button type="button" data-jump="process">Process</button>
+  <button type="button" data-jump="reel">Showreel</button>
+  <button type="button" data-jump="contact">Contact</button>
+  <button type="button" data-jump="appearance">Appearance</button>
+</div>
+
 
 <div class="aurora-glow" aria-hidden="true"></div>
 <div class="ambient-particles" aria-hidden="true">
@@ -512,6 +553,64 @@ render();
     requestAnimationFrame(tick);
   }
   tick();
+})();
+</script>
+
+
+<script id="editor-section-nav-script">
+(function(){
+  const aliases={
+    identity:["Identity","Profile"],
+    hero:["Hero"],
+    about:["About"],
+    work:["Work","Works","Projects"],
+    services:["Services"],
+    process:["Process"],
+    reel:["Showreel","Reel"],
+    contact:["Contact"],
+    appearance:["Appearance","Style","Design"]
+  };
+
+  function findGroup(key){
+    const names=aliases[key]||[];
+    const groups=[...document.querySelectorAll(".group,.editor-group,.panel,section")];
+    return groups.find(el=>{
+      const text=(el.innerText||"").trim().slice(0,180).toLowerCase();
+      return names.some(n=>text.includes(n.toLowerCase()));
+    });
+  }
+
+  function prepare(){
+    Object.keys(aliases).forEach(key=>{
+      const el=findGroup(key);
+      if(el){
+        el.classList.add("editor-section-anchor");
+        el.id="section-"+key;
+      }
+    });
+  }
+
+  function jump(key){
+    prepare();
+    const el=document.getElementById("section-"+key);
+    if(el){
+      el.scrollIntoView({behavior:"smooth",block:"start"});
+      history.replaceState(null,"","#section-"+key);
+    }
+  }
+
+  document.querySelectorAll("#sectionQuickNav [data-jump]").forEach(btn=>{
+    btn.addEventListener("click",()=>jump(btn.dataset.jump));
+  });
+
+  const observer=new MutationObserver(prepare);
+  observer.observe(document.body,{childList:true,subtree:true});
+  prepare();
+
+  window.addEventListener("hashchange",()=>{
+    const key=location.hash.replace("#section-","");
+    if(key) setTimeout(()=>jump(key),50);
+  });
 })();
 </script>
 

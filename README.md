@@ -59,3 +59,12 @@ The editor now supports:
 - Click-to-preview YouTube videos in a glassmorphism modal
 - Showreel YouTube preview
 - Image URLs without Firebase Storage
+
+
+## Quick section navigation
+
+The editor now has a sticky quick-navigation bar with direct buttons for:
+
+Identity, Hero, About, Works, Services, Process, Showreel, Contact, and Appearance.
+
+Clicking a button smoothly scrolls directly to that section.
