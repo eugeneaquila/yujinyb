@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09090b">
+<meta name="description" content="Yujin — Motion Designer & Visual Creator specializing in anime-inspired motion, music visuals, VTuber content and compositing.">
+<title>Yujin — Motion Designer & Visual Creator</title>
+<style>
+:root{
+  --panel:#111114;--accentText:#09090b;--heroGlow:rgba(255,255,255,.12);
+  --bg:#09090b;--panel:#111114;--panel2:#17171b;--text:#f5f5f5;--muted:#a1a1aa;
+  --line:rgba(255,255,255,.10);--accent:#fff;--max:1180px;--radius:22px;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+a{color:inherit;text-decoration:none} button{font:inherit}
+.container{width:min(calc(100% - 40px),var(--max));margin:auto}
+nav{position:fixed;z-index:50;top:16px;left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),1080px);display:flex;align-items:center;justify-content:space-between;padding:12px 14px 12px 18px;background:rgba(12,12,15,.72);border:1px solid var(--line);border-radius:999px;backdrop-filter:blur(18px)}
+.logo{font-weight:800;letter-spacing:-.04em}.navlinks{display:flex;gap:6px}.navlinks a{font-size:13px;color:#b9b9c0;padding:8px 12px;border-radius:999px}.navlinks a:hover{background:#fff;color:#09090b}
+.nav-cta{background:#fff;color:#09090b;padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700}
+.hero{min-height:100vh;display:grid;place-items:center;padding:150px 0 80px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;width:680px;height:680px;right:-250px;top:-180px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 65%);filter:blur(20px)}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:70px;align-items:end}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:#8d8d96;margin-bottom:22px}
+h1{font-size:clamp(58px,9vw,128px);line-height:.84;letter-spacing:-.075em;margin:0;max-width:850px}
+.hero-copy{font-size:clamp(18px,2vw,24px);color:#c9c9ce;max-width:650px;margin:30px 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 19px;border-radius:999px;border:1px solid var(--line);font-weight:700;font-size:14px}.btn.primary{background:#fff;color:#09090b;border-color:#fff}.btn:hover{transform:translateY(-2px)}
+.hero-note{border-left:1px solid var(--line);padding-left:25px;color:#a8a8b0}.hero-note strong{display:block;color:#fff;font-size:14px;margin-bottom:8px}
+section{padding:110px 0;border-top:1px solid var(--line)}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:45px}.kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#85858e}.section-title{font-size:clamp(34px,5vw,64px);letter-spacing:-.06em;line-height:.95;margin:10px 0 0}.section-desc{max-width:430px;color:var(--muted);font-size:15px}
+.reel{aspect-ratio:16/8;background:linear-gradient(135deg,#19191e,#09090b);border:1px solid var(--line);border-radius:28px;display:grid;place-items:center;position:relative;overflow:hidden;cursor:pointer}
+.reel:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.16),transparent 28%),linear-gradient(120deg,transparent 35%,rgba(255,255,255,.05),transparent 65%)}
+.play{width:82px;height:82px;border:1px solid rgba(255,255,255,.35);border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);z-index:1;font-size:22px;padding-left:4px}
+.reel-label{position:absolute;bottom:20px;left:22px;z-index:2;font-size:12px;color:#aaa}
+.work-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.work{min-height:390px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:20px;display:flex;flex-direction:column;justify-content:end;overflow:hidden;position:relative;transition:.25s}
+.work:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.25)}
+.work-visual{position:absolute;inset:0;background:
+radial-gradient(circle at 25% 25%,rgba(255,255,255,.18),transparent 25%),
+linear-gradient(135deg,#22222a 0%,#0d0d10 55%,#1b1b21 100%)}
+.work:nth-child(2) .work-visual{background:radial-gradient(circle at 70% 30%,rgba(255,255,255,.2),transparent 22%),linear-gradient(150deg,#101014,#292930)}
+.work:nth-child(3) .work-visual{background:linear-gradient(125deg,#27272c,#101013 60%,#222227)}
+.work:nth-child(4) .work-visual{background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.15),transparent 25%),linear-gradient(145deg,#19191e,#09090b)}
+.work-info{position:relative;z-index:2;background:linear-gradient(transparent,rgba(0,0,0,.82));margin:0 -20px -20px;padding:70px 20px 20px}
+.work-tag{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#aaa}.work h3{margin:7px 0 0;font-size:28px;letter-spacing:-.04em}
+.case{display:grid;grid-template-columns:1fr 1fr;gap:20px}.case-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:30px}.case-card h3{font-size:24px;margin:0 0 12px}.case-card p{color:var(--muted);margin:0}.process{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.step{border-top:1px solid var(--line);padding-top:18px}.step b{font-size:12px;color:#777}.step h3{margin:10px 0 7px}.step p{color:var(--muted);font-size:14px}
+.services{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.service{padding:24px;border-right:1px solid var(--line);min-height:180px}.service:last-child{border-right:0}.service span{font-size:11px;color:#777}.service h3{font-size:19px;margin-top:48px;letter-spacing:-.03em}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px}.about-text{font-size:clamp(25px,3vw,40px);line-height:1.1;letter-spacing:-.04em}.about-text em{font-style:normal;color:#777}.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}.fact{background:var(--bg);padding:22px}.fact small{display:block;color:#777;margin-bottom:8px}.fact strong{font-size:16px}
+.contact{padding:130px 0 80px;text-align:center}.contact h2{font-size:clamp(52px,9vw,120px);letter-spacing:-.075em;line-height:.82;margin:0 auto 35px}.contact p{color:var(--muted);margin:0 auto 28px}.contact-email{font-size:clamp(18px,3vw,30px);font-weight:700;border-bottom:1px solid #777;padding-bottom:5px}
+footer{padding:25px 0 40px;color:#777;font-size:12px;display:flex;justify-content:space-between;border-top:1px solid var(--line)}
+.reveal{opacity:0;transform:translateY(20px);transition:.7s ease}.reveal.visible{opacity:1;transform:none}
+@media(max-width:850px){
+ .container{width:min(calc(100% - 28px),var(--max))}.navlinks{display:none}
+ .hero{padding-top:130px}.hero-grid,.about-grid,.case{grid-template-columns:1fr;gap:35px}.hero-note{margin-top:10px}
+ .work-grid{grid-template-columns:1fr}.work{min-height:330px}.services{grid-template-columns:1fr 1fr}.service{border-right:0;border-bottom:1px solid var(--line)}.service:nth-child(odd){border-right:1px solid var(--line)}.service:last-child{border-bottom:0}.process{grid-template-columns:1fr 1fr}
+ .section-head{display:block}.section-desc{margin-top:20px}
+}
+@media(max-width:520px){section{padding:80px 0}.hero{min-height:auto;padding-bottom:90px}h1{font-size:62px}.services{grid-template-columns:1fr}.service,.service:nth-child(odd){border-right:0}.process{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.contact h2{font-size:64px}footer{display:block}footer span{display:block;margin-top:8px}}
+</style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+import { firebaseConfig } from "./firebase-config.js";
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+window.YUJIN_FIREBASE = { firebaseApp, db, doc, getDoc };
+</script>
+<style>
+/* Ambient Light + Glassmorphism */
+:root{
+  --ambient-1: rgba(117,88,255,.22);
+  --ambient-2: rgba(0,214,255,.14);
+  --ambient-3: rgba(255,104,183,.11);
+  --glass-blur: 22px;
+}
+body{
+  position:relative;
+  isolation:isolate;
+  background:
+    radial-gradient(700px 500px at 8% 4%,var(--ambient-1),transparent 68%),
+    radial-gradient(650px 520px at 92% 14%,var(--ambient-2),transparent 66%),
+    radial-gradient(700px 600px at 50% 88%,var(--ambient-3),transparent 70%),
+    #08080a;
+}
+body::before,body::after{
+  content:"";
+  position:fixed;
+  pointer-events:none;
+  z-index:-1;
+  border-radius:999px;
+  filter:blur(90px);
+  opacity:.65;
+  mix-blend-mode:screen;
+  animation:ambientFloat 16s ease-in-out infinite alternate;
+}
+body::before{
+  width:420px;height:420px;left:-130px;top:18%;
+  background:rgba(130,105,255,.16);
+}
+body::after{
+  width:520px;height:520px;right:-190px;bottom:5%;
+  background:rgba(0,210,255,.11);
+  animation-delay:-6s;
+}
+@keyframes ambientFloat{
+  from{transform:translate3d(0,0,0) scale(1)}
+  to{transform:translate3d(35px,-25px,0) scale(1.12)}
+}
+.glass,nav,header,.card,.project,.work-card,.service,.process-card,
+.modal-card,.panel,.sidebar,.toolbar,footer{
+  background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.025)) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  box-shadow:0 18px 60px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.18) !important;
+  backdrop-filter:blur(var(--glass-blur)) saturate(135%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(135%);
+}
+button,.btn{
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 30px rgba(0,0,0,.18);
+}
+::selection{background:rgba(150,125,255,.32);color:#fff}
+@media(prefers-reduced-motion:reduce){
+  body::before,body::after{animation:none}
+}
+</style>
+<style>
+/* Advanced ambient glow + interaction effects */
+:root{
+  --glow-purple: rgba(139,92,246,.42);
+  --glow-cyan: rgba(34,211,238,.30);
+  --glow-pink: rgba(244,114,182,.25);
+  --glow-white: rgba(255,255,255,.12);
+}
+body::marker{display:none}
+body::after{
+  animation:ambientFloat 16s ease-in-out infinite alternate, ambientPulse 7s ease-in-out infinite;
+}
+@keyframes ambientPulse{
+  0%,100%{opacity:.45}
+  50%{opacity:.82}
+}
+/* Cursor-following light */
+body .cursor-glow{
+  position:fixed;
+  width:420px;height:420px;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(139,92,246,.13) 0%,rgba(34,211,238,.06) 28%,transparent 68%);
+  filter:blur(18px);
+  mix-blend-mode:screen;
+  opacity:0;
+  transition:opacity .35s ease;
+}
+body:hover .cursor-glow{opacity:1}
+
+/* Shimmer on glass */
+.glass,.card,.project,.work-card,.service,.process-card,.modal-card,.panel,.sidebar,footer{
+  position:relative;
+  overflow:hidden;
+}
+.glass::before,.card::before,.project::before,.work-card::before,.service::before,.process-card::before,.panel::before{
+  content:"";
+  position:absolute;
+  inset:-120% 35%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.075),transparent);
+  transform:rotate(18deg) translateX(-80%);
+  pointer-events:none;
+  animation:glassShimmer 9s ease-in-out infinite;
+}
+@keyframes glassShimmer{
+  0%,55%{transform:rotate(18deg) translateX(-90%)}
+  72%,100%{transform:rotate(18deg) translateX(220%)}
+}
+
+/* Elevated hover glow */
+.card,.project,.work-card,.service,.process-card,button,.btn{
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease,background .35s ease;
+}
+.card:hover,.project:hover,.work-card:hover,.service:hover,.process-card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(255,255,255,.22)!important;
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.30),
+    0 0 38px var(--glow-purple),
+    inset 0 1px 0 rgba(255,255,255,.20)!important;
+}
+button:hover,.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.24),
+    0 0 24px var(--glow-cyan),
+    inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+/* Gradient text glow for major headings */
+h1,h2{
+  text-shadow:0 0 34px rgba(139,92,246,.12);
+}
+
+/* Glowing accent links */
+a:hover{
+  text-shadow:0 0 18px rgba(34,211,238,.30);
+}
+
+/* Image cinematic glow */
+img:hover{
+  filter:saturate(1.06) brightness(1.035);
+}
+
+/* Floating decorative particles */
+.ambient-particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.ambient-particles i{
+  position:absolute;
+  width:3px;height:3px;
+  border-radius:50%;
+  background:rgba(255,255,255,.5);
+  box-shadow:0 0 12px rgba(255,255,255,.55);
+  animation:particleFloat linear infinite;
+}
+@keyframes particleFloat{
+  from{transform:translate3d(0,110vh,0);opacity:0}
+  12%{opacity:.65}
+  85%{opacity:.35}
+  to{transform:translate3d(40px,-15vh,0);opacity:0}
+}
+
+/* Aurora ribbon */
+.aurora-glow{
+  position:fixed;
+  width:55vw;height:18vw;
+  left:22%;top:42%;
+  pointer-events:none;
+  z-index:0;
+  opacity:.14;
+  filter:blur(70px);
+  background:linear-gradient(90deg,transparent,#8b5cf6,#22d3ee,#f472b6,transparent);
+  transform:rotate(-12deg);
+  animation:aurora 12s ease-in-out infinite alternate;
+}
+@keyframes aurora{
+  from{transform:translateX(-8%) rotate(-12deg) scale(.9)}
+  to{transform:translateX(8%) rotate(-7deg) scale(1.1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .glass::before,.card::before,.project::before,.work-card::before,.service::before,.process-card::before,
+  .ambient-particles i,.aurora-glow,body::after{animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="aurora-glow" aria-hidden="true"></div>
+<div class="ambient-particles" aria-hidden="true">
+  <i style="left:8%;animation-duration:13s;animation-delay:-4s"></i>
+  <i style="left:19%;animation-duration:18s;animation-delay:-11s"></i>
+  <i style="left:31%;animation-duration:15s;animation-delay:-7s"></i>
+  <i style="left:46%;animation-duration:21s;animation-delay:-14s"></i>
+  <i style="left:61%;animation-duration:16s;animation-delay:-3s"></i>
+  <i style="left:74%;animation-duration:19s;animation-delay:-12s"></i>
+  <i style="left:88%;animation-duration:14s;animation-delay:-8s"></i>
+</div>
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<nav>
+  <a class="logo" href="#top">YUJIN.</a>
+  <div class="navlinks">
+    <a href="#work">Work</a><a href="#services">Services</a><a href="#about">About</a><a href="#process">Process</a>
+  </div>
+  <a class="nav-cta" href="#contact">Let's talk ↗</a>
+</nav>
+
+<main id="top">
+<section class="hero">
+ <div class="container hero-grid reveal">
+  <div>
+   <div class="eyebrow">Motion Designer · MV Animator · Compositor</div>
+   <h1>I make motion feel alive.</h1>
+   <p class="hero-copy">I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.</p>
+   <div class="actions"><a class="btn primary" href="#work">View selected work ↗</a><a class="btn" href="#contact">Start a project</a></div>
+  </div>
+  <div class="hero-note"><strong>Yujin — Visual Creator</strong>Focused on motion design, MV production, anime compositing and creator-focused visuals. Available for remote projects worldwide.</div>
+ </div>
+</section>
+
+<section id="reel">
+ <div class="container reveal">
+  <div class="section-head"><div><div class="kicker">01 / Showreel</div><h2 class="section-title">Selected motion.</h2></div><p class="section-desc">Replace this visual with your latest reel, then let the work do the talking.</p></div>
+  <div class="reel" onclick="alert('Connect this area to your showreel video or YouTube/Vimeo embed.')"><div class="play">▶</div><div class="reel-label">SHOWREEL 2024 — 2026</div></div>
+ </div>
+</section>
+
+<section id="work">
+ <div class="container reveal">
+  <div class="section-head"><div><div class="kicker">02 / Selected work</div><h2 class="section-title">Things I've made.</h2></div><p class="section-desc">A curated selection is stronger than a giant archive. Lead with your best work.</p></div>
+  <div class="work-grid">
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">MV · Motion Design</div><h3>Music Visual</h3></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">VTuber · Promotional</div><h3>Debut Trailer</h3></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">Anime · Compositing</div><h3>Post-Shiage</h3></div></a>
+   <a class="work" href="#contact"><div class="work-visual"></div><div class="work-info"><div class="work-tag">Music · Visualizer</div><h3>Visual Experience</h3></div></a>
+  </div>
+ </div>
+</section>
+
+<section>
+ <div class="container reveal">
+  <div class="section-head"><div><div class="kicker">03 / Case study</div><h2 class="section-title">Show the thinking.</h2></div><p class="section-desc">The next version of your portfolio should prove not only what you made, but what you contributed.</p></div>
+  <div class="case">
+   <div class="case-card"><div class="kicker">01 — The brief</div><h3>Turn a song into a visual identity.</h3><p>Start with the artist's concept, references and music. Define the visual language before opening After Effects.</p></div>
+   <div class="case-card"><div class="kicker">02 — The craft</div><h3>Animation → effects → compositing.</h3><p>Break down your contribution: camera movement, typography, FX, transitions, lighting, color and final polish.</p></div>
+  </div>
+ </div>
+</section>
+
+<section id="services">
+ <div class="container reveal">
+  <div class="section-head"><div><div class="kicker">04 / Services</div><h2 class="section-title">What I do.</h2></div><p class="section-desc">Focused services built around motion, music and character-driven visuals.</p></div>
+  <div class="services">
+   <div class="service"><span>01</span><h3>Motion Design</h3></div>
+   <div class="service"><span>02</span><h3>MV Production</h3></div>
+   <div class="service"><span>03</span><h3>VTuber Visuals</h3></div>
+   <div class="service"><span>04</span><h3>Anime Compositing</h3></div>
+   <div class="service"><span>05</span><h3>Video Editing</h3></div>
+  </div>
+ </div>
+</section>
+
+<section id="process">
+ <div class="container reveal">
+  <div class="section-head"><div><div class="kicker">05 / Process</div><h2 class="section-title">Simple. Clear. Collaborative.</h2></div></div>
+  <div class="process">
+   <div class="step"><b>01</b><h3>Brief</h3><p>Goals, references, assets, music and timeline.</p></div>
+   <div class="step"><b>02</b><h3>Direction</h3><p>Visual concept, mood and motion language.</p></div>
+   <div class="step"><b>03</b><h3>Production</h3><p>Animation, compositing, editing and polish.</p></div>
+   <div class="step"><b>04</b><h3>Delivery</h3><p>Final exports, revisions and organized files.</p></div>
+  </div>
+ </div>
+</section>
+
+<section id="about">
+ <div class="container reveal">
+  <div class="section-head"><div><div class="kicker">06 / About</div><h2 class="section-title">Meet Yujin.</h2></div></div>
+  <div class="about-grid">
+   <div class="about-text">I'm a motion designer and visual creator obsessed with <em>movement, atmosphere and music.</em><br><br>I turn static artwork and ideas into visuals that feel cinematic, energetic and alive.</div>
+   <div class="facts">
+    <div class="fact"><small>Specialization</small><strong>Anime · VTuber · Music</strong></div>
+    <div class="fact"><small>Core tools</small><strong>After Effects · Premiere</strong></div>
+    <div class="fact"><small>Based in</small><strong>Indonesia</strong></div>
+    <div class="fact"><small>Availability</small><strong>Remote · Worldwide</strong></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="contact" id="contact">
+ <div class="container reveal">
+  <div class="kicker">07 / Contact</div>
+  <h2>Have a project in mind?</h2>
+  <p>Tell me what you're creating, what you need, and when you need it.</p>
+  <a class="contact-email" href="mailto:hello@yujinyb.com">hello@yujinyb.com ↗</a>
+  <div class="actions" style="justify-content:center;margin-top:30px"><a class="btn primary" href="mailto:hello@yujinyb.com">Start a project</a><a class="btn" href="https://www.instagram.com/yujinaquila/" target="_blank" rel="noopener">Instagram ↗</a></div>
+ </div>
+</section>
+</main>
+
+<footer class="container"><span>© <span id="year"></span> Yujin. All rights reserved.</span><span>Motion Designer · Visual Creator</span></footer>
+
+<script>
+document.getElementById('year').textContent=new Date().getFullYear();
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+<script>
+const YUJIN_CONFIG_KEY="yujinPortfolioVisualConfig";
+const YUJIN_DEFAULT={
+  nav:{logo:"YUJIN.",cta:"Let's talk ↗"},
+  hero:{eyebrow:"Motion Designer · MV Animator · Compositor",title:"I make motion feel alive.",description:"I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.",primary:"View selected work ↗",primaryLink:"#work",secondary:"Start a project",secondaryLink:"#contact",noteTitle:"Yujin — Visual Creator",noteText:"Focused on motion design, MV production, anime compositing and creator-focused visuals. Available for remote projects worldwide."},
+  reel:{title:"Selected motion.",desc:"Replace this visual with your latest reel, then let the work do the talking.",label:"SHOWREEL 2024 — 2026",url:""},
+  work:{title:"Things I've made.",desc:"A curated selection is stronger than a giant archive. Lead with your best work.",items:[
+    {tag:"MV · Motion Design",title:"Music Visual",image:"",url:"#contact"},
+    {tag:"VTuber · Promotional",title:"Debut Trailer",image:"",url:"#contact"},
+    {tag:"Anime · Compositing",title:"Post-Shiage",image:"",url:"#contact"},
+    {tag:"Music · Visualizer",title:"Visual Experience",image:"",url:"#contact"}]},
+  case:{title:"Show the thinking.",desc:"The next version of your portfolio should prove not only what you made, but what you contributed.",cards:[
+    {kicker:"01 — The brief",title:"Turn a song into a visual identity.",text:"Start with the artist's concept, references and music. Define the visual language before opening After Effects."},
+    {kicker:"02 — The craft",title:"Animation → effects → compositing.",text:"Break down your contribution: camera movement, typography, FX, transitions, lighting, color and final polish."}]},
+  services:{title:"What I do.",desc:"Focused services built around motion, music and character-driven visuals.",items:["Motion Design","MV Production","VTuber Visuals","Anime Compositing","Video Editing"]},
+  process:{title:"Simple. Clear. Collaborative.",items:[
+    {title:"Brief",text:"Goals, references, assets, music and timeline."},{title:"Direction",text:"Visual concept, mood and motion language."},{title:"Production",text:"Animation, compositing, editing and polish."},{title:"Delivery",text:"Final exports, revisions and organized files."}]},
+  about:{title:"Meet Yujin.",text:"I'm a motion designer and visual creator obsessed with <em>movement, atmosphere and music.</em><br><br>I turn static artwork and ideas into visuals that feel cinematic, energetic and alive.",facts:[
+    ["Specialization","Anime · VTuber · Music"],["Core tools","After Effects · Premiere"],["Based in","Indonesia"],["Availability","Remote · Worldwide"]]},
+  contact:{title:"Have a project in mind?",desc:"Tell me what you're creating, what you need, and when you need it.",email:"hello@yujinyb.com",primary:"Start a project",instagram:"Instagram ↗",instagramUrl:"https://www.instagram.com/yujinaquila/"},
+  footer:{name:"Yujin",tag:"Motion Designer · Visual Creator"},
+  theme:{bg:"#09090b",panel:"#111114",text:"#f5f5f5",muted:"#a1a1aa",accent:"#ffffff",accentText:"#09090b",radius:22,sectionSpace:110,maxWidth:1180,heroScale:9}
+};
+function yujinMerge(a,b){const o=structuredClone(a);const m=(x,y)=>Object.keys(y||{}).forEach(k=>{if(y[k]&&typeof y[k]=="object"&&!Array.isArray(y[k])&&x[k]&&typeof x[k]=="object"&&!Array.isArray(x[k]))m(x[k],y[k]);else x[k]=y[k]});m(o,b||{});return o}
+function yujinLoad(){try{return yujinMerge(YUJIN_DEFAULT,JSON.parse(localStorage.getItem(YUJIN_CONFIG_KEY)||"null"))}catch(e){return structuredClone(YUJIN_DEFAULT)}}
+function yujinApply(c){
+ const root=document.documentElement.style;
+ root.setProperty("--bg",c.theme.bg);root.setProperty("--panel",c.theme.panel);root.setProperty("--text",c.theme.text);root.setProperty("--muted",c.theme.muted);root.setProperty("--accent",c.theme.accent);root.setProperty("--accentText",c.theme.accentText);root.setProperty("--radius",c.theme.radius+"px");root.setProperty("--max",c.theme.maxWidth+"px");
+ document.querySelectorAll("section").forEach(s=>s.style.paddingTop=c.theme.sectionSpace+"px");
+ const nav=document.querySelector("nav"); if(nav){nav.querySelector(".logo").textContent=c.nav.logo;nav.querySelector(".nav-cta").textContent=c.nav.cta}
+ const hero=document.querySelector(".hero"); if(hero)hero.querySelector("h1").style.fontSize=`clamp(58px,${c.theme.heroScale}vw,128px)`;
+ const hs=document.querySelector(".hero"); if(hs){const e=hs.querySelector(".eyebrow"),h=hs.querySelector("h1"),p=hs.querySelector(".hero-copy"),links=hs.querySelectorAll(".actions a"),note=hs.querySelector(".hero-note");e.textContent=c.hero.eyebrow;h.innerHTML=c.hero.title;p.innerHTML=c.hero.description;if(links[0]){links[0].textContent=c.hero.primary;links[0].href=c.hero.primaryLink}if(links[1]){links[1].textContent=c.hero.secondary;links[1].href=c.hero.secondaryLink}if(note){note.querySelector("strong").textContent=c.hero.noteTitle;note.lastChild.textContent=c.hero.noteText}}
+ const reel=document.querySelector("#reel"); if(reel){reel.querySelector(".section-title").textContent=c.reel.title;reel.querySelector(".section-desc").textContent=c.reel.desc;reel.querySelector(".reel-label").textContent=c.reel.label;const box=reel.querySelector(".reel");box.onclick=()=>c.reel.url?window.open(c.reel.url,"_blank","noopener"):null}
+ const work=document.querySelector("#work"); if(work){work.querySelector(".section-title").textContent=c.work.title;work.querySelector(".section-desc").textContent=c.work.desc;const cards=work.querySelectorAll(".work");c.work.items.forEach((x,i)=>{if(!cards[i])return;cards[i].querySelector(".work-tag").textContent=x.tag;cards[i].querySelector("h3").textContent=x.title;cards[i].href=x.url||"#";const v=cards[i].querySelector(".work-visual");v.style.backgroundImage=x.image?`url("${x.image}")`:"";v.style.backgroundSize="cover";v.style.backgroundPosition="center"})}
+ const sections=document.querySelectorAll("main>section");
+ const caseSec=sections[2]; if(caseSec){caseSec.querySelector(".section-title").textContent=c.case.title;caseSec.querySelector(".section-desc").textContent=c.case.desc;caseSec.querySelectorAll(".case-card").forEach((card,i)=>{const x=c.case.cards[i];if(!x)return;card.querySelector(".kicker").textContent=x.kicker;card.querySelector("h3").textContent=x.title;card.querySelector("p").textContent=x.text})}
+ const serv=document.querySelector("#services"); if(serv){serv.querySelector(".section-title").textContent=c.services.title;serv.querySelector(".section-desc").textContent=c.services.desc;serv.querySelectorAll(".service h3").forEach((h,i)=>h.textContent=c.services.items[i]||"")}
+ const proc=document.querySelector("#process"); if(proc){proc.querySelector(".section-title").textContent=c.process.title;proc.querySelectorAll(".step").forEach((s,i)=>{const x=c.process.items[i];if(!x)return;s.querySelector("h3").textContent=x.title;s.querySelector("p").textContent=x.text})}
+ const about=document.querySelector("#about");if(about){about.querySelector(".section-title").textContent=c.about.title;about.querySelector(".about-text").innerHTML=c.about.text;about.querySelectorAll(".fact").forEach((f,i)=>{const x=c.about.facts[i];if(x){f.querySelector("small").textContent=x[0];f.querySelector("strong").textContent=x[1]}})}
+ const contact=document.querySelector("#contact");if(contact){contact.querySelector("h2").textContent=c.contact.title;contact.querySelector("p").textContent=c.contact.desc;const email=contact.querySelector(".contact-email");email.textContent=c.contact.email+" ↗";email.href="mailto:"+c.contact.email;const as=contact.querySelectorAll(".actions a");if(as[0]){as[0].textContent=c.contact.primary;as[0].href="mailto:"+c.contact.email}if(as[1]){as[1].textContent=c.contact.instagram;as[1].href=c.contact.instagramUrl}}
+ const footer=document.querySelector("footer");if(footer){footer.children[0].innerHTML=`© <span id="year"></span> ${c.footer.name}. All rights reserved.`;footer.children[1].textContent=c.footer.tag;document.getElementById("year").textContent=new Date().getFullYear()}
+}
+let YUJIN_CONFIG=yujinLoad();
+yujinApply(YUJIN_CONFIG);
+
+async function loadPublishedConfig(){
+  try{
+    if(!window.YUJIN_FIREBASE) return;
+    const snap=await window.YUJIN_FIREBASE.getDoc(
+      window.YUJIN_FIREBASE.doc(window.YUJIN_FIREBASE.db,"sites","portfolio")
+    );
+    if(snap.exists()){
+      const data=snap.data();
+      if(data.publishedConfig){
+        YUJIN_CONFIG=yujinMerge(YUJIN_DEFAULT,data.publishedConfig);
+        yujinApply(YUJIN_CONFIG);
+        try{localStorage.setItem(YUJIN_CONFIG_KEY,JSON.stringify(YUJIN_CONFIG))}catch(e){}
+      }
+    }
+  }catch(err){
+    console.warn("Firebase portfolio config unavailable; using local/default config.",err);
+  }
+}
+loadPublishedConfig();
+
+window.addEventListener("message",e=>{
+  if(e.data?.type==="YUJIN_PREVIEW") yujinApply(yujinMerge(YUJIN_DEFAULT,e.data.config));
+});
+</script>
+
+
+<script>
+(function(){
+  const glow=document.querySelector('.cursor-glow');
+  if(!glow || !window.matchMedia('(pointer:fine)').matches) return;
+  let tx=innerWidth/2,ty=innerHeight/2,x=tx,y=ty;
+  addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY});
+  function tick(){
+    x+=(tx-x)*.12;y+=(ty-y)*.12;
+    glow.style.left=x+'px';glow.style.top=y+'px';
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+</body>
+</html>
