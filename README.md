@@ -49,15 +49,8 @@ Added to both the public portfolio and editor:
 - Live ambient-color and blur controls inside the editor
 
 
-## Advanced effects
+## Authentication state fix
 
-Added a cinematic visual layer:
-- Cursor-following ambient light
-- Aurora ribbon glow
-- Floating light particles
-- Animated glass shimmer
-- Neon hover glow on cards and buttons
-- Elevated glass hover movement
-- Soft heading/accent glow
-- Cinematic image hover treatment
-- Reduced-motion accessibility support
+The editor now waits for Firebase `onAuthStateChanged` before declaring the user signed out.
+After Google or email login succeeds, the editor immediately updates the signed-in UI and
+loads the Firebase draft. Unauthorized accounts are still rejected.

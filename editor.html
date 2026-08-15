@@ -112,155 +112,10 @@ button,.btn{
   body::before,body::after{animation:none}
 }
 </style>
-<style>
-/* Advanced ambient glow + interaction effects */
-:root{
-  --glow-purple: rgba(139,92,246,.42);
-  --glow-cyan: rgba(34,211,238,.30);
-  --glow-pink: rgba(244,114,182,.25);
-  --glow-white: rgba(255,255,255,.12);
-}
-body::marker{display:none}
-body::after{
-  animation:ambientFloat 16s ease-in-out infinite alternate, ambientPulse 7s ease-in-out infinite;
-}
-@keyframes ambientPulse{
-  0%,100%{opacity:.45}
-  50%{opacity:.82}
-}
-/* Cursor-following light */
-body .cursor-glow{
-  position:fixed;
-  width:420px;height:420px;
-  border-radius:50%;
-  pointer-events:none;
-  z-index:0;
-  transform:translate(-50%,-50%);
-  background:radial-gradient(circle,rgba(139,92,246,.13) 0%,rgba(34,211,238,.06) 28%,transparent 68%);
-  filter:blur(18px);
-  mix-blend-mode:screen;
-  opacity:0;
-  transition:opacity .35s ease;
-}
-body:hover .cursor-glow{opacity:1}
-
-/* Shimmer on glass */
-.glass,.card,.project,.work-card,.service,.process-card,.modal-card,.panel,.sidebar,footer{
-  position:relative;
-  overflow:hidden;
-}
-.glass::before,.card::before,.project::before,.work-card::before,.service::before,.process-card::before,.panel::before{
-  content:"";
-  position:absolute;
-  inset:-120% 35%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.075),transparent);
-  transform:rotate(18deg) translateX(-80%);
-  pointer-events:none;
-  animation:glassShimmer 9s ease-in-out infinite;
-}
-@keyframes glassShimmer{
-  0%,55%{transform:rotate(18deg) translateX(-90%)}
-  72%,100%{transform:rotate(18deg) translateX(220%)}
-}
-
-/* Elevated hover glow */
-.card,.project,.work-card,.service,.process-card,button,.btn{
-  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease,background .35s ease;
-}
-.card:hover,.project:hover,.work-card:hover,.service:hover,.process-card:hover{
-  transform:translateY(-5px);
-  border-color:rgba(255,255,255,.22)!important;
-  box-shadow:
-    0 22px 70px rgba(0,0,0,.30),
-    0 0 38px var(--glow-purple),
-    inset 0 1px 0 rgba(255,255,255,.20)!important;
-}
-button:hover,.btn:hover{
-  transform:translateY(-2px);
-  box-shadow:
-    0 10px 35px rgba(0,0,0,.24),
-    0 0 24px var(--glow-cyan),
-    inset 0 1px 0 rgba(255,255,255,.20);
-}
-
-/* Gradient text glow for major headings */
-h1,h2{
-  text-shadow:0 0 34px rgba(139,92,246,.12);
-}
-
-/* Glowing accent links */
-a:hover{
-  text-shadow:0 0 18px rgba(34,211,238,.30);
-}
-
-/* Image cinematic glow */
-img:hover{
-  filter:saturate(1.06) brightness(1.035);
-}
-
-/* Floating decorative particles */
-.ambient-particles{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  overflow:hidden;
-}
-.ambient-particles i{
-  position:absolute;
-  width:3px;height:3px;
-  border-radius:50%;
-  background:rgba(255,255,255,.5);
-  box-shadow:0 0 12px rgba(255,255,255,.55);
-  animation:particleFloat linear infinite;
-}
-@keyframes particleFloat{
-  from{transform:translate3d(0,110vh,0);opacity:0}
-  12%{opacity:.65}
-  85%{opacity:.35}
-  to{transform:translate3d(40px,-15vh,0);opacity:0}
-}
-
-/* Aurora ribbon */
-.aurora-glow{
-  position:fixed;
-  width:55vw;height:18vw;
-  left:22%;top:42%;
-  pointer-events:none;
-  z-index:0;
-  opacity:.14;
-  filter:blur(70px);
-  background:linear-gradient(90deg,transparent,#8b5cf6,#22d3ee,#f472b6,transparent);
-  transform:rotate(-12deg);
-  animation:aurora 12s ease-in-out infinite alternate;
-}
-@keyframes aurora{
-  from{transform:translateX(-8%) rotate(-12deg) scale(.9)}
-  to{transform:translateX(8%) rotate(-7deg) scale(1.1)}
-}
-
-@media(prefers-reduced-motion:reduce){
-  .glass::before,.card::before,.project::before,.work-card::before,.service::before,.process-card::before,
-  .ambient-particles i,.aurora-glow,body::after{animation:none!important}
-}
-</style>
 </head><body>
-
-<div class="aurora-glow" aria-hidden="true"></div>
-<div class="ambient-particles" aria-hidden="true">
-  <i style="left:8%;animation-duration:13s;animation-delay:-4s"></i>
-  <i style="left:19%;animation-duration:18s;animation-delay:-11s"></i>
-  <i style="left:31%;animation-duration:15s;animation-delay:-7s"></i>
-  <i style="left:46%;animation-duration:21s;animation-delay:-14s"></i>
-  <i style="left:61%;animation-duration:16s;animation-delay:-3s"></i>
-  <i style="left:74%;animation-duration:19s;animation-delay:-12s"></i>
-  <i style="left:88%;animation-duration:14s;animation-delay:-8s"></i>
-</div>
-<div class="cursor-glow" aria-hidden="true"></div>
-
 <div class="app"><aside class="side"><div class="top"><div class="brand"><b>YUJIN / VISUAL EDITOR</b><span class="pill">No Code</span></div>
 <div class="actions"><button class="btn primary" id="save">Save Draft</button><button class="btn success" id="publish">Publish</button><button class="btn" id="reset">Reset</button><button class="btn" id="export">Export</button><button class="btn" id="import">Import</button></div>
-<div class="authbar"><span class="auth-email" id="authEmail">Not signed in</span><button class="btn small" id="signIn">Sign in</button><button class="btn small" id="signOut" style="display:none">Sign out</button></div>
+<div class="authbar"><span class="auth-email" id="authEmail">Checking sign-in…</span><button class="btn small" id="signIn">Sign in</button><button class="btn small" id="signOut" style="display:none">Sign out</button></div>
 <div class="publish-state" id="publishState">Local editor ready.</div>
 <div class="tabs"><button class="tab active" data-tab="content">Content</button><button class="tab" data-tab="design">Design</button><button class="tab" data-tab="sections">Sections</button></div></div>
 <div class="body"><div id="content" class="panel active"></div><div id="design" class="panel"></div><div id="sections" class="panel"></div><p class="hint">This editor is built around your actual portfolio layout. The preview is the real <b>index.html</b>, not a separate mockup.</p></div></aside>
@@ -279,6 +134,7 @@ function merge(a,b){const o=structuredClone(a);const m=(x,y)=>Object.keys(y||{})
 let c=merge(D,JSON.parse(localStorage.getItem(KEY)||"null"));
 let currentUser=null;
 let firebaseReady=false;
+let authInitializing=true;
 let remoteDraft=null;
 let remotePublished=null;
 const $=s=>document.querySelector(s), esc=s=>String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -408,7 +264,13 @@ $("#googleSignIn").onclick=async()=>{
       alert("This Google account is not authorized to access the admin editor.");
       return;
     }
+    currentUser=result.user;
+    $("#authEmail").textContent=result.user.email||result.user.uid;
+    $("#signIn").style.display="none";
+    $("#signOut").style.display="block";
     closeAuth();
+    setPublishState("Signed in as "+(result.user.email||"admin")+".");
+    await loadRemote();
   }catch(err){
     console.error(err);
     alert("Google sign-in failed: "+err.message);
@@ -423,21 +285,36 @@ $("#authSubmit").onclick=async()=>{
 $("#signOut").onclick=()=>window.YUJIN_FIREBASE.signOut(window.YUJIN_FIREBASE.auth);
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.tab).classList.add("active")});
 window.YUJIN_FIREBASE.onAuthStateChanged(window.YUJIN_FIREBASE.auth,async user=>{
-  currentUser=user; firebaseReady=!!user;
+  authInitializing=false;
+  currentUser=user;
+  firebaseReady=!!user;
+
   if(user){
     const email=(user.email||"").toLowerCase();
     if(!window.YUJIN_FIREBASE.GOOGLE_ADMIN_EMAILS.includes(email)){
       await window.YUJIN_FIREBASE.signOut(window.YUJIN_FIREBASE.auth);
+      currentUser=null;
+      firebaseReady=false;
       $("#authEmail").textContent="Unauthorized account";
-      $("#signIn").style.display="block";$("#signOut").style.display="none";
-      setPublishState("Only the authorized admin account can access this editor.");
+      $("#signIn").style.display="block";
+      $("#signOut").style.display="none";
+      setPublishState("Only the authorized admin accounts can access this editor.");
+      openAuth();
       return;
     }
-    $("#authEmail").textContent=user.email||user.uid;$("#signIn").style.display="none";$("#signOut").style.display="block";
-    setPublishState("Signed in. Loading Firebase portfolio…");await loadRemote();
+
+    $("#authEmail").textContent=user.email||user.uid;
+    $("#signIn").style.display="none";
+    $("#signOut").style.display="block";
+    setPublishState("Signed in as "+(user.email||"admin")+". Loading Firebase portfolio…");
+    closeAuth();
+    await loadRemote();
   }else{
-    $("#authEmail").textContent="Not signed in";$("#signIn").style.display="block";$("#signOut").style.display="none";
-    setPublishState("Local editor ready. Sign in to save/publish with Firebase.");
+    $("#authEmail").textContent="Not signed in";
+    $("#signIn").style.display="block";
+    $("#signOut").style.display="none";
+    setPublishState("Sign in to edit and publish with Firebase.");
+    openAuth();
   }
 });
 render();
@@ -461,22 +338,6 @@ render();
   }
   ['amb1','amb2','amb3','ambBlur'].forEach(id=>document.getElementById(id).addEventListener('input',update));
   update();
-})();
-</script>
-
-
-<script>
-(function(){
-  const glow=document.querySelector('.cursor-glow');
-  if(!glow || !window.matchMedia('(pointer:fine)').matches) return;
-  let tx=innerWidth/2,ty=innerHeight/2,x=tx,y=ty;
-  addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY});
-  function tick(){
-    x+=(tx-x)*.12;y+=(ty-y)*.12;
-    glow.style.left=x+'px';glow.style.top=y+'px';
-    requestAnimationFrame(tick);
-  }
-  tick();
 })();
 </script>
 
