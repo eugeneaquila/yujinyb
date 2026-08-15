@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08080c">
+<meta name="description" content="Yujin — Motion Designer, Animator and Visual Artist.">
+<title>Yujin — Motion Designer</title>
+
+<style>
+:root{
+  --bg:#07070a;--surface:rgba(255,255,255,.055);--surface2:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.12);--text:#f6f4fb;--muted:#aaa7b4;
+  --accent:#9b7cff;--accent2:#65d9ff;--danger:#ff6b81;
+  --radius:22px;--shadow:0 30px 100px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+ radial-gradient(circle at 15% 15%,rgba(155,124,255,.13),transparent 30%),
+ radial-gradient(circle at 85% 30%,rgba(101,217,255,.08),transparent 28%),
+ var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+body.locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.container{width:min(1120px,calc(100% - 36px));margin:auto}
+.glow{position:fixed;width:360px;height:360px;border-radius:50%;pointer-events:none;z-index:0;
+ background:radial-gradient(circle,rgba(155,124,255,.16),transparent 68%);transform:translate(-50%,-50%);mix-blend-mode:screen}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E")}
+
+header{position:fixed;top:14px;left:0;right:0;z-index:20}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 18px;
+ border:1px solid var(--line);border-radius:999px;background:rgba(10,10,14,.62);
+ backdrop-filter:blur(22px);box-shadow:0 14px 50px rgba(0,0,0,.25)}
+.logo{font-weight:850;letter-spacing:-.03em}
+.navlinks{display:flex;align-items:center;gap:8px}
+.navlinks a,.admin-open{padding:9px 12px;border-radius:999px;color:#d5d1dc;font-size:13px}
+.navlinks a:hover,.admin-open:hover{background:rgba(255,255,255,.07);color:#fff}
+.admin-open{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.055);color:#fff;font-weight:750}
+
+main{position:relative;z-index:2}
+.hero{min-height:100svh;display:grid;align-items:center;padding:140px 0 80px}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:60px;align-items:end}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#aaa4b6}
+h1{font-size:clamp(52px,9vw,112px);line-height:.88;letter-spacing:-.07em;margin:18px 0 28px;max-width:900px}
+.gradient{background:linear-gradient(110deg,#fff 15%,#bfaeff 50%,#7fe4ff 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-desc{max-width:620px;font-size:18px;line-height:1.65;color:var(--muted)}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;padding:12px 17px;border-radius:999px;font-weight:750}
+.btn.primary{background:linear-gradient(135deg,rgba(155,124,255,.8),rgba(101,217,255,.35));border-color:rgba(255,255,255,.2)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,0,0,.25)}
+.hero-card{border:1px solid var(--line);border-radius:28px;padding:22px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));backdrop-filter:blur(18px);box-shadow:var(--shadow)}
+.hero-card .orb{height:330px;border-radius:22px;background:
+ radial-gradient(circle at 30% 30%,rgba(155,124,255,.75),transparent 25%),
+ radial-gradient(circle at 70% 60%,rgba(101,217,255,.45),transparent 25%),
+ linear-gradient(135deg,#16131f,#08090e);position:relative;overflow:hidden}
+.orb:after{content:"";position:absolute;inset:-40%;background:conic-gradient(from 120deg,transparent,rgba(255,255,255,.18),transparent 35%);animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+section{padding:110px 0;scroll-margin-top:100px}
+.section-head{display:flex;justify-content:space-between;gap:25px;align-items:end;margin-bottom:35px}
+.section-title{font-size:clamp(34px,5vw,62px);letter-spacing:-.05em;margin:0}
+.section-desc{max-width:550px;color:var(--muted);line-height:1.6}
+.about{display:grid;grid-template-columns:.8fr 1.2fr;gap:50px}
+.about p{font-size:20px;line-height:1.75;color:#d0ccd7}
+.work-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.work{border:1px solid var(--line);border-radius:var(--radius);padding:14px;background:rgba(255,255,255,.035);transition:.3s;overflow:hidden}
+.work:hover{transform:translateY(-5px);border-color:rgba(155,124,255,.4);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.work-visual{height:310px;border-radius:16px;background:
+ radial-gradient(circle at 30% 30%,rgba(155,124,255,.25),transparent 30%),
+ linear-gradient(135deg,#15151c,#0b0b10);background-size:cover;background-position:center}
+.work-tag{margin-top:18px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#9e99a9}
+.work h3{font-size:26px;letter-spacing:-.04em;margin:7px 0}
+.work-description{margin:0 0 12px;color:#aaa7b4;line-height:1.55;font-size:14px}
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.service{padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.service h3{margin:0 0 10px;font-size:20px}.service p{color:var(--muted);line-height:1.6}
+.reel-card{border:1px solid var(--line);border-radius:28px;padding:14px;background:rgba(255,255,255,.035)}
+.reel{min-height:420px;border-radius:20px;display:grid;place-items:center;cursor:pointer;
+ background:radial-gradient(circle at 50% 40%,rgba(155,124,255,.5),transparent 28%),linear-gradient(135deg,#15131d,#08090d)}
+.play{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);font-size:25px;backdrop-filter:blur(15px)}
+.contact-card{display:flex;justify-content:space-between;align-items:center;gap:20px;border:1px solid var(--line);padding:30px;border-radius:28px;background:linear-gradient(135deg,rgba(155,124,255,.12),rgba(101,217,255,.05))}
+footer{padding:40px 0 60px;color:#777480;font-size:13px}
+
+.video-modal,.auth-modal{position:fixed;inset:0;z-index:1000;display:none;place-items:center;padding:20px;background:rgba(0,0,0,.82);backdrop-filter:blur(25px)}
+.video-modal.show,.auth-modal.show{display:grid}
+.video-card,.auth-card{width:min(950px,100%);background:rgba(16,16,21,.9);border:1px solid var(--line);border-radius:26px;padding:14px;box-shadow:var(--shadow)}
+.video-head{display:flex;justify-content:space-between;align-items:center;padding:4px 5px 12px}
+.close{border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;border-radius:50%;width:36px;height:36px}
+iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:16px;background:#000}
+.auth-card{width:min(430px,100%);padding:30px}
+.auth-card h2{margin:8px 0;font-size:28px}.auth-card p{color:var(--muted);line-height:1.55}
+.auth-kicker{font-size:10px;letter-spacing:.18em;color:#888}
+.google{width:100%;padding:13px;border-radius:13px;border:1px solid rgba(155,124,255,.4);background:rgba(155,124,255,.16);color:#fff;font-weight:800}
+.cancel{width:100%;padding:12px;border:0;background:none;color:#999;margin-top:7px}
+
+#adminPanel{position:fixed;inset:0;z-index:900;display:none;overflow:auto;background:rgba(6,6,10,.96);backdrop-filter:blur(26px)}
+#adminPanel.show{display:block}
+.admin-shell{width:min(1280px,100%);margin:auto;padding:16px}
+.admin-top{position:sticky;top:10px;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 17px;border:1px solid var(--line);border-radius:20px;background:rgba(18,18,23,.8);backdrop-filter:blur(20px);margin-bottom:14px}
+.admin-top h2{margin:0;font-size:19px}.admin-top small{color:#999}
+.admin-top-actions{display:flex;gap:8px;align-items:center}
+.admin-top-actions button{border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;border-radius:11px;padding:9px 12px}
+.admin-top-actions .save{background:rgba(155,124,255,.18);border-color:rgba(155,124,255,.45)}
+.admin-layout{display:grid;grid-template-columns:220px 1fr;gap:14px}
+.admin-nav{position:sticky;top:100px;height:max-content;padding:10px;border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.035)}
+.admin-nav button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;color:#aaa7b4;border-radius:10px;margin:2px 0}
+.admin-nav button:hover,.admin-nav button.active{background:rgba(155,124,255,.14);color:#fff}
+.admin-content{border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.025);padding:18px}
+.editor-section{padding:20px 0;border-bottom:1px solid rgba(255,255,255,.08);scroll-margin-top:95px}
+.editor-section:last-child{border-bottom:0}.editor-section h3{margin:0 0 5px;font-size:20px}.editor-section>p{margin:0 0 18px;color:#8f8b98;font-size:13px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field.full{grid-column:1/-1}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#88848f;margin:0 0 6px}
+.field input,.field textarea,.field select{width:100%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);color:#fff;border-radius:12px;padding:11px 12px;outline:none}
+.field textarea{min-height:110px;resize:vertical}.field input:focus,.field textarea:focus{border-color:rgba(155,124,255,.7);box-shadow:0 0 0 3px rgba(155,124,255,.1)}
+.admin-note{padding:12px;border-radius:12px;background:rgba(155,124,255,.08);border:1px solid rgba(155,124,255,.18);color:#bdb8d0;font-size:12px;line-height:1.5;margin-bottom:15px}
+.admin-list{display:grid;gap:12px}.work-editor{padding:15px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(255,255,255,.025)}
+.work-editor h4{margin:0 0 12px}.work-editor-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.preview-status{font-size:11px;color:#8f8b98}.success{color:#7ce3aa}.error{color:#ff8798}
+
+@media(max-width:800px){
+ .navlinks a{display:none}.hero-grid,.about{grid-template-columns:1fr}.hero-card{display:none}
+ .work-grid,.services{grid-template-columns:1fr}.work-visual{height:240px}
+ .section-head{display:block}.section-desc{margin-top:12px}
+ .admin-layout{grid-template-columns:1fr}.admin-nav{position:sticky;top:76px;display:flex;overflow:auto;gap:5px}.admin-nav button{white-space:nowrap;width:auto}
+ .fields,.work-editor-grid{grid-template-columns:1fr}.admin-top{align-items:flex-start}.admin-top-actions{flex-wrap:wrap}
+}
+</style>
+</head>
+
+<body>
+<div class="glow" id="cursorGlow"></div><div class="noise"></div>
+
+<header>
+<nav class="nav container">
+  <a href="#top" class="logo" id="navLogo">YUJIN</a>
+  <div class="navlinks">
+    <a href="#about">About</a><a href="#work">Works</a><a href="#services">Services</a><a href="#contact">Contact</a>
+    <button class="admin-open" id="adminButton">Admin</button>
+  </div>
+</nav>
+</header>
+
+<main id="top">
+<section class="hero">
+ <div class="container hero-grid">
+  <div>
+   <div class="eyebrow" id="heroEyebrow">MOTION DESIGNER · ANIMATOR · VISUAL ARTIST</div>
+   <h1 id="heroTitle">I make <span class="gradient">motion feel alive.</span></h1>
+   <p class="hero-desc" id="heroDescription">Motion design, animation and visual experiences built with rhythm, atmosphere and personality.</p>
+   <div class="hero-actions"><a class="btn primary" href="#work" id="heroPrimary">View my work</a><a class="btn" href="#contact" id="heroSecondary">Let's work together</a></div>
+  </div>
+  <div class="hero-card"><div class="orb"></div></div>
+ </div>
+</section>
+
+<section id="about"><div class="container about">
+ <div><div class="eyebrow">ABOUT</div><h2 class="section-title" id="aboutTitle">Built around movement.</h2></div>
+ <div><p id="aboutText">I'm Yujin, a motion designer and animator focused on expressive visuals, music-driven animation, compositing and cinematic presentation.</p></div>
+</div></section>
+
+<section id="work"><div class="container">
+ <div class="section-head"><div><div class="eyebrow">SELECTED WORK</div><h2 class="section-title" id="workTitle">Things I've made.</h2></div><p class="section-desc" id="workDescription">A selection of motion, animation and visual projects.</p></div>
+ <div class="work-grid" id="workGrid"></div>
+</div></section>
+
+<section id="services"><div class="container">
+ <div class="section-head"><div><div class="eyebrow">SERVICES</div><h2 class="section-title" id="servicesTitle">What I do.</h2></div><p class="section-desc" id="servicesDescription">From a single visual to a complete motion package.</p></div>
+ <div class="services" id="servicesGrid"></div>
+</div></section>
+
+<section id="reel"><div class="container">
+ <div class="section-head"><div><div class="eyebrow">SHOWREEL</div><h2 class="section-title" id="reelTitle">A few seconds of me.</h2></div><p class="section-desc" id="reelDescription">Click the preview to watch the showreel.</p></div>
+ <div class="reel-card"><div class="reel" id="reelPreview"><div class="play">▶</div></div></div>
+</div></section>
+
+<section id="contact"><div class="container">
+ <div class="contact-card"><div><div class="eyebrow">CONTACT</div><h2 class="section-title" id="contactTitle">Let's make something.</h2><p class="section-desc" id="contactDescription">Have a project in mind? Let's talk.</p></div><a class="btn primary" id="contactButton" href="mailto:yujin@example.com">Get in touch</a></div>
+</div></section>
+</main>
+
+<footer><div class="container"><span id="footerName">Yujin</span> · <span id="footerYear"></span></div></footer>
+
+<div class="auth-modal" id="authModal" aria-hidden="true">
+ <div class="auth-card" role="dialog" aria-modal="true">
+  <div class="auth-kicker">PRIVATE AREA</div><h2>Admin Sign In</h2>
+  <p>Sign in with one of the authorized Google accounts to edit this portfolio.</p>
+  <button class="google" id="googleSignIn">Continue with Google</button>
+  <button class="cancel" id="cancelAuth">Cancel</button>
+ </div>
+</div>
+
+<div class="video-modal" id="videoModal" aria-hidden="true">
+ <div class="video-card"><div class="video-head"><strong id="videoTitle">Project Preview</strong><button class="close" id="closeVideo">×</button></div><iframe id="videoFrame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+</div>
+
+<section id="adminPanel" aria-hidden="true">
+ <div class="admin-shell">
+  <div class="admin-top">
+   <div><h2>Portfolio Editor</h2><small id="authStatus">Not signed in</small></div>
+   <div class="admin-top-actions">
+    <span class="preview-status" id="saveStatus">Ready</span>
+    <button id="saveDraft" class="save">Save Draft</button>
+    <button id="publish">Publish</button>
+    <button id="signOut">Sign Out</button>
+    <button id="closeAdmin">Portfolio</button>
+   </div>
+  </div>
+  <div class="admin-layout">
+   <aside class="admin-nav" id="adminNav">
+    <button data-section="identity">Identity</button><button data-section="hero">Hero</button>
+    <button data-section="about">About</button><button data-section="work">Works</button>
+    <button data-section="services">Services</button><button data-section="reel">Showreel</button>
+    <button data-section="contact">Contact</button><button data-section="appearance">Appearance</button>
+   </aside>
+   <div class="admin-content" id="editorContent"></div>
+  </div>
+ </div>
+</section>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {getAuth,setPersistence,browserLocalPersistence,GoogleAuthProvider,onAuthStateChanged,signInWithPopup,signOut} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig={"apiKey": "AIzaSyAbql1-bQ7LJYCDbMyX2DULo3A1HygAVKY", "authDomain": "yujin-f6be5.firebaseapp.com", "projectId": "yujin-f6be5", "storageBucket": "yujin-f6be5.firebasestorage.app", "messagingSenderId": "597941904523", "appId": "1:597941904523:web:cda7d94fc5d9589f47a08e", "measurementId": "G-JE7HLD0G0Y"};
+const ADMIN_EMAILS=["eugene.aquila06@gmail.com","yujinybwork@gmail.com"];
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+await setPersistence(auth,browserLocalPersistence);
+const db=getFirestore(app);
+const provider=new GoogleAuthProvider();
+provider.setCustomParameters({prompt:"select_account"});
+
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+const DEFAULT={
+ nav:{logo:"YUJIN"},
+ hero:{eyebrow:"MOTION DESIGNER · ANIMATOR · VISUAL ARTIST",title:"I make <span class=\"gradient\">motion feel alive.</span>",description:"Motion design, animation and visual experiences built with rhythm, atmosphere and personality.",primary:"View my work",secondary:"Let's work together"},
+ about:{title:"Built around movement.",text:"I'm Yujin, a motion designer and animator focused on expressive visuals, music-driven animation, compositing and cinematic presentation."},
+ work:{title:"Things I've made.",desc:"A selection of motion, animation and visual projects.",items:[
+  {tag:"MV · Motion Design",title:"Music Visual",description:"Music-driven motion design and cinematic visual treatment.",image:"",url:"#contact",youtube:""},
+  {tag:"VTuber · Promotional",title:"Debut Trailer",description:"Character-focused promotional animation for VTuber launches.",image:"",url:"#contact",youtube:""},
+  {tag:"Anime · Compositing",title:"Post-Shiage",description:"Anime compositing, effects, lighting and final visual polish.",image:"",url:"#contact",youtube:""},
+  {tag:"Music · Visualizer",title:"Visual Experience",description:"Atmospheric visualizer work built around rhythm, light and movement.",image:"",url:"#contact",youtube:""}
+ ]},
+ services:{title:"What I do.",desc:"From a single visual to a complete motion package.",items:[
+  {title:"Motion Design",description:"Dynamic graphics, transitions, typography and visual systems."},
+  {title:"Animation",description:"Character, music-video and promotional animation."},
+  {title:"Compositing",description:"Effects, lighting, color and anime-style post-shiage."}
+ ]},
+ reel:{title:"A few seconds of me.",description:"Click the preview to watch the showreel.",url:""},
+ contact:{title:"Let's make something.",description:"Have a project in mind? Let's talk.",email:"yujin@example.com",button:"Get in touch"},
+ footer:{name:"Yujin"},
+ appearance:{accent:"#9b7cff",accent2:"#65d9ff"}
+};
+
+let config=clone(DEFAULT);
+let currentUser=null;
+
+function merge(base,saved){
+ if(!saved)return clone(base);
+ if(Array.isArray(base))return Array.isArray(saved)?saved:clone(base);
+ if(base&&typeof base==="object"){
+  const o={...base};
+  Object.keys(saved||{}).forEach(k=>o[k]=k in base?merge(base[k],saved[k]):saved[k]);
+  return o;
+ }
+ return saved;
+}
+
+function setPath(path,value){
+ let o=config;const parts=path.split(".");
+ for(let i=0;i<parts.length-1;i++){if(!o[parts[i]]||typeof o[parts[i]]!=="object")o[parts[i]]={};o=o[parts[i]]}
+ o[parts.at(-1)]=value;
+}
+
+function getPath(path){return path.split(".").reduce((o,k)=>o?.[k],config)}
+
+function saveLocal(){localStorage.setItem("yujin_portfolio_config",JSON.stringify(config))}
+
+async function loadRemote(){
+ const snap=await getDoc(doc(db,"sites","portfolio"));
+ if(snap.exists())config=merge(DEFAULT,snap.data());
+ else{
+  const local=localStorage.getItem("yujin_portfolio_config");
+  if(local)try{config=merge(DEFAULT,JSON.parse(local))}catch{}
+ }
+ saveLocal();renderPublic();renderEditor();
+}
+
+async function saveRemote(publish=false){
+ if(!currentUser){setStatus("Not signed in",true);openAuth();return}
+ try{
+  setStatus(publish?"Publishing…":"Saving…");
+  await setDoc(doc(db,"sites","portfolio"),{...config,published:true,updatedAt:new Date().toISOString(),updatedBy:currentUser.email},{merge:true});
+  saveLocal();setStatus(publish?"Published ✓":"Draft saved ✓");
+ }catch(e){console.error(e);setStatus(e.message,true)}
+}
+
+function setStatus(text,error=false){$("#saveStatus").textContent=text;$("#saveStatus").className="preview-status "+(error?"error":"success")}
+
+function renderPublic(){
+ $("#navLogo").textContent=config.nav.logo;
+ $("#heroEyebrow").textContent=config.hero.eyebrow;
+ $("#heroTitle").innerHTML=config.hero.title;
+ $("#heroDescription").textContent=config.hero.description;
+ $("#heroPrimary").textContent=config.hero.primary;
+ $("#heroSecondary").textContent=config.hero.secondary;
+ $("#aboutTitle").textContent=config.about.title;
+ $("#aboutText").textContent=config.about.text;
+ $("#workTitle").textContent=config.work.title;
+ $("#workDescription").textContent=config.work.desc;
+ $("#servicesTitle").textContent=config.services.title;
+ $("#servicesDescription").textContent=config.services.desc;
+ $("#reelTitle").textContent=config.reel.title;
+ $("#reelDescription").textContent=config.reel.description;
+ $("#contactTitle").textContent=config.contact.title;
+ $("#contactDescription").textContent=config.contact.description;
+ $("#contactButton").textContent=config.contact.button;
+ $("#contactButton").href="mailto:"+config.contact.email;
+ $("#footerName").textContent=config.footer.name;
+ $("#footerYear").textContent=new Date().getFullYear();
+ document.documentElement.style.setProperty("--accent",config.appearance.accent);
+ document.documentElement.style.setProperty("--accent2",config.appearance.accent2);
+
+ $("#workGrid").innerHTML=config.work.items.map((x,i)=>`
+  <a class="work" href="${esc(x.youtube||x.url||"#")}" data-work="${i}">
+   <div class="work-visual" style="${x.image?`background-image:url('${esc(x.image)}')`:''}"></div>
+   <div class="work-tag">${esc(x.tag)}</div><h3>${esc(x.title)}</h3>
+   <p class="work-description">${esc(x.description)}</p>
+  </a>`).join("");
+
+ $("#servicesGrid").innerHTML=config.services.items.map(x=>`<div class="service"><h3>${esc(x.title)}</h3><p>${esc(x.description)}</p></div>`).join("");
+ $("#reelPreview").onclick=()=>openVideo(config.reel.url,config.reel.title);
+ document.querySelectorAll("[data-work]").forEach(a=>{
+  const x=config.work.items[Number(a.dataset.work)];
+  if(x.youtube){a.onclick=e=>{e.preventDefault();openVideo(x.youtube,x.title)}}
+ });
+}
+
+function field(path,label,full=false,textarea=false){
+ const value=getPath(path)??"";
+ return `<div class="field ${full?"full":""}"><label>${esc(label)}</label>${
+  textarea?`<textarea data-path="${esc(path)}">${esc(value)}</textarea>`:
+  `<input data-path="${esc(path)}" value="${esc(value)}">`
+ }</div>`;
+}
+
+function renderEditor(){
+ const c=config;
+ $("#editorContent").innerHTML=`
+  <div class="admin-note">Edit any field directly. The public portfolio updates immediately. YouTube links open in the built-in preview. Images use normal image URLs — Firebase Storage is not required.</div>
+
+  <section class="editor-section" id="edit-identity"><h3>Identity</h3><p>Your name and footer identity.</p><div class="fields">
+   ${field("nav.logo","Profile / logo name")}${field("footer.name","Footer name")}
+  </div></section>
+
+  <section class="editor-section" id="edit-hero"><h3>Hero</h3><p>The first section visitors see.</p><div class="fields">
+   ${field("hero.eyebrow","Eyebrow",true)}${field("hero.title","Headline",true,true)}${field("hero.description","Description",true,true)}
+   ${field("hero.primary","Primary button")}${field("hero.secondary","Secondary button")}
+  </div></section>
+
+  <section class="editor-section" id="edit-about"><h3>About</h3><p>Your introduction.</p><div class="fields">
+   ${field("about.title","Title")}${field("about.text","About description",true,true)}
+  </div></section>
+
+  <section class="editor-section" id="edit-work"><h3>Works</h3><p>Edit titles, descriptions, images, project links and YouTube previews.</p><div class="admin-list">
+   ${c.work.items.map((x,i)=>`<div class="work-editor"><h4>Work ${i+1}</h4><div class="work-editor-grid">
+    ${field(`work.items.${i}.tag`,"Tag")}${field(`work.items.${i}.title`,"Title")}
+    ${field(`work.items.${i}.description`,"Description",true,true)}
+    ${field(`work.items.${i}.image`,"Image URL",true)}${field(`work.items.${i}.url`,"Project URL")}
+    ${field(`work.items.${i}.youtube`,"YouTube URL",true)}
+   </div></div>`).join("")}
+  </div></section>
+
+  <section class="editor-section" id="edit-services"><h3>Services</h3><p>Edit the service cards shown publicly.</p><div class="fields">
+   ${field("services.title","Title")}${field("services.desc","Description",true,true)}
+  </div><div class="admin-list" style="margin-top:12px">${c.services.items.map((x,i)=>`<div class="work-editor"><h4>Service ${i+1}</h4><div class="work-editor-grid">${field(`services.items.${i}.title`,"Title")}${field(`services.items.${i}.description`,"Description",true,true)}</div></div>`).join("")}</div></section>
+
+  <section class="editor-section" id="edit-reel"><h3>Showreel</h3><p>Use a YouTube URL to make the preview clickable.</p><div class="fields">
+   ${field("reel.title","Title")}${field("reel.url","YouTube URL")}
+   ${field("reel.description","Description",true,true)}
+  </div></section>
+
+  <section class="editor-section" id="edit-contact"><h3>Contact</h3><p>Contact call-to-action.</p><div class="fields">
+   ${field("contact.title","Title")}${field("contact.button","Button text")}${field("contact.email","Email")}${field("contact.description","Description",true,true)}
+  </div></section>
+
+  <section class="editor-section" id="edit-appearance"><h3>Appearance</h3><p>Ambient accent colors.</p><div class="fields">
+   ${field("appearance.accent","Accent color")}${field("appearance.accent2","Secondary glow color")}
+  </div></section>`;
+
+ document.querySelectorAll("[data-path]").forEach(el=>{
+  const update=()=>{setPath(el.dataset.path,el.value);saveLocal();renderPublic();setStatus("Preview updated");};
+  el.addEventListener("input",update);el.addEventListener("change",update);
+ });
+}
+
+function openAuth(){$("#authModal").classList.add("show");$("#authModal").setAttribute("aria-hidden","false");document.body.classList.add("locked");setTimeout(()=>$("#googleSignIn").focus(),50)}
+function closeAuth(){$("#authModal").classList.remove("show");$("#authModal").setAttribute("aria-hidden","true");if(!$("#adminPanel").classList.contains("show"))document.body.classList.remove("locked")}
+function openAdmin(){$("#adminPanel").classList.add("show");$("#adminPanel").setAttribute("aria-hidden","false");document.body.classList.add("locked");renderEditor();$("#adminButton").blur()}
+function closeAdmin(){$("#adminPanel").classList.remove("show");$("#adminPanel").setAttribute("aria-hidden","true");document.body.classList.remove("locked")}
+
+function openVideo(url,title){
+ if(!url)return alert("Add a YouTube URL in the Admin editor first.");
+ let id="";
+ try{
+  const u=new URL(url);
+  if(u.hostname.includes("youtu.be"))id=u.pathname.slice(1).split("/")[0];
+  if(u.hostname.includes("youtube.com")){
+   id=u.searchParams.get("v")||"";
+   if(!id&&u.pathname.includes("/shorts/"))id=u.pathname.split("/shorts/")[1].split("/")[0];
+   if(!id&&u.pathname.includes("/embed/"))id=u.pathname.split("/embed/")[1].split("/")[0];
+  }
+ }catch{}
+ if(!id){window.open(url,"_blank","noopener");return}
+ $("#videoTitle").textContent=title||"Project Preview";
+ $("#videoFrame").src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&rel=0";
+ $("#videoModal").classList.add("show");$("#videoModal").setAttribute("aria-hidden","false");document.body.classList.add("locked");
+}
+function closeVideo(){$("#videoFrame").src="";$("#videoModal").classList.remove("show");$("#videoModal").setAttribute("aria-hidden","true");if(!$("#adminPanel").classList.contains("show")&&!$("#authModal").classList.contains("show"))document.body.classList.remove("locked")}
+
+$("#adminButton").onclick=()=>currentUser?openAdmin():openAuth();
+$("#cancelAuth").onclick=closeAuth;
+$("#closeAdmin").onclick=closeAdmin;
+$("#closeVideo").onclick=closeVideo;
+$("#videoModal").onclick=e=>{if(e.target.id==="videoModal")closeVideo()};
+$("#authModal").onclick=e=>{if(e.target.id==="authModal")closeAuth()};
+$("#saveDraft").onclick=()=>saveRemote(false);
+$("#publish").onclick=()=>saveRemote(true);
+$("#signOut").onclick=async()=>{await signOut(auth);closeAdmin();setStatus("Signed out")};
+
+$("#googleSignIn").onclick=async()=>{
+ try{
+  const result=await signInWithPopup(auth,provider);
+  const email=(result.user.email||"").toLowerCase();
+  if(!ADMIN_EMAILS.includes(email)){
+   await signOut(auth);alert("This Google account is not authorized.");return;
+  }
+  currentUser=result.user;closeAuth();openAdmin();$("#authStatus").textContent="Signed in as "+email;await loadRemote();
+ }catch(e){console.error(e);alert("Google sign-in failed: "+e.message)}
+};
+
+document.querySelectorAll("#adminNav button").forEach(btn=>btn.onclick=()=>{
+ document.querySelectorAll("#adminNav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+ $("#edit-"+btn.dataset.section)?.scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+onAuthStateChanged(auth,async user=>{
+ currentUser=user;
+ if(user&&ADMIN_EMAILS.includes((user.email||"").toLowerCase())){
+  $("#authStatus").textContent="Signed in as "+user.email;
+ }else if(user){
+  await signOut(auth);
+ }
+});
+
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#videoModal").classList.contains("show"))closeVideo();else if($("#authModal").classList.contains("show"))closeAuth();else if($("#adminPanel").classList.contains("show"))closeAdmin()}});
+
+let local=localStorage.getItem("yujin_portfolio_config");
+if(local)try{config=merge(DEFAULT,JSON.parse(local))}catch{}
+renderPublic();renderEditor();
+</script>
+</body>
+</html>
