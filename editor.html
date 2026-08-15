@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yujin Portfolio Editor</title>
+<style>
+:root{--bg:#0a0a0d;--panel:#111116;--panel2:#18181d;--text:#f5f5f5;--muted:#a1a1aa;--line:rgba(255,255,255,.1);--accent:#fff;--danger:#ff7272}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif}body{min-height:100vh}
+button,input,textarea,select{font:inherit}.app{display:grid;grid-template-columns:330px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:#0d0d10;padding:18px}
+.brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand strong{letter-spacing:-.04em}.badge{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#777;border:1px solid var(--line);padding:5px 8px;border-radius:999px}
+.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 11px;cursor:pointer}.btn:hover{background:#1d1d22}.btn.primary{background:var(--accent);color:#09090b;border-color:var(--accent)}.btn.danger{color:#ff9a9a}
+.tabbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:14px}.tab{background:transparent;color:#8f8f98;border:1px solid transparent;border-radius:9px;padding:9px 5px;font-size:12px;cursor:pointer}.tab.active{color:var(--text);border-color:var(--line);background:var(--panel)}
+.panel{display:none}.panel.active{display:block}.group{border:1px solid var(--line);background:var(--panel);border-radius:14px;margin:10px 0;overflow:hidden}.group>button{width:100%;display:flex;justify-content:space-between;background:none;border:0;color:var(--text);padding:14px;font-weight:700;cursor:pointer;text-align:left}.group-body{padding:0 13px 13px;border-top:1px solid var(--line)}.field{margin:12px 0}.field label{display:block;font-size:11px;color:#8b8b95;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em}.field input,.field textarea,.field select{width:100%;background:#0b0b0e;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px 11px;outline:none}.field textarea{min-height:80px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:#7f7f88}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.color{display:grid;grid-template-columns:1fr 45px;gap:8px}.color input[type=color]{padding:3px;height:41px}
+.stage{min-width:0;display:grid;grid-template-rows:auto 1fr;background:#151519}.stagebar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}.stagebar .status{font-size:12px;color:#858590}.stage-actions{display:flex;gap:8px}.stage iframe{width:100%;height:calc(100vh - 66px);border:0;background:#09090b}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;z-index:100;padding:20px}.modal.show{display:grid}.modal-card{width:min(620px,100%);background:#111116;border:1px solid var(--line);border-radius:18px;padding:20px}.modal-card textarea{width:100%;min-height:300px;background:#09090b;border:1px solid var(--line);color:#fff;padding:12px;border-radius:10px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}.drop{border:1px dashed #555;border-radius:11px;padding:16px;text-align:center;color:#888;font-size:12px}.drop input{display:block;width:100%;margin-top:8px}
+.help{font-size:11px;color:#707078;line-height:1.45}
+@media(max-width:900px){.app{grid-template-columns:280px 1fr}}@media(max-width:700px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.stage{min-height:80vh}.stage iframe{height:75vh}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><strong>YUJIN / EDITOR</strong><span class="badge">No code</span></div>
+ <div class="toolbar"><button class="btn primary" id="saveBtn">Save</button><button class="btn" id="resetBtn">Reset</button><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button></div>
+ <div class="tabbar"><button class="tab active" data-tab="content">Content</button><button class="tab" data-tab="design">Design</button><button class="tab" data-tab="site">Site</button></div>
+ <div id="contentPanel" class="panel active"></div><div id="designPanel" class="panel"></div><div id="sitePanel" class="panel"></div>
+ <p class="help">Changes are saved in this browser. The public page reads the same configuration from localStorage. For deployment, export your JSON and use it as the site's content source, or keep the browser-saved version for local editing.</p>
+</aside>
+<section class="stage">
+ <div class="stagebar"><span class="status" id="status">Editing your portfolio</span><div class="stage-actions"><button class="btn" id="openSite">Open site ↗</button><button class="btn" id="previewBtn">Refresh preview</button></div></div>
+ <iframe id="preview" title="Portfolio preview"></iframe>
+</section>
+</div>
+
+<div class="modal" id="jsonModal"><div class="modal-card"><h3>Configuration JSON</h3><textarea id="jsonArea"></textarea><div class="modal-actions"><button class="btn" id="closeModal">Close</button><button class="btn primary" id="applyJson">Apply</button></div></div></div>
+
+<script>
+const KEY='yujinPortfolioConfigV1';
+const DEFAULTS={
+ meta:{siteTitle:'Yujin — Motion Designer & Visual Creator',description:'I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.',language:'en'},
+ theme:{background:'#09090b',panel:'#111114',panel2:'#17171b',text:'#f5f5f5',muted:'#a1a1aa',accent:'#ffffff',accentText:'#09090b',font:'Inter,ui-sans-serif,system-ui,sans-serif',radius:22,compact:false},
+ nav:{logo:'YUJIN.',cta:'Let\\'s talk ↗'},
+ hero:{eyebrow:'Motion Designer · MV Animator · Compositor',title:'I make motion feel alive.',description:'I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.',primary:'View selected work ↗',primaryLink:'#work',secondary:'Start a project',secondaryLink:'#contact',noteTitle:'Yujin — Visual Creator',noteText:'Focused on motion design, MV production, anime compositing and creator-focused visuals. Available for remote projects worldwide.'},
+ reel:{kicker:'01 / Showreel',title:'Selected motion.',desc:'A curated look at my latest motion work.',label:'SHOWREEL 2024 — 2026',url:'',image:''},
+ work:{kicker:'02 / Selected work',title:'Things I\\'ve made.',desc:'A curated selection of recent motion, music and creator projects.',items:[
+  {tag:'MV · Motion Design',title:'Music Visual',image:'',url:'#contact'},{tag:'VTuber · Promotional',title:'Debut Trailer',image:'',url:'#contact'},{tag:'Anime · Compositing',title:'Post-Shiage',image:'',url:'#contact'},{tag:'Music · Visualizer',title:'Visual Experience',image:'',url:'#contact'}]},
+ caseStudy:{kicker:'03 / Case study',title:'Show the thinking.',desc:'Prove not only what you made, but what you contributed.',cards:[
+  {kicker:'01 — The brief',title:'Turn a song into a visual identity.',text:'Start with the artist’s concept, references and music. Define the visual language before opening After Effects.'},
+  {kicker:'02 — The craft',title:'Animation → effects → compositing.',text:'Break down your contribution: camera movement, typography, FX, transitions, lighting, color and final polish.'}]},
+ services:{kicker:'04 / Services',title:'What I do.',desc:'Focused services built around motion, music and character-driven visuals.',items:[{title:'Motion Design'},{title:'MV Production'},{title:'VTuber Visuals'},{title:'Anime Compositing'},{title:'Video Editing'}]},
+ process:{kicker:'05 / Process',title:'Simple. Clear. Collaborative.',items:[{title:'Brief',text:'Goals, references, assets, music and timeline.'},{title:'Direction',text:'Visual concept, mood and motion language.'},{title:'Production',text:'Animation, compositing, editing and polish.'},{title:'Delivery',text:'Final exports, revisions and organized files.'}]},
+ about:{kicker:'06 / About',title:'Meet Yujin.',text:'I’m a motion designer and visual creator obsessed with <em>movement, atmosphere and music.</em><br><br>I turn static artwork and ideas into visuals that feel cinematic, energetic and alive.',facts:[['Specialization','Anime · VTuber · Music'],['Core tools','After Effects · Premiere'],['Based in','Indonesia'],['Availability','Remote · Worldwide']]},
+ contact:{kicker:'07 / Contact',title:'Have a project in mind?',desc:'Tell me what you’re creating, what you need, and when you need it.',email:'hello@yujinyb.com',primary:'Start a project',instagram:'Instagram ↗',instagramUrl:'https://www.instagram.com/yujinaquila/'},
+ footer:{name:'Yujin',tag:'Motion Designer · Visual Creator'}
+};
+function deepMerge(base,saved){if(!saved)return structuredClone(base);const out=structuredClone(base);const merge=(a,b)=>{Object.keys(b||{}).forEach(k=>{if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==='object'&&!Array.isArray(a[k]))merge(a[k],b[k]);else a[k]=b[k]})};merge(out,saved);return out}
+let cfg=deepMerge(DEFAULTS,JSON.parse(localStorage.getItem(KEY)||'null'));
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+function setAt(path,val){let o=cfg;const parts=path.split('.');parts.slice(0,-1).forEach(p=>o=o[p]);o[parts.at(-1)]=val}
+function field(path,label,value,type='text',opts=''){return `<div class="field"><label>${label}</label>${type==='textarea'?`<textarea data-path="${path}">${esc(value)}</textarea>`:type==='color'?`<div class="color"><input data-path="${path}" value="${esc(value)}"><input type="color" data-color="${path}" value="${esc(value)}"></div>`:type==='select'?`<select data-path="${path}">${opts}</select>`:`<input data-path="${path}" type="${type}" value="${esc(value)}">`}</div>`}
+function group(title,body,open=false){return `<div class="group"><button class="group-toggle">${title}<span>${open?'−':'+'}</span></button><div class="group-body" style="${open?'':'display:none'}">${body}</div></div>`}
+function render(){
+ const c=cfg;
+ $('#contentPanel').innerHTML=
+ group('Navigation',field('nav.logo','Logo',c.nav.logo)+field('nav.cta','CTA label',c.nav.cta),true)+
+ group('Hero',field('hero.eyebrow','Eyebrow',c.hero.eyebrow)+field('hero.title','Headline',c.hero.title,'textarea')+field('hero.description','Description',c.hero.description,'textarea')+field('hero.primary','Primary button',c.hero.primary)+field('hero.primaryLink','Primary link',c.hero.primaryLink)+field('hero.secondary','Secondary button',c.hero.secondary)+field('hero.secondaryLink','Secondary link',c.hero.secondaryLink)+field('hero.noteTitle','Side title',c.hero.noteTitle)+field('hero.noteText','Side text',c.hero.noteText,'textarea'))+
+ group('Showreel',field('reel.kicker','Kicker',c.reel.kicker)+field('reel.title','Title',c.reel.title)+field('reel.desc','Description',c.reel.desc,'textarea')+field('reel.label','Label',c.reel.label)+field('reel.url','Video / reel URL',c.reel.url)+field('reel.image','Cover image URL',c.reel.image))+
+ group('Work cards',`
+ <div class="field"><label>Card count</label><select id="workCount">${[2,3,4,5,6].map(n=>`<option ${c.work.items.length===n?'selected':''}>${n}</option>`).join('')}</select></div>
+ ${c.work.items.map((x,i)=>group('Work '+(i+1),field(`work.items.${i}.tag`,'Tag',x.tag)+field(`work.items.${i}.title`,'Title',x.title)+field(`work.items.${i}.image`,'Image URL',x.image)+field(`work.items.${i}.url`,'Link',x.url),i===0)).join('')}
+ ${field('work.kicker','Section kicker',c.work.kicker)+field('work.title','Section title',c.work.title)+field('work.desc','Section description',c.work.desc,'textarea')}`)+
+ group('Case study',field('caseStudy.kicker','Kicker',c.caseStudy.kicker)+field('caseStudy.title','Title',c.caseStudy.title)+field('caseStudy.desc','Description',c.caseStudy.desc,'textarea')+
+ c.caseStudy.cards.map((x,i)=>group('Case card '+(i+1),field(`caseStudy.cards.${i}.kicker`,'Kicker',x.kicker)+field(`caseStudy.cards.${i}.title`,'Title',x.title)+field(`caseStudy.cards.${i}.text`,'Text',x.text,'textarea'),i===0)).join(''))+
+ group('Services',field('services.kicker','Kicker',c.services.kicker)+field('services.title','Title',c.services.title)+field('services.desc','Description',c.services.desc,'textarea')+c.services.items.map((x,i)=>field(`services.items.${i}.title`,'Service '+(i+1),x.title)).join(''))+
+ group('Process',field('process.kicker','Kicker',c.process.kicker)+field('process.title','Title',c.process.title)+c.process.items.map((x,i)=>group('Step '+(i+1),field(`process.items.${i}.title`,'Title',x.title)+field(`process.items.${i}.text`,'Text',x.text,'textarea'),i===0)).join(''))+
+ group('About',field('about.kicker','Kicker',c.about.kicker)+field('about.title','Title',c.about.title)+field('about.text','Body (supports <em> and <br>)',c.about.text,'textarea')+c.about.facts.map((x,i)=>group('Fact '+(i+1),field(`about.facts.${i}.0`,'Label',x[0])+field(`about.facts.${i}.1`,'Value',x[1]),i===0)).join(''))+
+ group('Contact',field('contact.kicker','Kicker',c.contact.kicker)+field('contact.title','Title',c.contact.title)+field('contact.desc','Description',c.contact.desc,'textarea')+field('contact.email','Email',c.contact.email,'email')+field('contact.primary','Button',c.contact.primary)+field('contact.instagram','Social button',c.contact.instagram)+field('contact.instagramUrl','Social URL',c.contact.instagramUrl));
+ $('#designPanel').innerHTML=
+ group('Colors',field('theme.background','Background',c.theme.background,'color')+field('theme.panel','Card background',c.theme.panel,'color')+field('theme.panel2','Secondary panel',c.theme.panel2,'color')+field('theme.text','Text',c.theme.text,'color')+field('theme.muted','Muted text',c.theme.muted,'color')+field('theme.accent','Accent / button',c.theme.accent,'color')+field('theme.accentText','Button text',c.theme.accentText,'color'),true)+
+ group('Typography',field('theme.font','Font stack',c.theme.font)+field('theme.radius','Corner radius',c.theme.radius,'number'))+
+ group('Layout',`<div class="field"><label>Compact spacing</label><select data-path="theme.compact"><option value="false" ${!c.theme.compact?'selected':''}>Comfortable</option><option value="true" ${c.theme.compact?'selected':''}>Compact</option></select></div><p class="help">For external fonts, use a CSS font-family stack. No external font loader is required.</p>`);
+ $('#sitePanel').innerHTML=group('SEO & site',field('meta.siteTitle','Browser title',c.meta.siteTitle)+field('meta.description','SEO description',c.meta.description,'textarea')+field('meta.language','Language',c.meta.language)+field('footer.name','Footer name',c.footer.name)+field('footer.tag','Footer tagline',c.footer.tag),true)+
+ `<div class="group"><button class="group-toggle">Image uploads <span>+</span></button><div class="group-body" style="display:none"><div class="drop">Choose an image, then paste/use the resulting local data URL in a matching Image URL field below.<input type="file" accept="image/*" id="imgUpload"></div><p class="help">Uploads are stored in this browser. Very large images can make localStorage heavy; optimized WebP/JPG is best.</p></div></div>`;
+ bind();
+}
+function bind(){
+ document.querySelectorAll('[data-path]').forEach(el=>{
+   el.addEventListener('input',()=>{let v=el.type==='number'?Number(el.value):(el.value==='true'?'true':el.value==='false'?'false':el.value); if(el.dataset.path==='theme.compact')v=v==='true';setAt(el.dataset.path,v); schedulePreview()});
+ });
+ document.querySelectorAll('[data-color]').forEach(el=>el.addEventListener('input',()=>{setAt(el.dataset.color,el.value);const txt=document.querySelector(`[data-path="${el.dataset.color}"]`);if(txt)txt.value=el.value;schedulePreview()}));
+ document.querySelectorAll('.group-toggle').forEach(b=>b.addEventListener('click',()=>{const body=b.nextElementSibling;body.style.display=body.style.display==='none'?'block':'none';b.querySelector('span').textContent=body.style.display==='none'?'+':'−'}));
+ $('#workCount')?.addEventListener('change',e=>{const n=Number(e.target.value);while(cfg.work.items.length<n)cfg.work.items.push({tag:'NEW · PROJECT',title:'New Project',image:'',url:'#contact'});cfg.work.items.length=n;render();schedulePreview()});
+ $('#imgUpload')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{navigator.clipboard?.writeText(reader.result);alert('Image converted to a local data URL and copied to clipboard. Paste it into an Image URL field.');};reader.readAsDataURL(f)});
+}
+let timer;function schedulePreview(){clearTimeout(timer);timer=setTimeout(()=>{localStorage.setItem(KEY,JSON.stringify(cfg));loadPreview()},200)}
+function loadPreview(){const iframe=$('#preview');iframe.src='index.html?preview='+Date.now();$('#status').textContent='Preview updated';setTimeout(()=>$('#status').textContent='Editing your portfolio',800)}
+$('#saveBtn').addEventListener('click',()=>{localStorage.setItem(KEY,JSON.stringify(cfg));loadPreview();$('#status').textContent='Saved to this browser'});
+$('#resetBtn').addEventListener('click',()=>{if(confirm('Reset every customization to the default template?')){cfg=structuredClone(DEFAULTS);localStorage.setItem(KEY,JSON.stringify(cfg));render();loadPreview()}});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.tab+'Panel').classList.add('active')}));
+$('#previewBtn').addEventListener('click',loadPreview);$('#openSite').addEventListener('click',()=>window.open('index.html','_blank'));
+$('#exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='yujin-portfolio-config.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)});
+$('#importBtn').addEventListener('click',()=>{$('#jsonModal').classList.add('show');$('#jsonArea').value=JSON.stringify(cfg,null,2)});
+$('#closeModal').addEventListener('click',()=>$('#jsonModal').classList.remove('show'));
+$('#applyJson').addEventListener('click',()=>{try{cfg=deepMerge(DEFAULTS,JSON.parse($('#jsonArea').value));localStorage.setItem(KEY,JSON.stringify(cfg));$('#jsonModal').classList.remove('show');render();loadPreview()}catch(e){alert('Invalid JSON: '+e.message)}});
+render();loadPreview();
+</script>
+</body>
+</html>

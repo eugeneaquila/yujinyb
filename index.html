@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="">
+<meta name="theme-color" content="#09090b">
+<title>Yujin — Motion Designer & Visual Creator</title>
+<style>
+:root{--bg:#09090b;--panel:#111114;--panel2:#17171b;--text:#f5f5f5;--muted:#a1a1aa;--line:rgba(255,255,255,.10);--accent:#fff;--accentText:#09090b;--max:1180px;--radius:22px;--font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5}a{color:inherit;text-decoration:none}button{font:inherit}
+.container{width:min(calc(100% - 40px),var(--max));margin:auto}.site-nav{position:fixed;z-index:50;top:16px;left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),1080px);display:flex;align-items:center;justify-content:space-between;padding:12px 14px 12px 18px;background:rgba(12,12,15,.72);border:1px solid var(--line);border-radius:999px;backdrop-filter:blur(18px)}
+.logo{font-weight:800;letter-spacing:-.04em}.navlinks{display:flex;gap:6px}.navlinks a{font-size:13px;color:#b9b9c0;padding:8px 12px;border-radius:999px}.navlinks a:hover{background:var(--accent);color:var(--accentText)}.nav-cta{background:var(--accent);color:var(--accentText);padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700}
+.hero{min-height:100vh;display:grid;place-items:center;padding:150px 0 80px;position:relative;overflow:hidden}.hero:before{content:"";position:absolute;width:680px;height:680px;right:-250px;top:-180px;background:radial-gradient(circle,var(--heroGlow,rgba(255,255,255,.12)),transparent 65%);filter:blur(20px)}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:70px;align-items:end}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:#8d8d96;margin-bottom:22px}h1{font-size:clamp(58px,9vw,128px);line-height:.84;letter-spacing:-.075em;margin:0;max-width:850px}.hero-copy{font-size:clamp(18px,2vw,24px);color:#c9c9ce;max-width:650px;margin:30px 0}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 19px;border-radius:999px;border:1px solid var(--line);font-weight:700;font-size:14px}.btn.primary{background:var(--accent);color:var(--accentText);border-color:var(--accent)}.btn:hover{transform:translateY(-2px)}.hero-note{border-left:1px solid var(--line);padding-left:25px;color:#a8a8b0}.hero-note strong{display:block;color:#fff;font-size:14px;margin-bottom:8px}
+section{padding:110px 0;border-top:1px solid var(--line)}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:45px}.kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#85858e}.section-title{font-size:clamp(34px,5vw,64px);letter-spacing:-.06em;line-height:.95;margin:10px 0 0}.section-desc{max-width:430px;color:var(--muted);font-size:15px}
+.reel{aspect-ratio:16/8;background:linear-gradient(135deg,#19191e,#09090b);border:1px solid var(--line);border-radius:28px;display:grid;place-items:center;position:relative;overflow:hidden;background-size:cover;background-position:center;cursor:pointer}.reel:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.16),transparent 28%),linear-gradient(120deg,transparent 35%,rgba(255,255,255,.05),transparent 65%)}.play{width:82px;height:82px;border:1px solid rgba(255,255,255,.35);border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);z-index:1;font-size:22px;padding-left:4px}.reel-label{position:absolute;bottom:20px;left:22px;z-index:2;font-size:12px;color:#aaa}
+.work-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.work{min-height:390px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:20px;display:flex;flex-direction:column;justify-content:end;overflow:hidden;position:relative;transition:.25s}.work:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.25)}.work-visual{position:absolute;inset:0;background:linear-gradient(135deg,#22222a 0%,#0d0d10 55%,#1b1b21 100%);background-size:cover;background-position:center}.work-info{position:relative;z-index:2;background:linear-gradient(transparent,rgba(0,0,0,.88));margin:0 -20px -20px;padding:70px 20px 20px}.work-tag{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#aaa}.work h3{margin:7px 0 0;font-size:28px;letter-spacing:-.04em}
+.case{display:grid;grid-template-columns:1fr 1fr;gap:20px}.case-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:30px}.case-card h3{font-size:24px;margin:0 0 12px}.case-card p{color:var(--muted);margin:0}.process{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.step{border-top:1px solid var(--line);padding-top:18px}.step b{font-size:12px;color:#777}.step h3{margin:10px 0 7px}.step p{color:var(--muted);font-size:14px}
+.services{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.service{padding:24px;border-right:1px solid var(--line);min-height:180px}.service:last-child{border-right:0}.service span{font-size:11px;color:#777}.service h3{font-size:19px;margin-top:48px;letter-spacing:-.03em}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px}.about-text{font-size:clamp(25px,3vw,40px);line-height:1.1;letter-spacing:-.04em}.about-text em{font-style:normal;color:#777}.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}.fact{background:var(--bg);padding:22px}.fact small{display:block;color:#777;margin-bottom:8px}.fact strong{font-size:16px}
+.contact{padding:130px 0 80px;text-align:center}.contact h2{font-size:clamp(52px,9vw,120px);letter-spacing:-.075em;line-height:.82;margin:0 auto 35px}.contact p{color:var(--muted);margin:0 auto 28px}.contact-email{font-size:clamp(18px,3vw,30px);font-weight:700;border-bottom:1px solid #777;padding-bottom:5px}footer{padding:25px 0 40px;color:#777;font-size:12px;display:flex;justify-content:space-between;border-top:1px solid var(--line)}
+.reveal{opacity:0;transform:translateY(20px);transition:.7s ease}.reveal.visible{opacity:1;transform:none}
+body.compact section{padding:80px 0}.hide{display:none!important}
+@media(max-width:850px){.container{width:min(calc(100% - 28px),var(--max))}.navlinks{display:none}.hero{padding-top:130px}.hero-grid,.about-grid,.case{grid-template-columns:1fr;gap:35px}.hero-note{margin-top:10px}.work-grid{grid-template-columns:1fr}.work{min-height:330px}.services{grid-template-columns:1fr 1fr}.service{border-right:0;border-bottom:1px solid var(--line)}.service:nth-child(odd){border-right:1px solid var(--line)}.service:last-child{border-bottom:0}.process{grid-template-columns:1fr 1fr}.section-head{display:block}.section-desc{margin-top:20px}}
+@media(max-width:520px){section{padding:80px 0}.hero{min-height:auto;padding-bottom:90px}h1{font-size:62px}.services{grid-template-columns:1fr}.service,.service:nth-child(odd){border-right:0}.process{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.contact h2{font-size:64px}footer{display:block}footer span{display:block;margin-top:8px}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="logo" id="navLogo" href="#top">YUJIN.</a>
+  <div class="navlinks">
+    <a href="#work">Work</a><a href="#services">Services</a><a href="#about">About</a><a href="#process">Process</a>
+  </div>
+  <a class="nav-cta" id="navCta" href="#contact">Let's talk ↗</a>
+</nav>
+
+<main id="top">
+<section class="hero" id="heroSection"><div class="container hero-grid reveal">
+  <div>
+   <div class="eyebrow" id="heroEyebrow"></div>
+   <h1 id="heroTitle"></h1>
+   <p class="hero-copy" id="heroDescription"></p>
+   <div class="actions"><a class="btn primary" id="heroPrimary" href="#work"></a><a class="btn" id="heroSecondary" href="#contact"></a></div>
+  </div>
+  <div class="hero-note"><strong id="heroNoteTitle"></strong><span id="heroNoteText"></span></div>
+</div></section>
+
+<section id="reelSection"><div class="container reveal">
+  <div class="section-head"><div><div class="kicker" id="reelKicker"></div><h2 class="section-title" id="reelTitle"></h2></div><p class="section-desc" id="reelDesc"></p></div>
+  <a class="reel" id="reelBox" target="_blank" rel="noopener"><div class="play">▶</div><div class="reel-label" id="reelLabel"></div></a>
+</div></section>
+
+<section id="work"><div class="container reveal">
+  <div class="section-head"><div><div class="kicker" id="workKicker"></div><h2 class="section-title" id="workTitle"></h2></div><p class="section-desc" id="workDesc"></p></div>
+  <div class="work-grid" id="workGrid"></div>
+</div></section>
+
+<section id="caseStudy"><div class="container reveal">
+  <div class="section-head"><div><div class="kicker" id="caseKicker"></div><h2 class="section-title" id="caseTitle"></h2></div><p class="section-desc" id="caseDesc"></p></div>
+  <div class="case" id="caseGrid"></div>
+</div></section>
+
+<section id="services"><div class="container reveal">
+  <div class="section-head"><div><div class="kicker" id="servicesKicker"></div><h2 class="section-title" id="servicesTitle"></h2></div><p class="section-desc" id="servicesDesc"></p></div>
+  <div class="services" id="servicesGrid"></div>
+</div></section>
+
+<section id="process"><div class="container reveal">
+  <div class="section-head"><div><div class="kicker" id="processKicker"></div><h2 class="section-title" id="processTitle"></h2></div></div>
+  <div class="process" id="processGrid"></div>
+</div></section>
+
+<section id="about"><div class="container reveal">
+  <div class="section-head"><div><div class="kicker" id="aboutKicker"></div><h2 class="section-title" id="aboutTitle"></h2></div></div>
+  <div class="about-grid"><div class="about-text" id="aboutText"></div><div class="facts" id="factsGrid"></div></div>
+</div></section>
+
+<section class="contact" id="contact"><div class="container reveal">
+ <div class="kicker" id="contactKicker"></div><h2 id="contactTitle"></h2><p id="contactDesc"></p>
+ <a class="contact-email" id="contactEmail"></a>
+ <div class="actions" style="justify-content:center;margin-top:30px"><a class="btn primary" id="contactPrimary"></a><a class="btn" id="instagram"></a></div>
+</div></section>
+</main>
+<footer class="container"><span>© <span id="year"></span> <span id="footerName"></span>. All rights reserved.</span><span id="footerTag"></span></footer>
+
+<script>
+const KEY='yujinPortfolioConfigV1';
+const DEFAULTS={
+ meta:{siteTitle:'Yujin — Motion Designer & Visual Creator',description:'I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.',language:'en'},
+ theme:{background:'#09090b',panel:'#111114',panel2:'#17171b',text:'#f5f5f5',muted:'#a1a1aa',accent:'#ffffff',accentText:'#09090b',font:'Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',radius:22,compact:false},
+ nav:{logo:'YUJIN.',cta:'Let\\'s talk ↗'},
+ hero:{eyebrow:'Motion Designer · MV Animator · Compositor',title:'I make motion feel alive.',description:'I create cinematic motion, anime-inspired visuals and music-driven experiences for VTubers, artists and digital creators.',primary:'View selected work ↗',primaryLink:'#work',secondary:'Start a project',secondaryLink:'#contact',noteTitle:'Yujin — Visual Creator',noteText:'Focused on motion design, MV production, anime compositing and creator-focused visuals. Available for remote projects worldwide.'},
+ reel:{kicker:'01 / Showreel',title:'Selected motion.',desc:'A curated look at my latest motion work.',label:'SHOWREEL 2024 — 2026',url:'',image:''},
+ work:{kicker:'02 / Selected work',title:'Things I\\'ve made.',desc:'A curated selection of recent motion, music and creator projects.',items:[
+  {tag:'MV · Motion Design',title:'Music Visual',image:'',url:'#contact'},
+  {tag:'VTuber · Promotional',title:'Debut Trailer',image:'',url:'#contact'},
+  {tag:'Anime · Compositing',title:'Post-Shiage',image:'',url:'#contact'},
+  {tag:'Music · Visualizer',title:'Visual Experience',image:'',url:'#contact'}]},
+ caseStudy:{kicker:'03 / Case study',title:'Show the thinking.',desc:'Prove not only what you made, but what you contributed.',cards:[
+  {kicker:'01 — The brief',title:'Turn a song into a visual identity.',text:'Start with the artist’s concept, references and music. Define the visual language before opening After Effects.'},
+  {kicker:'02 — The craft',title:'Animation → effects → compositing.',text:'Break down your contribution: camera movement, typography, FX, transitions, lighting, color and final polish.'}]},
+ services:{kicker:'04 / Services',title:'What I do.',desc:'Focused services built around motion, music and character-driven visuals.',items:[
+  {title:'Motion Design'},{title:'MV Production'},{title:'VTuber Visuals'},{title:'Anime Compositing'},{title:'Video Editing'}]},
+ process:{kicker:'05 / Process',title:'Simple. Clear. Collaborative.',items:[
+  {title:'Brief',text:'Goals, references, assets, music and timeline.'},{title:'Direction',text:'Visual concept, mood and motion language.'},{title:'Production',text:'Animation, compositing, editing and polish.'},{title:'Delivery',text:'Final exports, revisions and organized files.'}]},
+ about:{kicker:'06 / About',title:'Meet Yujin.',text:'I’m a motion designer and visual creator obsessed with <em>movement, atmosphere and music.</em><br><br>I turn static artwork and ideas into visuals that feel cinematic, energetic and alive.',facts:[
+  ['Specialization','Anime · VTuber · Music'],['Core tools','After Effects · Premiere'],['Based in','Indonesia'],['Availability','Remote · Worldwide']]},
+ contact:{kicker:'07 / Contact',title:'Have a project in mind?',desc:'Tell me what you’re creating, what you need, and when you need it.',email:'hello@yujinyb.com',primary:'Start a project',instagram:'Instagram ↗',instagramUrl:'https://www.instagram.com/yujinaquila/'},
+ footer:{name:'Yujin',tag:'Motion Designer · Visual Creator'}
+};
+
+function deepMerge(base, saved){
+  if(!saved) return structuredClone(base);
+  const out=structuredClone(base);
+  const merge=(a,b)=>{Object.keys(b||{}).forEach(k=>{if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==='object'&&!Array.isArray(a[k]))merge(a[k],b[k]);else a[k]=b[k]})};
+  merge(out,saved); return out;
+}
+let cfg=deepMerge(DEFAULTS, JSON.parse(localStorage.getItem(KEY)||'null'));
+function apply(){
+ document.title=cfg.meta.siteTitle; document.querySelector('meta[name="description"]').content=cfg.meta.description;
+ const r=document.documentElement.style; r.setProperty('--bg',cfg.theme.background);r.setProperty('--panel',cfg.theme.panel);r.setProperty('--panel2',cfg.theme.panel2);r.setProperty('--text',cfg.theme.text);r.setProperty('--muted',cfg.theme.muted);r.setProperty('--accent',cfg.theme.accent);r.setProperty('--accentText',cfg.theme.accentText);r.setProperty('--font',cfg.theme.font);r.setProperty('--radius',cfg.theme.radius+'px');document.body.classList.toggle('compact',!!cfg.theme.compact);
+ const t=(id,v)=>document.getElementById(id).innerHTML=v??''; const attr=(id,a,v)=>document.getElementById(id).setAttribute(a,v||'');
+ t('navLogo',cfg.nav.logo);t('navCta',cfg.nav.cta);attr('navCta','href','#contact');
+ t('heroEyebrow',cfg.hero.eyebrow);t('heroTitle',cfg.hero.title);t('heroDescription',cfg.hero.description);t('heroPrimary',cfg.hero.primary);t('heroSecondary',cfg.hero.secondary);attr('heroPrimary','href',cfg.hero.primaryLink);attr('heroSecondary','href',cfg.hero.secondaryLink);t('heroNoteTitle',cfg.hero.noteTitle);t('heroNoteText',cfg.hero.noteText);
+ t('reelKicker',cfg.reel.kicker);t('reelTitle',cfg.reel.title);t('reelDesc',cfg.reel.desc);t('reelLabel',cfg.reel.label);attr('reelBox','href',cfg.reel.url||'#');if(cfg.reel.image)document.getElementById('reelBox').style.backgroundImage=`url("${cfg.reel.image}")`;
+ t('workKicker',cfg.work.kicker);t('workTitle',cfg.work.title);t('workDesc',cfg.work.desc);
+ document.getElementById('workGrid').innerHTML=cfg.work.items.map(x=>`<a class="work" href="${x.url||'#'}" ${/^https?:/.test(x.url||'')?'target="_blank" rel="noopener"':''}><div class="work-visual" ${x.image?`style="background-image:url('${x.image.replaceAll("'","%27")}')"`:''}></div><div class="work-info"><div class="work-tag">${x.tag||''}</div><h3>${x.title||''}</h3></div></a>`).join('');
+ t('caseKicker',cfg.caseStudy.kicker);t('caseTitle',cfg.caseStudy.title);t('caseDesc',cfg.caseStudy.desc);document.getElementById('caseGrid').innerHTML=cfg.caseStudy.cards.map(x=>`<div class="case-card"><div class="kicker">${x.kicker}</div><h3>${x.title}</h3><p>${x.text}</p></div>`).join('');
+ t('servicesKicker',cfg.services.kicker);t('servicesTitle',cfg.services.title);t('servicesDesc',cfg.services.desc);document.getElementById('servicesGrid').innerHTML=cfg.services.items.map((x,i)=>`<div class="service"><span>${String(i+1).padStart(2,'0')}</span><h3>${x.title}</h3></div>`).join('');
+ t('processKicker',cfg.process.kicker);t('processTitle',cfg.process.title);document.getElementById('processGrid').innerHTML=cfg.process.items.map((x,i)=>`<div class="step"><b>${String(i+1).padStart(2,'0')}</b><h3>${x.title}</h3><p>${x.text}</p></div>`).join('');
+ t('aboutKicker',cfg.about.kicker);t('aboutTitle',cfg.about.title);t('aboutText',cfg.about.text);document.getElementById('factsGrid').innerHTML=cfg.about.facts.map(x=>`<div class="fact"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
+ t('contactKicker',cfg.contact.kicker);t('contactTitle',cfg.contact.title);t('contactDesc',cfg.contact.desc);t('contactEmail',cfg.contact.email);attr('contactEmail','href','mailto:'+cfg.contact.email);t('contactPrimary',cfg.contact.primary);attr('contactPrimary','href','mailto:'+cfg.contact.email);t('instagram',cfg.contact.instagram);attr('instagram','href',cfg.contact.instagramUrl);t('footerName',cfg.footer.name);t('footerTag',cfg.footer.tag);document.getElementById('year').textContent=new Date().getFullYear();
+}
+apply();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.12});document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+</script>
+</body>
+</html>
