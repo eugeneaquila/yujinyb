@@ -39,19 +39,17 @@ body.auth-locked > *:not(#authModal){
 
 </style><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
-
 import { firebaseConfig, ADMIN_EMAILS } from "./firebase-config.js";
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
+await setPersistence(auth, browserLocalPersistence);
 const db = getFirestore(firebaseApp);
-const storage = getStorage(firebaseApp);
 const GOOGLE_ADMIN_EMAILS=ADMIN_EMAILS;
 const googleProvider=new GoogleAuthProvider();
 googleProvider.setCustomParameters({prompt:"select_account"});
-window.YUJIN_FIREBASE={firebaseApp,auth,db,storage,doc,getDoc,setDoc,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,googleProvider,onAuthStateChanged,signOut,ref,uploadBytes,getDownloadURL,GOOGLE_ADMIN_EMAILS};
+window.YUJIN_FIREBASE={firebaseApp,auth,db,doc,getDoc,setDoc,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,googleProvider,onAuthStateChanged,signOut,GOOGLE_ADMIN_EMAILS};
 </script>
 <style>
 /* Ambient Light + Glassmorphism */
@@ -313,7 +311,7 @@ document.querySelectorAll("[data-upload-project]").forEach(input=>input.addEvent
   try{
     setPublishState("Uploading image…");
     const path="portfolio/projects/"+Date.now()+"-"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-    const storageRef=window.YUJIN_FIREBASE.ref(window.YUJIN_FIREBASE.storage,path);
+    const storageRef=window.YUJIN_FIREBASE.ref(window.YUJIN_FIREBASE.path);
     await window.YUJIN_FIREBASE.uploadBytes(storageRef,file);
     const url=await window.YUJIN_FIREBASE.getDownloadURL(storageRef);
     c.work.items[i].image=url; saveLocal(); render(); send(); setPublishState("Image uploaded. Save draft or publish.");
@@ -408,36 +406,85 @@ $("#googleSignIn").onclick=async()=>{
       alert("This Google account is not authorized to access the admin editor.");
       return;
     }
+    currentUser=result.user;
+    firebaseReady=true;
+    $("#authEmail").textContent=result.user.email;
+    $("#signIn").style.display="none";
+    $("#signOut").style.display="block";
     closeAuth();
+    setPublishState("Signed in as "+result.user.email+" — loading portfolio…");
+    await loadRemote();
   }catch(err){
-    console.error(err);
+    console.error("Google sign-in failed:",err);
     alert("Google sign-in failed: "+err.message);
   }
 };
 $("#authSubmit").onclick=async()=>{
-  const email=$("#authEmailInput").value.trim(),password=$("#authPasswordInput").value;
+  const email=$("#authEmailInput").value.trim().toLowerCase();
+  const password=$("#authPasswordInput").value;
   if(!email||!password){alert("Enter your Firebase email and password.");return}
-  try{await window.YUJIN_FIREBASE.signInWithEmailAndPassword(window.YUJIN_FIREBASE.auth,email,password);$("#authModal").classList.remove("show")}
-  catch(err){alert("Sign in failed: "+err.message)}
+  try{
+    const result=await window.YUJIN_FIREBASE.signInWithEmailAndPassword(
+      window.YUJIN_FIREBASE.auth,email,password
+    );
+    if(!window.YUJIN_FIREBASE.GOOGLE_ADMIN_EMAILS.includes(email)){
+      await window.YUJIN_FIREBASE.signOut(window.YUJIN_FIREBASE.auth);
+      alert("This account is not authorized to access the admin editor.");
+      return;
+    }
+    currentUser=result.user;
+    firebaseReady=true;
+    $("#authEmail").textContent=result.user.email;
+    $("#signIn").style.display="none";
+    $("#signOut").style.display="block";
+    closeAuth();
+    setPublishState("Signed in as "+result.user.email+" — loading portfolio…");
+    await loadRemote();
+  }catch(err){
+    console.error("Email sign-in failed:",err);
+    alert("Sign in failed: "+err.message);
+  }
 };
 $("#signOut").onclick=()=>window.YUJIN_FIREBASE.signOut(window.YUJIN_FIREBASE.auth);
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.tab).classList.add("active")});
 window.YUJIN_FIREBASE.onAuthStateChanged(window.YUJIN_FIREBASE.auth,async user=>{
-  currentUser=user; firebaseReady=!!user;
+  currentUser=user;
+  firebaseReady=!!user;
+
   if(user){
     const email=(user.email||"").toLowerCase();
     if(!window.YUJIN_FIREBASE.GOOGLE_ADMIN_EMAILS.includes(email)){
       await window.YUJIN_FIREBASE.signOut(window.YUJIN_FIREBASE.auth);
+      currentUser=null;
+      firebaseReady=false;
       $("#authEmail").textContent="Unauthorized account";
-      $("#signIn").style.display="block";$("#signOut").style.display="none";
-      setPublishState("Only the authorized admin account can access this editor.");
+      $("#signIn").style.display="block";
+      $("#signOut").style.display="none";
+      setPublishState("This Google account is not authorized.");
+      openAuth();
       return;
     }
-    $("#authEmail").textContent=user.email||user.uid;$("#signIn").style.display="none";$("#signOut").style.display="block";
-    setPublishState("Signed in. Loading Firebase portfolio…");await loadRemote();
+
+    $("#authEmail").textContent=user.email || "Signed in";
+    $("#signIn").style.display="none";
+    $("#signOut").style.display="block";
+    $("#authModal").classList.remove("show");
+    document.body.classList.remove("auth-locked");
+    setPublishState("Signed in as "+(user.email||"admin")+" — loading portfolio…");
+
+    try{
+      await loadRemote();
+      setPublishState("Signed in as "+(user.email||"admin")+" — Firebase connected.");
+    }catch(err){
+      console.error("Firestore load failed:",err);
+      setPublishState("Signed in, but Firestore could not be loaded: "+err.message);
+    }
   }else{
-    $("#authEmail").textContent="Not signed in";$("#signIn").style.display="block";$("#signOut").style.display="none";
-    setPublishState("Local editor ready. Sign in to save/publish with Firebase.");
+    $("#authEmail").textContent="Not signed in";
+    $("#signIn").style.display="block";
+    $("#signOut").style.display="none";
+    setPublishState("Sign in to save and publish with Firebase.");
+    openAuth();
   }
 });
 render();
