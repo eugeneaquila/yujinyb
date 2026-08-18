@@ -87,7 +87,7 @@
   }
   @keyframes twinkle{from{opacity:.55;}to{opacity:.85;}}
 
-  /* ---------- moon component (reused: progress rail + price scope) ---------- */
+  /* ---------- moon component ---------- */
   .moon{
     --phase:0;
     position:relative;
@@ -270,6 +270,44 @@
   .reel-card.is-playing .thumb-wrap,.reel-card.is-playing{cursor:default;}
   .reel-card iframe{width:100%;aspect-ratio:16/9;display:block;border:0;}
 
+  /* Service tags badge styling */
+  .reel-tags{
+    display:flex;flex-wrap:wrap;gap:4px;padding:0 .8rem .7rem;
+  }
+  .reel-tag-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:.65rem;
+    padding:2px 6px;border-radius:4px;
+    background:rgba(201,182,255,0.1);border:1px solid rgba(201,182,255,0.25);
+    color:var(--accent-moon);
+  }
+
+  /* Tag Filter Buttons Bar */
+  .tag-filter-bar{
+    display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem;
+  }
+  .tag-filter-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:.75rem;
+    padding:.35rem .85rem;border-radius:999px;
+    border:1px solid var(--line);color:var(--text-muted);
+    background:var(--bg-panel);cursor:pointer;transition:all .15s;
+  }
+  .tag-filter-btn:hover, .tag-filter-btn.is-active{
+    border-color:var(--accent-gold);color:var(--accent-gold);
+    background:rgba(239,193,122,.08);
+  }
+
+  /* Quick-tag buttons styling for admin panel */
+  .quick-tag-btn-container{
+    display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem;
+  }
+  .quick-tag-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:.7rem;
+    padding:.25rem .6rem;border-radius:6px;
+    border:1px solid var(--line);background:var(--bg);color:var(--accent-moon);
+    cursor:pointer;
+  }
+  .quick-tag-btn:hover{border-color:var(--accent-moon);background:rgba(201,182,255,.1);}
+
   /* ---------- prices ---------- */
   .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;}
   .price-card{
@@ -380,6 +418,10 @@
   <div class="section-inner">
     <span class="eyebrow" data-i18n="works_eyebrow">Selected videos</span>
     <h2 class="section-title" data-i18n="works_title">Works</h2>
+    
+    <!-- Dynamic Tag Filter Bar -->
+    <div class="tag-filter-bar" id="tagFilterBar"></div>
+
     <div class="gallery" id="gallery"></div>
   </div>
 </section>
@@ -403,7 +445,19 @@
         </select>
         <textarea id="videoDescriptionInput" class="full" placeholder="YouTube description (auto-fetched from YouTube; you can edit/override it)"></textarea>
         <input id="videoPriceInput" placeholder="Price" readonly>
-        <input id="videoTagsInput" placeholder="Tags, comma separated">
+        
+        <div class="full">
+          <input id="videoTagsInput" placeholder="Tags, comma separated (e.g. MV Simple, 2D Motion, Typography)">
+          <div class="quick-tag-btn-container">
+            <button type="button" class="quick-tag-btn" onclick="addQuickTag('MV Simple')">+ MV Simple</button>
+            <button type="button" class="quick-tag-btn" onclick="addQuickTag('MV Complex')">+ MV Complex</button>
+            <button type="button" class="quick-tag-btn" onclick="addQuickTag('Debut PV')">+ Debut PV</button>
+            <button type="button" class="quick-tag-btn" onclick="addQuickTag('Puppet Animation')">+ Puppet Animation</button>
+            <button type="button" class="quick-tag-btn" onclick="addQuickTag('Typography')">+ Typography</button>
+            <button type="button" class="quick-tag-btn" onclick="addQuickTag('3D Camera')">+ 3D Camera</button>
+          </div>
+        </div>
+
         <input id="videoCtaTextInput" placeholder="CTA text">
         <input id="videoCtaUrlInput" placeholder="CTA URL">
       </div>
@@ -572,6 +626,17 @@
 </div>
 
 <script>
+// Helper function for Quick Tag Adder Buttons
+function addQuickTag(tagName) {
+  var input = document.getElementById('videoTagsInput');
+  if (!input) return;
+  var current = input.value ? input.value.split(',').map(function(t){ return t.trim(); }) : [];
+  if (current.indexOf(tagName) === -1) {
+    current.push(tagName);
+    input.value = current.join(', ');
+  }
+}
+
 (function(){
   // ---------- mobile nav ----------
   var navToggle = document.getElementById('navToggle');
@@ -602,18 +667,63 @@
   var videos = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
   var gallery = document.getElementById('gallery');
   var workMetadata = JSON.parse(localStorage.getItem('yujin_work_youtube_metadata') || '{}');
+  var activeFilterTag = 'all';
+
   function saveWorkMetadata(){ localStorage.setItem('yujin_work_youtube_metadata', JSON.stringify(workMetadata)); }
   function workTitle(id, i){ return (workMetadata[id] && workMetadata[id].title) || ('Work '+(i+1)); }
+
   function renderWorks(){
-    gallery.innerHTML = videos.map(function(id, i){
-      var meta=workMetadata[id]||{};
+    var filtered = videos.filter(function(id){
+      if (activeFilterTag === 'all') return true;
+      var tags = (workMetadata[id] && workMetadata[id].tags) || [];
+      return tags.indexOf(activeFilterTag) !== -1;
+    });
+
+    gallery.innerHTML = filtered.map(function(id, i){
+      var meta = workMetadata[id] || {};
+      var tags = meta.tags || [];
+      var tagsHTML = tags.map(function(t){ return '<span class="reel-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
+
       return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open '+escapeHtml(workTitle(id,i))+'">'
         + '<span class="reel-edge"></span><span class="thumb-wrap">'
         + '<img loading="lazy" src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="'+escapeHtml(workTitle(id,i))+'">'
         + '<span class="play-glyph"></span></span><span class="reel-edge"></span>'
-        + '<span class="reel-title" style="display:block;padding:.65rem .8rem .8rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(workTitle(id,i))+'</span></button>';
-    }).join('');
+        + '<span class="reel-title" style="display:block;padding:.65rem .8rem .2rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(workTitle(id,i))+'</span>'
+        + (tagsHTML ? '<div class="reel-tags">'+tagsHTML+'</div>' : '')
+        + '</button>';
+    }).join('') || '<p style="color:var(--text-muted)">No works match the selected tag.</p>';
   }
+
+  function renderTagFilterBar(){
+    var filterBar = document.getElementById('tagFilterBar');
+    if (!filterBar) return;
+    
+    var allTags = {};
+    videos.forEach(function(id){
+      var tags = (workMetadata[id] && workMetadata[id].tags) || [];
+      tags.forEach(function(t){ allTags[t] = true; });
+    });
+
+    var embeddedList = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
+    embeddedList.forEach(function(item){
+      (item.tags || []).forEach(function(t){ allTags[t] = true; });
+    });
+
+    var tagList = Object.keys(allTags);
+    filterBar.innerHTML = '<button type="button" class="tag-filter-btn '+(activeFilterTag === 'all' ? 'is-active' : '')+'" data-tag="all">All</button>'
+      + tagList.map(function(t){
+        return '<button type="button" class="tag-filter-btn '+(activeFilterTag === t ? 'is-active' : '')+'" data-tag="'+escapeHtml(t)+'">'+escapeHtml(t)+'</button>';
+      }).join('');
+  }
+
+  document.getElementById('tagFilterBar').addEventListener('click', function(e){
+    var btn = e.target.closest('.tag-filter-btn');
+    if (!btn) return;
+    activeFilterTag = btn.dataset.tag;
+    renderTagFilterBar();
+    renderWorks();
+  });
+
   function fetchYouTubeMetadata(id){
     if(workMetadata[id] && workMetadata[id].title && workMetadata[id].description !== undefined){
       return Promise.resolve(workMetadata[id]);
@@ -621,20 +731,32 @@
     return fetch('/api/youtube?videoId='+encodeURIComponent(id), {headers:{'Accept':'application/json'}})
       .then(function(r){ if(!r.ok) throw new Error('YouTube metadata unavailable'); return r.json(); })
       .then(function(data){
-        var meta={title:data.title||'',description:data.description||'',publishedAt:data.publishedAt||'',channelTitle:data.channelTitle||''};
-        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); return meta;
+        var meta={
+          title:data.title||'',
+          description:data.description||'',
+          publishedAt:data.publishedAt||'',
+          channelTitle:data.channelTitle||'',
+          tags: workMetadata[id] ? (workMetadata[id].tags || []) : []
+        };
+        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
       });
   }
   function fetchYouTubeTitleFallback(id){
     return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
       .then(function(r){return r.json();})
       .then(function(info){
-        var meta={title:info.title||'',description:'',channelTitle:info.author_name||''};
-        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); return meta;
+        var meta={
+          title:info.title||'',
+          description:'',
+          channelTitle:info.author_name||'',
+          tags: workMetadata[id] ? (workMetadata[id].tags || []) : []
+        };
+        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
       });
   }
 
   renderWorks();
+  renderTagFilterBar();
 
   function openVideoModal(item){
     var modal=document.getElementById('videoModal');
@@ -671,7 +793,7 @@
     var card=e.target.closest('.reel-card'); if(!card) return;
     var id=card.dataset.id;
     var meta=workMetadata[id]||{};
-    openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:[]});
+    openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:meta.tags||[]});
     fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);}).then(function(info){
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
@@ -700,9 +822,12 @@
   function renderEmbedded(){
     if(!embeddedGallery) return;
     embeddedGallery.innerHTML=embeddedVideos.map(function(v,i){
+      var tagsHTML = (v.tags || []).map(function(t){ return '<span class="reel-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
       return '<button class="reel-card" type="button" data-embedded-index="'+i+'" aria-label="Open '+escapeHtml(v.title||'video')+'">'
         +'<span class="reel-edge"></span><span class="thumb-wrap"><img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title||'Video')+'"><span class="play-glyph"></span></span>'
-        +'<span class="reel-edge"></span><span class="reel-title" style="display:block;padding:.65rem .8rem .8rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(v.title||'Video')+'</span></button>';
+        +'<span class="reel-edge"></span><span class="reel-title" style="display:block;padding:.65rem .8rem .2rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(v.title||'Video')+'</span>'
+        +(tagsHTML ? '<div class="reel-tags">'+tagsHTML+'</div>' : '')
+        +'</button>';
     }).join('') || '<p style="color:var(--text-muted)">No featured videos yet.</p>';
   }
   if(embeddedGallery){
@@ -732,10 +857,24 @@
     var m=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
     return m?m[1]:(/^[A-Za-z0-9_-]{11}$/.test(v)?v:'');
   }
+
   function renderAdminList(){
     var list=document.getElementById('adminList'); if(!list) return;
-    list.innerHTML=embeddedVideos.map(function(v,i){return '<div class="admin-item"><div><strong>'+escapeHtml(v.title||'Untitled')+'</strong><small>'+escapeHtml(v.id)+'</small></div><button class="btn btn-ghost" type="button" data-remove-video="'+i+'">Remove</button></div>';}).join('') || '<small style="color:var(--text-muted)">No added videos.</small>';
+    
+    var embeddedItems = embeddedVideos.map(function(v,i){
+      var tagStr = (v.tags || []).join(', ');
+      return '<div class="admin-item"><div><strong>'+escapeHtml(v.title||'Untitled')+'</strong><small>ID: '+escapeHtml(v.id)+' | Tags: '+escapeHtml(tagStr || 'None')+'</small></div><button class="btn btn-ghost" type="button" data-remove-video="'+i+'">Remove</button></div>';
+    }).join('');
+
+    var defaultItems = videos.map(function(id, i){
+      var meta = workMetadata[id] || {};
+      var tagStr = (meta.tags || []).join(', ');
+      return '<div class="admin-item"><div><strong>'+escapeHtml(workTitle(id, i))+'</strong><small>Works ID: '+id+' | Tags: <input type="text" value="'+escapeHtml(tagStr)+'" data-work-tag-id="'+id+'" placeholder="Tags..." style="padding:.2rem .5rem;font-size:.75rem;width:200px;display:inline-block;margin-left:6px;"></small></div><button class="btn btn-ghost" type="button" data-save-work-tag="'+id+'">Save Tags</button></div>';
+    }).join('');
+
+    list.innerHTML = embeddedItems + (defaultItems ? '<hr style="border-color:var(--line);margin:1rem 0;"><strong style="color:var(--accent-gold);">Edit Tags for Main Works Gallery:</strong>' + defaultItems : '');
   }
+
   function unlockAdmin(){
     var pw=window.prompt('Admin password');
     if(pw===ADMIN_PASSWORD){adminPanel.classList.add('is-open');renderAdminList();}
@@ -771,11 +910,53 @@
   document.getElementById('addVideoBtn').addEventListener('click',function(){
     var id=youtubeId(document.getElementById('videoUrlInput').value);
     if(!id){window.alert('Enter a valid YouTube URL or 11-character video ID.');return;}
-    embeddedVideos.push({id:id,title:document.getElementById('videoTitleInput').value.trim()||'Video',description:document.getElementById('videoDescriptionInput').value.trim(),youtubeTitle:document.getElementById('videoTitleInput').value.trim(),youtubeDescription:document.getElementById('videoDescriptionInput').value.trim(),service:document.getElementById('videoServiceInput').value,price:document.getElementById('videoPriceInput').value.trim(),tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),ctaText:document.getElementById('videoCtaTextInput').value.trim(),ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()});
-    localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); renderEmbedded(); renderAdminList();
+    embeddedVideos.push({
+      id:id,
+      title:document.getElementById('videoTitleInput').value.trim()||'Video',
+      description:document.getElementById('videoDescriptionInput').value.trim(),
+      youtubeTitle:document.getElementById('videoTitleInput').value.trim(),
+      youtubeDescription:document.getElementById('videoDescriptionInput').value.trim(),
+      service:document.getElementById('videoServiceInput').value,
+      price:document.getElementById('videoPriceInput').value.trim(),
+      tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),
+      ctaText:document.getElementById('videoCtaTextInput').value.trim(),
+      ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()
+    });
+    localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); 
+    renderEmbedded(); 
+    renderTagFilterBar(); 
+    renderAdminList();
   });
-  document.getElementById('clearVideoBtn').addEventListener('click',function(){if(window.confirm('Remove all added videos from this browser?')){embeddedVideos=[];localStorage.removeItem('yujin_embedded_videos');renderEmbedded();renderAdminList();}});
-  document.getElementById('adminList').addEventListener('click',function(e){var b=e.target.closest('[data-remove-video]');if(!b)return;embeddedVideos.splice(Number(b.dataset.removeVideo),1);localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos));renderEmbedded();renderAdminList();});
+  document.getElementById('clearVideoBtn').addEventListener('click',function(){if(window.confirm('Remove all added videos from this browser?')){embeddedVideos=[];localStorage.removeItem('yujin_embedded_videos');renderEmbedded();renderTagFilterBar();renderAdminList();}});
+  
+  document.getElementById('adminList').addEventListener('click',function(e){
+    var b=e.target.closest('[data-remove-video]');
+    if(b){
+      embeddedVideos.splice(Number(b.dataset.removeVideo),1);
+      localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos));
+      renderEmbedded();
+      renderTagFilterBar();
+      renderAdminList();
+      return;
+    }
+
+    var saveWorkBtn = e.target.closest('[data-save-work-tag]');
+    if(saveWorkBtn){
+      var workId = saveWorkBtn.dataset.saveWorkTag;
+      var input = document.querySelector('[data-work-tag-id="'+workId+'"]');
+      if(input){
+        var newTags = input.value.split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+        if(!workMetadata[workId]) workMetadata[workId] = {};
+        workMetadata[workId].tags = newTags;
+        saveWorkMetadata();
+        renderWorks();
+        renderTagFilterBar();
+        renderAdminList();
+        window.alert('Tags saved for work: ' + workId);
+      }
+    }
+  });
+
   document.getElementById('videoModalClose').addEventListener('click',closeVideoModal);
   document.getElementById('videoModal').addEventListener('click',function(e){if(e.target===this)closeVideoModal();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeVideoModal();});
