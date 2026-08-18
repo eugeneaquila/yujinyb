@@ -2164,5 +2164,33 @@ updateCommissionCounter();
   });
 })();
 </script>
+
+<script>
+/* ===== Yujin recovery layer: preserve Works + keep Login usable ===== */
+(function(){
+  var WORK_IDS = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
+  function esc(v){return String(v||'').replace(/[&<>'"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];});}
+  function openLogin(){ var m=document.getElementById('authModal'); if(m){m.classList.add('is-open');document.body.style.overflow='hidden';} }
+  function closeLogin(){ var m=document.getElementById('authModal'); if(m){m.classList.remove('is-open');document.body.style.overflow='';} }
+  window.openAuthModal = window.openAuthModal || openLogin;
+  window.closeAuthModal = window.closeAuthModal || closeLogin;
+  function bindLogin(){
+    var nav=document.getElementById('authNavContainer');
+    if(nav && !nav.dataset.recoveryBound){ nav.dataset.recoveryBound='1'; nav.addEventListener('click',function(e){var b=e.target.closest('.btn-auth'); if(b){e.preventDefault();openLogin();}}); }
+    var google=document.getElementById('btnGoogleSignIn'); if(google && !google.dataset.recoveryBound){google.dataset.recoveryBound='1';google.addEventListener('click',function(){ if(typeof window.loginWithGoogle==='function') window.loginWithGoogle(); });}
+    var admin=document.getElementById('btnAdminDirectLogin'); if(admin && !admin.dataset.recoveryBound){admin.dataset.recoveryBound='1';admin.addEventListener('click',function(){ if(typeof window.loginAsYujinAdmin==='function') window.loginAsYujinAdmin(); });}
+  }
+  function recoverWorks(){
+    var gallery=document.getElementById('gallery'); if(!gallery || gallery.dataset.recoveryRendered) return;
+    if(gallery.querySelector('.reel-card')) return;
+    gallery.dataset.recoveryRendered='1';
+    var meta={}; try{meta=JSON.parse(localStorage.getItem('yujin_work_youtube_metadata')||'{}');}catch(e){}
+    gallery.innerHTML=WORK_IDS.map(function(id,i){var title=(meta[id]&&meta[id].title)||('Commission Work #'+(i+1)); return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open '+esc(title)+'"><span class="reel-edge"></span><span class="thumb-wrap"><img loading="lazy" src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="'+esc(title)+'"><span class="play-glyph"></span></span><span class="reel-edge"></span><span class="reel-title" style="display:block;padding:.85rem .9rem;text-align:left;font-size:.9rem;color:var(--text);font-weight:500;">'+esc(title)+'</span></button>';}).join('');
+    gallery.addEventListener('click',function(e){var card=e.target.closest('.reel-card');if(!card)return;var id=card.dataset.id;var m={};try{m=JSON.parse(localStorage.getItem('yujin_work_youtube_metadata')||'{}')[id]||{};}catch(x){};if(typeof window.openVideoModal==='function'){window.openVideoModal({id:id,title:m.title||('Commission Work #'+(WORK_IDS.indexOf(id)+1)),description:m.description||'Loading YouTube description…',tags:m.tags||[],service:(m.service||'MV Simple'),price:m.price||'$100'});}});
+  }
+  document.addEventListener('DOMContentLoaded',function(){bindLogin();recoverWorks();});
+  setTimeout(function(){bindLogin();recoverWorks();},1500);
+})();
+</script>
 </body>
 </html>
