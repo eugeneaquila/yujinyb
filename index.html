@@ -128,7 +128,7 @@
 
   .moon-rail{
     position:fixed;right:22px;top:50%;transform:translateY(-50%);
-    z-index:40;display:flex;flex-direction:column;align-items:center;gap:10px;
+    z-index:40;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;
   }
   .moon-rail .moon{width:18px;height:18px;}
   .moon-rail-track{width:1px;height:120px;background:var(--line);}
@@ -1689,7 +1689,7 @@ updateCommissionCounter();
   var activeFilterTag = 'all';
 
   function saveWorkMetadata(){ localStorage.setItem('yujin_work_youtube_metadata', JSON.stringify(workMetadata)); }
-  function workTitle(id, i){ return (workMetadata[id] && workMetadata[id].title) || ('Work '+(i+1)); }
+  function workTitle(id, i){ return (workMetadata[id] && workMetadata[id].title) || ('Commission Work #' + (i+1)); }
 
   function renderWorks(){
     var filtered = videos.filter(function(id){
@@ -1734,34 +1734,53 @@ updateCommissionCounter();
     renderWorks();
   });
 
-  function fetchYouTubeMetadata(id){
-    if(workMetadata[id] && workMetadata[id].title && workMetadata[id].description !== undefined){
+  // Reliable metadata fetcher with automatic fallback to YouTube oEmbed (no API key required)
+  function fetchYouTubeMetadata(id) {
+    if (workMetadata[id] && workMetadata[id].title) {
       return Promise.resolve(workMetadata[id]);
     }
-    return fetch('/api/youtube?videoId='+encodeURIComponent(id), {headers:{'Accept':'application/json'}})
-      .then(function(r){ if(!r.ok) throw new Error('YouTube metadata unavailable'); return r.json(); })
-      .then(function(data){
-        var meta={
-          title:data.title||'',
-          description:data.description||'',
-          publishedAt:data.publishedAt||'',
-          channelTitle:data.channelTitle||'',
-          tags: workMetadata[id] ? (workMetadata[id].tags || []) : []
+
+    return fetch('/api/youtube?videoId=' + encodeURIComponent(id), { headers: { 'Accept': 'application/json' } })
+      .then(function(r) {
+        if (!r.ok) throw new Error('Backend YouTube API unavailable');
+        return r.json();
+      })
+      .then(function(data) {
+        var meta = {
+          title: data.title || '',
+          description: data.description || '',
+          tags: workMetadata[id] ? (workMetadata[id].tags || ['MV Simple']) : ['MV Simple']
         };
-        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
-      });
-  }
-  function fetchYouTubeTitleFallback(id){
-    return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
-      .then(function(r){return r.json();})
-      .then(function(info){
-        var meta={
-          title:info.title||'',
-          description:'',
-          channelTitle:info.author_name||'',
-          tags: workMetadata[id] ? (workMetadata[id].tags || []) : []
-        };
-        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
+        workMetadata[id] = meta;
+        saveWorkMetadata();
+        renderWorks();
+        return meta;
+      })
+      .catch(function() {
+        return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + encodeURIComponent(id) + '&format=json')
+          .then(function(res) { return res.json(); })
+          .then(function(info) {
+            var meta = {
+              title: info.title || ('Work ' + id),
+              description: 'Created by ' + (info.author_name || 'Yujin'),
+              tags: workMetadata[id] ? (workMetadata[id].tags || ['MV Simple']) : ['MV Simple']
+            };
+            workMetadata[id] = meta;
+            saveWorkMetadata();
+            renderWorks();
+            return meta;
+          })
+          .catch(function() {
+            var meta = {
+              title: 'Commission Work (' + id + ')',
+              description: '',
+              tags: ['MV Simple']
+            };
+            workMetadata[id] = meta;
+            saveWorkMetadata();
+            renderWorks();
+            return meta;
+          });
       });
   }
 
@@ -1822,15 +1841,12 @@ updateCommissionCounter();
     var detectedService = (meta.tags && meta.tags[0]) || 'MV Simple';
 
     openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:meta.tags||[],service:detectedService});
-    fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);}).then(function(info){
+    fetchYouTubeMetadata(id).then(function(info){
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
         document.getElementById('videoModalTitle').textContent=info.title||'YouTube Video';
         document.getElementById('videoModalDescription').textContent=info.description||'No YouTube description available.';
       }
-    }).catch(function(){
-      var modal=document.getElementById('videoModal');
-      if(modal && modal.classList.contains('is-open')) document.getElementById('videoModalDescription').textContent='YouTube description could not be loaded. Please check YOUTUBE_API_KEY.';
     });
   });
 
@@ -1953,8 +1969,7 @@ updateCommissionCounter();
 
     var selectedService = document.getElementById('quickVideoService').value;
 
-    // Fetch details automatically from YouTube
-    fetchYouTubeMetadata(id).catch(function(){ return fetchYouTubeTitleFallback(id); }).then(function(info){
+    fetchYouTubeMetadata(id).then(function(info){
       embeddedVideos.unshift({
         id: id,
         title: info.title || 'YouTube Video',
@@ -1970,8 +1985,6 @@ updateCommissionCounter();
       updateCommissionCounter();
       renderAdminList();
       window.alert('Video successfully added!');
-    }).catch(function(){
-      window.alert('Could not fetch YouTube metadata, but added video using default settings.');
     });
   });
 
