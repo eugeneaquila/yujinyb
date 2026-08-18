@@ -695,8 +695,8 @@
       <div class="price-card">
         <div class="price-moon"><span class="moon" style="--phase:.5"></span><small data-i18n="phase_2">First Quarter</small></div>
         <h3 data-i18n="tier_custom_anim">Custom Animation</h3>
-        <p class="price-amount">$50</p>
-        <p class="price-note" data-i18n="custom_anim_note">Per project / scene</p>
+        <p class="price-amount" data-i18n="custom_anim_amount">Custom Quote</p>
+        <p class="price-note" data-i18n="custom_anim_note">Based on project scope</p>
         <ul class="price-features">
           <li data-i18n="custom_feat_1">Tailored motion &amp; custom effects</li>
           <li data-i18n="custom_feat_2">Frame-by-frame / custom rigging</li>
@@ -704,7 +704,7 @@
           <li data-i18n="custom_feat_4">Flexible delivery scope</li>
         </ul>
         <p class="price-eta">ETA · 2–3 weeks</p>
-        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Custom Animation', 50)" data-i18n="price_cta">Inquire</button>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Custom Animation', 0)" data-i18n="price_cta">Inquire</button>
       </div>
 
     </div>
@@ -823,7 +823,7 @@
             <option value="MV Complex">MV Complex ($300)</option>
             <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
             <option value="Puppet Animation">Puppet Animation ($30)</option>
-            <option value="Custom Animation">Custom Animation ($50)</option>
+            <option value="Custom Animation">Custom Animation (Custom Quote)</option>
           </select>
           <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
         </div>
@@ -935,7 +935,7 @@
     </div>
 
     <!-- 50% Deposit vs Full Payment Selector -->
-    <div class="deposit-toggle-container">
+    <div class="deposit-toggle-container" id="depositToggleContainer">
       <button type="button" class="deposit-btn is-selected" id="btnDeposit50" onclick="setPaymentMode('deposit')">
         <strong id="deposit50Label">50% Deposit</strong>
         <span data-i18n="deposit_save_slot">Save Slot</span>
@@ -959,7 +959,7 @@ var isDepositMode = true;
 
 function openPaymentModal(serviceName, priceNum) {
   currentService = serviceName || 'MV Simple';
-  currentBasePrice = Number(priceNum) || 100;
+  currentBasePrice = Number(priceNum) || 0;
   isDepositMode = true;
 
   var titleEl = document.getElementById('paymentModalTitle');
@@ -1004,6 +1004,22 @@ function updateFileNameDisplay(input) {
 }
 
 function updateDepositUI() {
+  var isJp = document.documentElement.lang === 'jp';
+  var toggleContainer = document.getElementById('depositToggleContainer');
+
+  if (currentBasePrice === 0) {
+    if (toggleContainer) toggleContainer.style.display = 'none';
+    document.getElementById('paymentModalSubtitle').textContent = isJp 
+      ? currentService + ' のご相談 | 以下のフォームから詳細をご送信ください。お見積もりをお送りいたします。'
+      : 'Inquiry for ' + currentService + ' | Fill out details below for a custom price quote.';
+    
+    var container = document.getElementById('paypal-button-container');
+    container.innerHTML = '<button type="button" class="btn btn-primary btn-block" style="padding:1rem;" onclick="submitCustomInquiry()">' + (isJp ? '見積もり依頼を送信' : 'Submit Inquiry Request') + '</button>';
+    return;
+  }
+
+  if (toggleContainer) toggleContainer.style.display = 'grid';
+
   var multiplier = 1.0;
   var addonsList = [];
 
@@ -1023,7 +1039,6 @@ function updateDepositUI() {
   var activePrice = currentBasePrice * multiplier;
   var depositAmount = (activePrice * 0.5).toFixed(2);
   var fullAmount = activePrice.toFixed(2);
-  var isJp = document.documentElement.lang === 'jp';
 
   document.getElementById('deposit50Label').textContent = (isJp ? '50% 手付金 ($' : '50% Deposit ($') + depositAmount + ')';
   document.getElementById('depositFullLabel').textContent = (isJp ? '100% 全額支払い ($' : 'Full Amount ($') + fullAmount + ')';
@@ -1041,6 +1056,47 @@ function updateDepositUI() {
   }
 
   renderPayPalButtons(finalPayAmount, currentService + (addonsList.length ? ' [' + addonsList.join('+') + ']' : '') + (isDepositMode ? ' (50% Deposit)' : ' (Full)'));
+}
+
+async function submitCustomInquiry() {
+  if (!validateInquiryForm()) {
+    var isJp = document.documentElement.lang === 'jp';
+    alert(isJp ? 'お名前、メールアドレス、SNSアカウントを入力し、利用規約に同意してください。' : 'Please fill out your Name, Email, Social Media Handle, and accept the Terms of Service before submitting.');
+    return;
+  }
+
+  var name = document.getElementById('inqName').value.trim();
+  var company = document.getElementById('inqCompany').value.trim();
+  var email = document.getElementById('inqEmail').value.trim();
+  var social = document.getElementById('inqSocial').value.trim();
+  var deadline = document.getElementById('inqDeadline').value;
+  var desc = document.getElementById('inqDesc').value.trim();
+
+  var addonsList = [];
+  if (document.getElementById('addonCommercial').checked) addonsList.push('Commercial');
+  if (document.getElementById('addonRush').checked) addonsList.push('Rush Fee');
+  if (document.getElementById('addonNda').checked) addonsList.push('Strict NDA');
+
+  var inquiryPayload = {
+    name: name,
+    company: company,
+    email: email,
+    social: social,
+    deadline: deadline || 'Flexible',
+    description: desc,
+    service: currentService,
+    addons: addonsList.join(', ') || 'None',
+    paidAmount: 'Custom Quote Inquired',
+    paymentType: 'Inquiry Pending'
+  };
+
+  await sendInquiryEmail(inquiryPayload);
+
+  var isJp = document.documentElement.lang === 'jp';
+  alert(isJp 
+    ? 'お見積もり依頼を送信しました！内容を確認次第、yujinybwork@gmail.com より返信いたします。'
+    : 'Inquiry request submitted successfully! Yujin will review your project brief and get back to you soon.');
+  closePaymentModal();
 }
 
 function validateInquiryForm() {
@@ -1439,9 +1495,9 @@ renderWaitlist();
       'MV Complex': 300, 
       'Debut Trailer / PV / Lore': 30, 
       'Puppet Animation': 30,
-      'Custom Animation': 50
+      'Custom Animation': 0
     };
-    var targetPrice = priceMap[targetService] || 100;
+    var targetPrice = priceMap[targetService] !== undefined ? priceMap[targetService] : 100;
 
     closeVideoModal();
     openPaymentModal(targetService, targetPrice);
@@ -1605,7 +1661,7 @@ renderWaitlist();
         title: info.title || 'YouTube Video',
         description: info.description || '',
         service: selectedService,
-        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : (selectedService === 'Custom Animation' ? '$50' : '$30'))),
+        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : (selectedService === 'Custom Animation' ? 'Custom Quote' : '$30'))),
         tags: [selectedService]
       });
 
@@ -1783,7 +1839,8 @@ renderWaitlist();
     phase_4:{en:"New Moon",jp:"新月"},
     phase_5:{en:"Waxing Gibbous",jp:"十三夜月"},
     tier_custom_anim:{en:"Custom Animation",jp:"カスタムアニメーション"},
-    custom_anim_note:{en:"Per project / scene",jp:"プロジェクト / シーン単位"},
+    custom_anim_amount:{en:"Custom Quote",jp:"要相談 / 要見積もり"},
+    custom_anim_note:{en:"Based on project scope",jp:"案件内容・規模に応じて算出"},
     custom_feat_1:{en:"Tailored motion & custom effects",jp:"ご要望に応じたモーション & カスタムエフェクト"},
     custom_feat_2:{en:"Frame-by-frame / custom rigging",jp:"フレームバイフレーム / カスタムリギング"},
     custom_feat_3:{en:"High-quality compositing",jp:"高品質コンポジット"},
