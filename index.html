@@ -815,9 +815,13 @@
 
       <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
         <strong style="display:block;font-size:1.05rem;color:var(--text);">Active Video Gallery</strong>
-        <button type="button" class="btn btn-ghost" id="copyTagsConfigBtn" title="Copy the current service tags as code to paste into index.html and deploy for everyone">📋 Copy Tags Config</button>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+          <button type="button" class="btn btn-ghost" id="resetTagsDraftBtn" title="Discard locally saved tag edits and go back to what's baked into index.html">↺ Reset</button>
+          <button type="button" class="btn btn-primary" id="saveTagsChangesBtn" title="Save tag edits in this browser so they survive a refresh">💾 Save Changes</button>
+          <button type="button" class="btn btn-ghost" id="copyTagsConfigBtn" title="Copy the current service tags as code to paste into index.html and deploy for everyone">📋 Copy Tags Config</button>
+        </div>
       </div>
-      <p style="font-size:.78rem;color:var(--text-muted);margin-top:-.6rem;margin-bottom:1rem;">Pick a tag from the dropdown on each work below to preview it here, then use "Copy Tags Config" and paste it into index.html so the change goes live for every visitor — tag changes made only in this panel stay local to this browser.</p>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-top:-.6rem;margin-bottom:1rem;">Edit tags below, then click "Save Changes" so they stick in this browser after a refresh. When you're happy with them, click "Copy Tags Config" and paste the result into index.html so the change goes live for every visitor.</p>
       <div id="adminVideoGrid" class="admin-video-grid"></div>
     </div>
 
@@ -1255,6 +1259,22 @@ renderWaitlist();
     "BLYdjq50ISE": ["MV Simple"]
   };
 
+  // Local admin draft: tag edits made in the Admin panel are stored here
+  // (via the "Save Changes" button) so they survive a page refresh in this
+  // browser. This is only a personal working copy for editing — visitors,
+  // and this browser too until you save, still see the WORK_TAGS baked in
+  // above. Use "Copy Tags Config" + redeploy to make a draft permanent and
+  // visible to everyone.
+  var WORK_TAGS_DRAFT_KEY = 'yujin_admin_work_tags_draft';
+  (function applySavedWorkTagsDraft(){
+    try{
+      var saved = JSON.parse(localStorage.getItem(WORK_TAGS_DRAFT_KEY) || 'null');
+      if(saved){
+        Object.keys(saved).forEach(function(id){ WORK_TAGS[id] = saved[id]; });
+      }
+    }catch(e){}
+  }());
+
   // ---------- mobile nav ----------
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
@@ -1293,7 +1313,8 @@ renderWaitlist();
     var filtered = videos.filter(function(id){
       if (activeFilterTag === 'all') return true;
       var tags = WORK_TAGS[id] || [];
-      return tags.indexOf(activeFilterTag) !== -1;
+      var target = activeFilterTag.toLowerCase();
+      return tags.some(function(t){ return t.toLowerCase() === target; });
     });
 
     gallery.innerHTML = filtered.map(function(id, i){
@@ -1313,12 +1334,30 @@ renderWaitlist();
     }).join('') || '<p style="color:var(--text-muted)">No works match the selected tag.</p>';
   }
 
+  // Builds the filter bar from every tag actually in use across the works
+  // (service tiers + any custom tags), not just the fixed TAG_OPTIONS list,
+  // so custom tags become filterable too. Service tiers (TAG_OPTIONS) are
+  // always listed first in their fixed order; custom tags follow in the
+  // order they're first encountered.
+  function getAllUsedTags(){
+    var seen = {};
+    var customOrdered = [];
+    videos.forEach(function(id){
+      (WORK_TAGS[id] || []).forEach(function(t){
+        if(TAG_OPTIONS.indexOf(t) !== -1) return; // service tiers handled separately, below
+        var k = t.toLowerCase();
+        if(!seen[k]){ seen[k] = true; customOrdered.push(t); }
+      });
+    });
+    return TAG_OPTIONS.concat(customOrdered);
+  }
+
   function renderTagFilterBar(){
     var filterBar = document.getElementById('tagFilterBar');
     if (!filterBar) return;
 
     filterBar.innerHTML = '<button type="button" class="tag-filter-btn '+(activeFilterTag === 'all' ? 'is-active' : '')+'" data-tag="all">All</button>'
-      + TAG_OPTIONS.map(function(t){
+      + getAllUsedTags().map(function(t){
         return '<button type="button" class="tag-filter-btn '+(activeFilterTag === t ? 'is-active' : '')+'" data-tag="'+escapeHtml(t)+'">'+escapeHtml(t)+'</button>';
       }).join('');
   }
@@ -1487,7 +1526,9 @@ renderWaitlist();
 
       // Render Default Portfolio Works
       var mainWorksCards = videos.map(function(id, i){
-        var curTag = (WORK_TAGS[id] && WORK_TAGS[id][0]) || 'MV Simple';
+        var workTagsArr = WORK_TAGS[id] || [];
+        var curTag = workTagsArr[0] || 'MV Simple';
+        var customTagsStr = workTagsArr.slice(1).join(', ');
         var tagSelectOptions = TAG_OPTIONS.map(function(t){
           return '<option value="'+escapeHtml(t)+'" '+(t===curTag?'selected':'')+'>'+escapeHtml(t)+'</option>';
         }).join('');
@@ -1498,12 +1539,14 @@ renderWaitlist();
           + '<select class="admin-video-badge" style="width:auto;padding:3px 8px;" data-main-work-tag="'+id+'">'+tagSelectOptions+'</select>'
           + '<strong>'+escapeHtml(workTitle(id, i))+'</strong>'
           + '<small style="color:var(--text-muted);font-family:\'IBM Plex Mono\',monospace;">ID: '+id+'</small>'
+          + '<input type="text" class="admin-custom-tags-input" style="padding:.4rem .6rem;font-size:.76rem;" data-main-work-custom-tags="'+id+'" placeholder="Custom tags, comma separated" value="'+escapeHtml(customTagsStr)+'">'
           + '</div>'
           + '<div class="admin-video-actions">'
           + '<button class="btn btn-danger" type="button" data-remove-main-work="'+id+'">Remove</button>'
           + '</div>'
           + '</div>';
       }).join('');
+
 
       videoGrid.innerHTML = embeddedCards + mainWorksCards || '<p style="color:var(--text-muted);">No videos available in gallery.</p>';
     }
@@ -1572,18 +1615,71 @@ renderWaitlist();
     });
   });
 
-  // Live-update a work's service tag when the admin picks a new one from
-  // its dropdown. This updates WORK_TAGS in memory (so the change previews
-  // immediately in this browser), but it does NOT persist for other
-  // visitors on its own — use "Copy Tags Config" below to make it permanent.
+  // Helper: split a "tag1, tag2" input into a clean, deduped array.
+  function parseCustomTags(str, excludeTag){
+    var seen = {};
+    if(excludeTag) seen[excludeTag.toLowerCase()] = true;
+    return String(str||'').split(',').map(function(t){ return t.trim(); }).filter(function(t){
+      if(!t) return false;
+      var k = t.toLowerCase();
+      if(seen[k]) return false;
+      seen[k] = true;
+      return true;
+    });
+  }
+
+  // Live-update a work's tags when the admin picks a new service from its
+  // dropdown or edits its custom tags field. This updates WORK_TAGS in
+  // memory (so the change previews immediately in this browser), but it
+  // does NOT persist for other visitors on its own — use "Copy Tags
+  // Config" below to make it permanent.
   document.getElementById('adminPanel').addEventListener('change', function(e){
     var tagSelect = e.target.closest('[data-main-work-tag]');
-    if(!tagSelect) return;
-    var id = tagSelect.dataset.mainWorkTag;
-    WORK_TAGS[id] = [tagSelect.value];
-    renderWorks();
-    renderTagFilterBar();
+    if(tagSelect){
+      var id = tagSelect.dataset.mainWorkTag;
+      var customTags = (WORK_TAGS[id] || []).slice(1);
+      WORK_TAGS[id] = [tagSelect.value].concat(customTags);
+      renderWorks();
+      renderTagFilterBar();
+      return;
+    }
+
+    var customInput = e.target.closest('[data-main-work-custom-tags]');
+    if(customInput){
+      var cid = customInput.dataset.mainWorkCustomTags;
+      var serviceTag = (WORK_TAGS[cid] && WORK_TAGS[cid][0]) || TAG_OPTIONS[0];
+      WORK_TAGS[cid] = [serviceTag].concat(parseCustomTags(customInput.value, serviceTag));
+      renderWorks();
+      renderTagFilterBar();
+      return;
+    }
   });
+
+  // Save the current WORK_TAGS state into this browser's localStorage so
+  // it survives a page refresh, instead of always falling back to the
+  // defaults baked into the file.
+  var saveTagsBtn = document.getElementById('saveTagsChangesBtn');
+  if(saveTagsBtn){
+    saveTagsBtn.addEventListener('click', function(){
+      try{
+        localStorage.setItem(WORK_TAGS_DRAFT_KEY, JSON.stringify(WORK_TAGS));
+        window.alert('Saved! These tags will stick around in this browser even after a refresh.\n\nRemember: this only affects your own browser — use "Copy Tags Config" and redeploy to make them visible to every visitor.');
+      }catch(e){
+        window.alert('Could not save changes in this browser (storage may be full or blocked).');
+      }
+    });
+  }
+
+  // Discard the locally saved draft and revert to whatever is baked into
+  // WORK_TAGS in the file.
+  var resetTagsBtn = document.getElementById('resetTagsDraftBtn');
+  if(resetTagsBtn){
+    resetTagsBtn.addEventListener('click', function(){
+      if(!window.confirm('Discard your locally saved tag edits and revert to the tags baked into index.html?')) return;
+      localStorage.removeItem(WORK_TAGS_DRAFT_KEY);
+      window.location.reload();
+    });
+  }
 
   // Export the current WORK_TAGS object as pasteable source code, so tag
   // changes made here can be committed to index.html and redeployed —
