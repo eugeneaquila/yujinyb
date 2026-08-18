@@ -12,6 +12,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+
+<!-- PayPal SDK Integration -->
+<script src="https://www.paypal.com/sdk/js?client-id=BAAnbHzcIYU_4RZTawb0AxKVfFazyHzcrnIadOF0ZCibxPbKRjqmaUR5YW9aGc57S2DlOSFM1NYs3fiyYM&currency=USD"></script>
+
 <style>
   :root{
     --bg:#090714;
@@ -238,7 +242,7 @@
   .service-card h2{font-family:'Instrument Serif',serif;font-style:italic;font-size:2.2rem;margin:.6rem 0 1rem;}
   .service-card p{color:var(--text-muted);position:relative;z-index:1;font-size:.95rem;}
 
-  /* ---------- video modal ---------- */
+  /* ---------- video & payment modal ---------- */
   .video-modal{position:fixed;inset:0;z-index:100;background:rgba(5,3,14,.88);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:1.25rem;}
   .video-modal.is-open{display:flex;}
   .video-modal-card{width:min(960px,100%);max-height:92vh;overflow:auto;background:var(--bg-panel);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.75);position:relative;}
@@ -252,6 +256,11 @@
   .video-modal-meta{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1rem;}
   .video-tag{font:500 .7rem 'IBM Plex Mono',monospace;padding:.35rem .65rem;border:1px solid rgba(201,182,255,0.3);border-radius:999px;color:var(--accent-moon);background:rgba(201,182,255,0.08);}
   .video-service{font:500 .72rem 'IBM Plex Mono',monospace;color:var(--accent-moon);margin-bottom:.35rem;letter-spacing:.04em;}.video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
+  
+  /* Payment Modal Overrides */
+  .payment-modal-card{width:min(500px,100%);padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
+  .payment-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;margin-bottom:.5rem;}
+  .payment-subtitle{color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem;}
   
   /* ---------- Admin Panel Styles ---------- */
   .admin-panel{display:none;margin-top:2.5rem;padding:1.75rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:20px;box-shadow:var(--shadow-card);}
@@ -521,7 +530,7 @@
           <li>Simple motion</li>
         </ul>
         <p class="price-eta">ETA · 1–2 weeks</p>
-        <a href="#contact" class="btn btn-ghost btn-block" data-i18n="price_cta">Inquire</a>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('MV Simple', '100')" data-i18n="price_cta">Inquire</button>
       </div>
 
       <div class="price-card">
@@ -536,7 +545,7 @@
           <li>Complex 3D camera</li>
         </ul>
         <p class="price-eta">ETA · 4–6 weeks</p>
-        <a href="#contact" class="btn btn-ghost btn-block" data-i18n="price_cta">Inquire</a>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('MV Complex', '300')" data-i18n="price_cta">Inquire</button>
       </div>
 
       <div class="price-card">
@@ -551,7 +560,7 @@
           <li>Complex 3D camera</li>
         </ul>
         <p class="price-eta">ETA · 2–3 weeks</p>
-        <a href="#contact" class="btn btn-ghost btn-block" data-i18n="price_cta">Inquire</a>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Debut Trailer / PV / Lore', '30')" data-i18n="price_cta">Inquire</button>
       </div>
 
       <div class="price-card">
@@ -564,7 +573,7 @@
           <li>3D camera movement</li>
         </ul>
         <p class="price-eta">ETA · 1–2 weeks</p>
-        <a href="#contact" class="btn btn-ghost btn-block" data-i18n="price_cta">Inquire</a>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Puppet Animation', '30')" data-i18n="price_cta">Inquire</button>
       </div>
 
     </div>
@@ -642,6 +651,7 @@
   <span data-i18n="footer_status">Commissions Open 🌙 — thank you for visiting.</span>
 </footer>
 
+<!-- Video Modal -->
 <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
   <div class="video-modal-card">
     <button class="video-modal-close" id="videoModalClose" type="button" aria-label="Close">×</button>
@@ -657,7 +667,71 @@
   </div>
 </div>
 
+<!-- Payment Checkout Modal -->
+<div class="video-modal" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
+  <div class="payment-modal-card">
+    <button class="video-modal-close" id="paymentModalClose" type="button" aria-label="Close">×</button>
+    <h3 class="payment-title" id="paymentModalTitle">Inquire & Pay</h3>
+    <p class="payment-subtitle" id="paymentModalSubtitle">Select payment method via PayPal or Debit / Credit Card.</p>
+    <div id="paypal-button-container"></div>
+  </div>
+</div>
+
 <script>
+// PayPal Modal Logic
+function openPaymentModal(serviceName, price) {
+  var modal = document.getElementById('paymentModal');
+  document.getElementById('paymentModalTitle').textContent = 'Inquire — ' + serviceName;
+  document.getElementById('paymentModalSubtitle').textContent = 'Total: $' + price + ' USD (Includes PayPal / Debit / Credit Card options)';
+  
+  var container = document.getElementById('paypal-button-container');
+  container.innerHTML = '';
+
+  if (window.paypal) {
+    paypal.Buttons({
+      style: {
+        shape: 'rect',
+        color: 'gold',
+        layout: 'vertical',
+        label: 'paypal'
+      },
+      createOrder: async function() {
+        const response = await fetch('/api/paypal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: price,
+            service: serviceName
+          })
+        });
+        const order = await response.json();
+        return order.id;
+      },
+      onApprove: async function(data, actions) {
+        const details = await actions.order.capture();
+        alert('Thank you ' + details.payer.name.given_name + '! Your order has been placed successfully.');
+        closePaymentModal();
+      },
+      onError: function(err) {
+        console.error('PayPal Checkout Error:', err);
+      }
+    }).render('#paypal-button-container');
+  }
+
+  modal.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePaymentModal() {
+  var modal = document.getElementById('paymentModal');
+  modal.classList.remove('is-open');
+  document.getElementById('paypal-button-container').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('paymentModalClose').addEventListener('click', closePaymentModal);
+document.getElementById('paymentModal').addEventListener('click', function(e){ if(e.target===this) closePaymentModal(); });
+
 (function(){
   // Predefined Tag options
   var TAG_OPTIONS = [
@@ -998,7 +1072,7 @@
 
   document.getElementById('videoModalClose').addEventListener('click',closeVideoModal);
   document.getElementById('videoModal').addEventListener('click',function(e){if(e.target===this)closeVideoModal();});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeVideoModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeVideoModal();closePaymentModal();}});
 
   // ---------- EN / JP toggle ----------
   var dict = {
