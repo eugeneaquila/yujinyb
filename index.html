@@ -404,7 +404,8 @@
   }
   .admin-add-card h4{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.3rem;margin-bottom:.3rem;}
   .admin-add-card p{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem;}
-  .admin-add-form{display:grid;grid-template-columns:2fr 1fr auto;gap:1rem;align-items:center;}
+  .admin-add-form{display:grid;grid-template-columns:1fr;gap:1rem;align-items:center;}
+  .admin-add-form-row{display:grid;grid-template-columns:2fr 1fr auto;gap:1rem;align-items:center;}
   
   .admin-tools-card{
     background:var(--bg-panel-2);border:1px solid var(--line);border-radius:18px;
@@ -413,7 +414,7 @@
   .admin-tools-actions{display:flex;gap:.8rem;flex-wrap:wrap;}
 
   @media(max-width:760px){
-    .admin-add-form{grid-template-columns:1fr;}
+    .admin-add-form-row{grid-template-columns:1fr;}
     .inquiry-form{grid-template-columns:1fr;}
     .inquiry-form .full{grid-column:auto;}
   }
@@ -801,18 +802,21 @@
     <div id="tabAdminVideos" class="admin-tab-content is-active">
       <div class="admin-add-card">
         <h4>Add New Video to Supabase</h4>
-        <p>Paste any YouTube URL or Video ID and select its service tier. Changes instantly sync to Supabase!</p>
+        <p>Paste any YouTube URL or Video ID, select its service tier, and optionally add a description. Changes sync to Supabase!</p>
         
         <div class="admin-add-form">
-          <input id="quickVideoUrl" placeholder="Paste YouTube Link or Video ID (e.g. https://youtu.be/...) *">
-          <select id="quickVideoService">
-            <option value="MV Simple">MV Simple ($100)</option>
-            <option value="MV Complex">MV Complex ($300)</option>
-            <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
-            <option value="Puppet Animation">Puppet Animation ($30)</option>
-            <option value="Custom Animation">Custom Animation (Custom Quote)</option>
-          </select>
-          <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
+          <div class="admin-add-form-row">
+            <input id="quickVideoUrl" placeholder="Paste YouTube Link or Video ID (e.g. https://youtu.be/...) *">
+            <select id="quickVideoService">
+              <option value="MV Simple">MV Simple ($100)</option>
+              <option value="MV Complex">MV Complex ($300)</option>
+              <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
+              <option value="Puppet Animation">Puppet Animation ($30)</option>
+              <option value="Custom Animation">Custom Animation (Custom Quote)</option>
+            </select>
+            <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
+          </div>
+          <textarea id="quickVideoDesc" rows="3" placeholder="Video Description / Notes (Optional)"></textarea>
         </div>
       </div>
 
@@ -827,7 +831,7 @@
         </div>
 
         <div id="importArea" style="display:none;margin-top:.8rem;flex-direction:column;gap:.6rem;">
-          <textarea id="importJsonText" rows="5" placeholder='Paste JSON array here, e.g. [{"id":"16WINlkPlS0", "service":"MV Complex", "tags":["MV Complex"]}]'></textarea>
+          <textarea id="importJsonText" rows="5" placeholder='Paste JSON array here, e.g. [{"id":"16WINlkPlS0", "service":"MV Complex", "tags":["MV Complex"], "description":"Client: ..."}]'></textarea>
           <div style="display:flex;gap:.5rem;">
             <button type="button" class="btn btn-primary" id="confirmImportBtn">Confirm &amp; Sync to Supabase</button>
             <button type="button" class="btn btn-ghost" onclick="document.getElementById('importArea').style.display='none'">Cancel</button>
@@ -946,7 +950,7 @@
 <script>
 // Supabase Setup
 const SUPABASE_URL = "https://glbfboefoxoimjuwmokm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsYmZib2Vmb3hvaW1qdXdtb2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNjExMDcsImV4cCI6MjEwMjYzNzEwN30.4StsNio8agFm9J0Rz9qddEPk7C93A5yRTZKKW7tsKOA"; // Replace with your public/anon key from Supabase Dashboard
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsYmZib2Vmb3hvaW1qdXdtb2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNjExMDcsImV4cCI6MjEwMjYzNzEwN30.4StsNio8agFm9J0Rz9qddEPk7C93A5yRTZKKW7tsKOA";
 
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -962,7 +966,7 @@ var TAG_OPTIONS = [
   "Custom Animation"
 ];
 
-// Load works automatically from Supabase
+// Load works automatically from Supabase including description
 async function loadWorksFromSupabase() {
   if(!supabaseClient) return;
   
@@ -978,7 +982,10 @@ async function loadWorksFromSupabase() {
 
     data.forEach(item => {
       WORK_TAGS[item.id] = item.tags && item.tags.length ? item.tags : [item.service || 'MV Simple'];
-      workMetadata[item.id] = { title: item.title || '' };
+      workMetadata[item.id] = { 
+        title: item.title || '',
+        description: item.description || '' 
+      };
     });
 
     renderWorks();
@@ -988,11 +995,11 @@ async function loadWorksFromSupabase() {
 }
 
 // Add/Update video in Supabase
-async function saveVideoToSupabase(id, title, service, tags) {
+async function saveVideoToSupabase(id, title, service, tags, description = '') {
   if(!supabaseClient) return;
   const { error } = await supabaseClient
     .from('works')
-    .upsert({ id: id, title: title, service: service, tags: tags });
+    .upsert({ id: id, title: title, service: service, tags: tags, description: description });
 
   if (error) {
     console.error('Supabase Upsert Error:', error);
@@ -1439,16 +1446,15 @@ renderWaitlist();
   });
 
   function fetchYouTubeMetadata(id){
-    if(workMetadata[id] && workMetadata[id].title && workMetadata[id].description !== undefined){
+    if(workMetadata[id] && workMetadata[id].title){
       return Promise.resolve(workMetadata[id]);
     }
     return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
       .then(function(r){return r.json();})
       .then(function(info){
-        var defaultDesc = (info.author_name ? 'Channel: ' + info.author_name + '\n' : '') + 'Watch on YouTube: https://www.youtube.com/watch?v=' + id;
         var meta={
           title:info.title||'',
-          description:defaultDesc,
+          description:(workMetadata[id] && workMetadata[id].description) || ('Watch on YouTube: https://www.youtube.com/watch?v=' + id),
           channelTitle:info.author_name||''
         };
         workMetadata[id]=meta; 
@@ -1528,9 +1534,6 @@ renderWaitlist();
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
         document.getElementById('videoModalTitle').textContent=info.title||'YouTube Video';
-        if(info.description) {
-          document.getElementById('videoModalDescription').textContent=info.description;
-        }
       }
     });
   });
@@ -1625,14 +1628,17 @@ renderWaitlist();
     if(!id){ window.alert('Please enter a valid YouTube link or 11-character video ID.'); return; }
 
     var selectedService = document.getElementById('quickVideoService').value;
+    var customDesc = document.getElementById('quickVideoDesc').value.trim();
 
     fetchYouTubeMetadata(id).then(function(info){
-      saveVideoToSupabase(id, info.title || 'YouTube Video', selectedService, [selectedService]);
+      saveVideoToSupabase(id, info.title || 'YouTube Video', selectedService, [selectedService], customDesc);
       document.getElementById('quickVideoUrl').value = '';
+      document.getElementById('quickVideoDesc').value = '';
       window.alert('Video successfully added to Supabase!');
     }).catch(function(){
-      saveVideoToSupabase(id, 'YouTube Video', selectedService, [selectedService]);
+      saveVideoToSupabase(id, 'YouTube Video', selectedService, [selectedService], customDesc);
       document.getElementById('quickVideoUrl').value = '';
+      document.getElementById('quickVideoDesc').value = '';
       window.alert('Video added to Supabase using default title.');
     });
   });
@@ -1644,7 +1650,8 @@ renderWaitlist();
         id: id,
         title: workTitle(id, 0),
         service: (WORK_TAGS[id] && WORK_TAGS[id][0]) || 'MV Simple',
-        tags: WORK_TAGS[id] || ['MV Simple']
+        tags: WORK_TAGS[id] || ['MV Simple'],
+        description: (workMetadata[id] && workMetadata[id].description) || ''
       };
     });
 
@@ -1684,7 +1691,8 @@ renderWaitlist();
           id: item.id,
           title: item.title || '',
           service: item.service || (item.tags && item.tags[0]) || 'MV Simple',
-          tags: item.tags || [item.service || 'MV Simple']
+          tags: item.tags || [item.service || 'MV Simple'],
+          description: item.description || ''
         };
       });
 
@@ -1711,7 +1719,8 @@ renderWaitlist();
     if(tagSelect){
       var id = tagSelect.dataset.mainWorkTag;
       var selectedService = tagSelect.value;
-      saveVideoToSupabase(id, workTitle(id, 0), selectedService, [selectedService]);
+      var currentDesc = (workMetadata[id] && workMetadata[id].description) || '';
+      saveVideoToSupabase(id, workTitle(id, 0), selectedService, [selectedService], currentDesc);
     }
   });
 
