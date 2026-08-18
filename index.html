@@ -207,6 +207,23 @@
   .hero-title em{font-style:italic;background:linear-gradient(135deg, #FFF, var(--accent-moon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
   .hero-tagline{color:var(--text-muted);font-size:clamp(1rem,2vw,1.15rem);max-width:36ch;margin:0 auto 2.5rem;font-weight:400;}
   .hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+  .stat-badge{
+    display:inline-flex;align-items:center;gap:.55rem;
+    margin:1.6rem auto 0;padding:.55rem 1.3rem .55rem .6rem;
+    border:1px solid var(--line);border-radius:999px;
+    background:rgba(241,237,251,0.04);
+    width:max-content;
+  }
+  .stat-badge-count{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:2.2rem;padding:.15rem .5rem;
+    border-radius:999px;
+    background:rgba(239,193,122,0.14);
+    color:var(--accent-gold);
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;font-size:.95rem;
+  }
+  .stat-badge-label{color:var(--text-muted);font-size:.85rem;}
 
   .btn{
     display:inline-flex;align-items:center;justify-content:center;
@@ -448,35 +465,6 @@
 
   /* ---------- works / reel gallery ---------- */
   .works{background:var(--bg-panel);}
-  .completed-projects-card{
-    display:flex;align-items:center;gap:1rem;
-    width:max-content;max-width:100%;
-    margin:.35rem 0 1.5rem; padding:.9rem 1.2rem;
-    border:1px solid rgba(239,193,122,.28);
-    border-radius:16px;
-    background:linear-gradient(135deg,rgba(239,193,122,.07),rgba(255,255,255,.025));
-    box-shadow:0 10px 30px rgba(0,0,0,.16);
-  }
-  .completed-projects-icon{
-    width:42px;height:42px;flex:0 0 42px;border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
-    border:1px solid rgba(239,193,122,.35);
-    background:rgba(239,193,122,.09);
-    color:var(--accent-gold);font-size:1.05rem;
-  }
-  .completed-projects-number{
-    display:block;color:var(--accent-gold);
-    font:600 1.55rem/1 'IBM Plex Mono',monospace;
-    letter-spacing:-.03em;
-  }
-  .completed-projects-label{
-    display:block;margin-top:.25rem;color:var(--text);
-    font:500 .78rem/1.2 'IBM Plex Mono',monospace;
-    text-transform:uppercase;letter-spacing:.08em;
-  }
-  .completed-projects-note{
-    display:block;margin-top:.2rem;color:var(--text-muted);font-size:.72rem;
-  }
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.6rem;}
   .reel-card{
     display:block;width:100%;background:var(--bg-panel-2);border-radius:16px;overflow:hidden;
@@ -638,6 +626,10 @@
       <a href="#prices" class="btn btn-primary" data-i18n="hero_cta_order">Order Here</a>
       <a href="#works" class="btn btn-ghost" data-i18n="hero_cta_works">See Works</a>
     </div>
+    <div class="stat-badge" id="heroStatBadge">
+      <span class="stat-badge-count" id="heroStatCount">26+</span>
+      <span class="stat-badge-label" data-i18n="hero_stat_label">Commissions Successfully Delivered</span>
+    </div>
   </div>
   <div class="scroll-cue"><span data-i18n="scroll_down">Scroll down</span></div>
 </header>
@@ -661,14 +653,6 @@
   <div class="section-inner">
     <span class="eyebrow" data-i18n="works_eyebrow">Selected videos</span>
     <h2 class="section-title" data-i18n="works_title">Works</h2>
-    <div id="completedProjectsStat" class="completed-projects-card" aria-live="polite" aria-label="Completed projects">
-      <span class="completed-projects-icon" aria-hidden="true">✦</span>
-      <div>
-        <strong id="completedProjectsCount" class="completed-projects-number">—</strong>
-        <span class="completed-projects-label" data-i18n="completed_projects_label">Projects Completed</span>
-        <span class="completed-projects-note" data-i18n="completed_projects_note">Commissioned projects delivered</span>
-      </div>
-    </div>
     
     <!-- Dynamic Tag Filter Bar -->
     <div class="tag-filter-bar" id="tagFilterBar"></div>
@@ -1231,12 +1215,9 @@ function renderPayPalButtons(amount, label) {
 
         waitlistEntries.push(orderPayload);
         saveWaitlist();
-        try {
-          const commissionRow={client_id:currentUser?currentUser.id:null,service:currentService,client_name:name,client_email:email,required_video_count:1,completed:false,local_reference:orderPayload.id};
-          const {error:syncError}=await supabaseClient.from('commissions').upsert(commissionRow,{onConflict:'local_reference'});
-          if(syncError) console.warn('Supabase commission sync:',syncError.message);
-          else await loadSupabaseCommissions();
-        } catch(syncErr){ console.warn('Supabase commission sync:',syncErr); }
+        if (currentUser) {
+          supabaseClient.from('commissions').insert({client_id:currentUser.id,service:currentService,client_name:name,client_email:email,required_video_count:1,completed:false,local_reference:orderPayload.id}).then(({error})=>{ if(error) console.warn('Supabase commission sync:',error.message); });
+        }
         renderWaitlist();
         if(typeof renderAdminList === 'function') renderAdminList();
 
@@ -1273,51 +1254,6 @@ function saveWaitlist(){
   localStorage.setItem('yujin_waitlist_entries', JSON.stringify(waitlistEntries));
 }
 
-async function loadSupabaseCommissions(){
-  try{
-    const {data:{session}}=await supabaseClient.auth.getSession();
-    if(!session?.user)return;
-    await supabaseClient.from('commissions').update({client_id:session.user.id})
-      .is('client_id',null).ilike('client_email',session.user.email||'');
-    const {data,error}=await supabaseClient.from('commissions').select('*, commission_videos(*)').order('created_at',{ascending:true});
-    if(error)throw error;
-    const remote=(data||[]).map(c=>{
-      const vids=c.commission_videos||[];
-      return {id:c.local_reference||c.id,supabaseId:c.id,name:c.client_name||c.client_email||'Client',
-        email:c.client_email||'',company:'',social:'',deadline:'Flexible',description:'',service:c.service||'Commission',
-        addons:'None',paidAmount:'',paymentType:'',date:c.created_at?new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'N/A',
-        phase:c.completed?3:1,completed:!!c.completed,completedAt:c.completed_at||null,clientId:c.client_id||null,
-        requiredVideoCount:Math.max(1,Number(c.required_video_count||1)),attachedVideoCount:vids.length,videoIds:vids.map(v=>v.youtube_id)};
-    });
-    const keys=new Set(remote.map(x=>String(x.id)));
-    waitlistEntries=remote.concat(waitlistEntries.filter(x=>!keys.has(String(x.id))));
-    saveWaitlist();renderWaitlist();
-    await refreshCompletedProjectsCount();
-    if(typeof renderAdminList==='function')renderAdminList();
-    if(typeof loadAccount==='function'&&currentUser)await loadAccount();
-  }catch(e){console.warn('Could not load Supabase commissions:',e);}
-}
-
-async function syncCommissionFromLocal(item){
-  const row={client_id:item.clientId||null,client_name:item.name||null,client_email:item.email||null,
-    service:item.service||'Commission',local_reference:item.id||null,required_video_count:Math.max(1,Number(item.requiredVideoCount||1)),
-    completed:!!item.completed,completed_at:item.completedAt||(item.completed?new Date().toISOString():null)};
-  const {data,error}=await supabaseClient.from('commissions').upsert(row,{onConflict:'local_reference'}).select('id').single();
-  if(error)throw error; item.supabaseId=data.id; return data.id;
-}
-
-async function refreshCompletedProjectsCount(){
-  const el=document.getElementById('completedProjectsCount');
-  if(!el || typeof supabaseClient==='undefined') return;
-  try{
-    const {count,error}=await supabaseClient.from('commissions').select('id',{count:'exact',head:true}).eq('completed',true);
-    if(error) throw error;
-    el.textContent=String(count||0);
-  }catch(e){
-    console.warn('Could not load completed project count:',e);
-  }
-}
-
 function renderWaitlist(){
   var queue = document.getElementById('waitlistPublicQueue');
   if(!queue) return;
@@ -1346,9 +1282,8 @@ function renderWaitlist(){
       + '<div><span class="waitlist-item-num">#'+(index+1)+'</span> <strong>'+escapeHtml(item.name)+'</strong> '+ (item.company ? '<small style="color:var(--text-muted)">['+escapeHtml(item.company)+']</small>' : '') +'</div>'
       + statusBadge
       + '</div>'
-      + '<div class="waitlist-meta"><strong>' + (isJp ? '動画進捗:' : 'Video completion:') + '</strong> ' + Number(item.attachedVideoCount||0) + '/' + Number(item.requiredVideoCount||1) + ' ' + (isJp ? '本' : 'videos') + ' · '+Math.min(100,Math.round(Number(item.attachedVideoCount||0)/Math.max(1,Number(item.requiredVideoCount||1))*100))+'% &nbsp;|&nbsp; ' + '<strong>' + (isJp ? 'サービス:' : 'Service:') + '</strong> '+escapeHtml(item.service)+' '+ (item.addons && item.addons!=='None' ? '<small style="color:var(--accent-moon)">['+escapeHtml(item.addons)+']</small>' : '') +' &nbsp;|&nbsp; <strong>' + (isJp ? '希望納期:' : 'Deadline:') + '</strong> '+escapeHtml(item.deadline||'Flexible')+' &nbsp;|&nbsp; <strong>' + (isJp ? 'ご依頼日:' : 'Commissioned:') + '</strong> '+escapeHtml(item.date||'N/A')
+      + '<div class="waitlist-meta"><strong>' + (isJp ? '動画進捗:' : 'Video completion:') + '</strong> ' + Number(item.attachedVideoCount||0) + '/' + Number(item.requiredVideoCount||1) + ' &nbsp;|&nbsp; ' + '<strong>' + (isJp ? 'サービス:' : 'Service:') + '</strong> '+escapeHtml(item.service)+' '+ (item.addons && item.addons!=='None' ? '<small style="color:var(--accent-moon)">['+escapeHtml(item.addons)+']</small>' : '') +' &nbsp;|&nbsp; <strong>' + (isJp ? '希望納期:' : 'Deadline:') + '</strong> '+escapeHtml(item.deadline||'Flexible')+' &nbsp;|&nbsp; <strong>' + (isJp ? 'ご依頼日:' : 'Commissioned:') + '</strong> '+escapeHtml(item.date||'N/A')
       + '</div>'
-      + '<div style="margin-top:.55rem;height:7px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:'+Math.min(100,Math.round(Number(item.attachedVideoCount||0)/Math.max(1,Number(item.requiredVideoCount||1))*100))+'%;background:var(--accent-moon);transition:width .3s ease"></span></div>'
       + '<div class="wip-tracker">'
       + '<div class="wip-step '+phase1Class+'">'+phase1Text+'</div>'
       + '<div class="wip-step '+phase2Class+'">'+phase2Text+'</div>'
@@ -1359,7 +1294,6 @@ function renderWaitlist(){
 }
 
 renderWaitlist();
-refreshCompletedProjectsCount();
 
 (function(){
   // Predefined Tag options
@@ -1559,70 +1493,10 @@ refreshCompletedProjectsCount();
   }());
 
   var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
-  var remotePortfolioWorks = [];
-
-  async function loadPortfolioWorksFromSupabase(){
-    try{
-      var result = await supabaseClient.from('portfolio_works').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
-      if(result.error) throw result.error;
-      remotePortfolioWorks = result.data || [];
-      remotePortfolioWorks.forEach(function(w){
-        var remoteTags = Array.isArray(w.tags) ? w.tags : [];
-        var localMeta = workMetadata[w.youtube_id] || {};
-        // Supabase is the durable source, but preserve any richer local metadata/tags.
-        workMetadata[w.youtube_id] = {
-          title: w.title || localMeta.title || 'YouTube Video',
-          description: w.description || localMeta.description || '',
-          publishedAt: localMeta.publishedAt || '',
-          channelTitle: localMeta.channelTitle || '',
-          tags: remoteTags.length ? remoteTags : (localMeta.tags || [])
-        };
-        var existing = embeddedVideos.find(function(v){return v.id===w.youtube_id;});
-        if(existing){
-          existing.title = w.title || existing.title;
-          existing.description = w.description || existing.description;
-          if(remoteTags.length) existing.tags = remoteTags;
-        } else {
-          embeddedVideos.push({id:w.youtube_id,title:w.title||'YouTube Video',description:w.description||'',tags:remoteTags});
-        }
-      });
-      saveWorkMetadata();
-      localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
-      renderTagFilterBar(); renderWorks(); renderAdminList();
-    }catch(err){ console.warn('Portfolio works could not be loaded from Supabase:',err); }
-  }
-
-  async function migrateLocalPortfolioWorksToSupabase(){
-    if(!currentUser || (currentUser.email||'').toLowerCase() !== 'yujinybwork@gmail.com') return;
-
-    // Migrate BOTH custom embedded works and the main Works gallery metadata.
-    // The old site kept titles/descriptions/tags in localStorage, so only migrating
-    // embeddedVideos would lose the tags attached to the main portfolio works.
-    var allIds = videos.slice();
-    embeddedVideos.forEach(function(v){ if(allIds.indexOf(v.id) === -1) allIds.push(v.id); });
-
-    for(var i=0;i<allIds.length;i++){
-      var id = allIds[i];
-      var meta = workMetadata[id] || {};
-      var embedded = embeddedVideos.find(function(v){return v.id===id;}) || {};
-      var tags = Array.isArray(meta.tags) && meta.tags.length ? meta.tags : (Array.isArray(embedded.tags) ? embedded.tags : []);
-      try{
-        var r=await supabaseClient.from('portfolio_works').upsert({
-          youtube_id:id,
-          title:meta.title || embedded.title || ('Work '+(i+1)),
-          description:meta.description || embedded.description || '',
-          tags:tags,
-          sort_order:i
-        },{onConflict:'youtube_id'});
-        if(r.error) throw r.error;
-      }catch(err){ console.warn('Portfolio migration failed for '+id,err); }
-    }
-    await loadPortfolioWorksFromSupabase();
-  }
 
   // ---------- Redesigned Private Video & Waitlist Manager ----------
   var adminPanel = document.getElementById('adminPanel');
-  var ADMIN_PASSWORD = 'YujinAdmin-7Qm4!';
+  var ADMIN_EMAIL = 'yujinybwork@gmail.com';
 
   function youtubeId(value){
     var v = String(value||'').trim();
@@ -1692,15 +1566,12 @@ refreshCompletedProjectsCount();
           + '<strong>#'+(i+1)+' '+escapeHtml(item.name)+' ('+escapeHtml(item.email)+')</strong>'
           + '<small>Company: '+escapeHtml(item.company||'None')+' | Social: '+escapeHtml(item.social||'None')+'</small>'
           + '<small>Service: '+escapeHtml(item.service)+' | Deadline: '+escapeHtml(item.deadline||'Flexible')+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+')</small>'
-          + '<small><strong>Completion:</strong> '+Number(item.attachedVideoCount||0)+' / '+Number(item.requiredVideoCount||1)+' videos attached · '+Math.min(100,Math.round(Number(item.attachedVideoCount||0)/Math.max(1,Number(item.requiredVideoCount||1))*100))+'%</small>'
-          + '<div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-top:5px;max-width:360px"><span style="display:block;height:100%;width:'+Math.min(100,Math.round(Number(item.attachedVideoCount||0)/Math.max(1,Number(item.requiredVideoCount||1))*100))+'%;background:var(--accent-moon)"></span></div>'
           + '<small>Desc: '+escapeHtml(item.description||'None')+'</small>'
           + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
           + '<span style="font-size:.75rem;color:var(--text-muted);">Set Phase:</span>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="1">Phase 1</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="2">Phase 2</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="3">Phase 3</button>'
-          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-required-videos="'+i+'">Set required videos</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-attach-video="'+i+'">Attach video</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;border-color:var(--accent-green);color:var(--accent-green);" type="button" data-toggle-complete="'+i+'">'+(item.completed ? 'Mark In-Progress' : 'Mark Completed')+'</button>'
           + '</div>'
@@ -1712,9 +1583,17 @@ refreshCompletedProjectsCount();
   };
 
   function unlockAdmin(){
-    var pw = window.prompt('Admin password');
-    if(pw === ADMIN_PASSWORD){ adminPanel.classList.add('is-open'); renderAdminList(); loadPortfolioWorksFromSupabase().then(migrateLocalPortfolioWorksToSupabase); }
-    else if(pw !== null) window.alert('Incorrect password.');
+    if(!currentUser){
+      window.alert('Please log in first (top-right Login button), then press Ctrl+Shift+A again.');
+      openAuthModal();
+      return;
+    }
+    if((currentUser.email||'').toLowerCase() === ADMIN_EMAIL){
+      adminPanel.classList.add('is-open');
+      renderAdminList();
+    } else {
+      window.alert('This account is not authorized for admin access.');
+    }
   }
 
   document.addEventListener('keydown', function(e){
@@ -1731,16 +1610,17 @@ refreshCompletedProjectsCount();
     var selectedService = document.getElementById('quickVideoService').value;
 
     // Fetch details automatically from YouTube
-    fetchYouTubeMetadata(id).catch(function(){ return fetchYouTubeTitleFallback(id); }).then(async function(info){
-      var newWork={id:id,title:info.title||'YouTube Video',description:info.description||'',service:selectedService,
-        price:(selectedService==='MV Complex'?'$300':(selectedService==='MV Simple'?'$100':'$30')),tags:[selectedService]};
-      embeddedVideos=embeddedVideos.filter(function(v){return v.id!==id;});
-      embeddedVideos.unshift(newWork);
+    fetchYouTubeMetadata(id).catch(function(){ return fetchYouTubeTitleFallback(id); }).then(function(info){
+      embeddedVideos.unshift({
+        id: id,
+        title: info.title || 'YouTube Video',
+        description: info.description || '',
+        service: selectedService,
+        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : '$30')),
+        tags: [selectedService]
+      });
+
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
-      try{
-        var sb=await supabaseClient.from('portfolio_works').upsert({youtube_id:id,title:newWork.title,description:newWork.description,tags:newWork.tags,sort_order:0},{onConflict:'youtube_id'});
-        if(sb.error) throw sb.error;
-      }catch(syncErr){ console.warn('Supabase portfolio save failed:',syncErr); }
       document.getElementById('quickVideoUrl').value = '';
       renderTagFilterBar();
       renderAdminList();
@@ -1751,14 +1631,12 @@ refreshCompletedProjectsCount();
   });
 
   // Admin Event Delegations for Deleting & Updating
-  document.getElementById('adminPanel').addEventListener('click', async function(e){
+  document.getElementById('adminPanel').addEventListener('click', function(e){
     var removeEmbeddedBtn = e.target.closest('[data-remove-video]');
     if(removeEmbeddedBtn){
       var idx = Number(removeEmbeddedBtn.dataset.removeVideo);
-      var removedWork=embeddedVideos[idx];
       embeddedVideos.splice(idx, 1);
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
-      try{ var del=await supabaseClient.from('portfolio_works').delete().eq('youtube_id',removedWork.id); if(del.error) throw del.error; }catch(syncErr){ console.warn('Supabase portfolio delete failed:',syncErr); }
       renderTagFilterBar();
       renderAdminList();
       return;
@@ -1789,26 +1667,10 @@ refreshCompletedProjectsCount();
     var phaseBtn = e.target.closest('[data-set-phase]');
     if(phaseBtn){
       var idx = Number(phaseBtn.dataset.setPhase);
-      waitlistEntries[idx].phase=Number(phaseBtn.dataset.phaseVal);
-      saveWaitlist();renderWaitlist();renderAdminList();
-      try{const target=waitlistEntries[idx];const id=target.supabaseId||await syncCommissionFromLocal(target);const {error}=await supabaseClient.from('commissions').update({completed:!!target.completed,completed_at:target.completed?(target.completedAt||new Date().toISOString()):null}).eq('id',id);if(error)throw error;}catch(err){console.warn('Commission phase sync failed:',err);}
-      return;
-    }
-
-    var reqBtn = e.target.closest('[data-set-required-videos]');
-    if(reqBtn){
-      var ri=Number(reqBtn.dataset.setRequiredVideos), reqRaw=window.prompt('How many videos are required to complete this commission?', String(waitlistEntries[ri].requiredVideoCount||1));
-      var req=Math.max(1,parseInt(reqRaw,10)||1), target=waitlistEntries[ri]; target.requiredVideoCount=req;
-      saveWaitlist(); renderWaitlist(); renderAdminList();
-      try{
-        const commissionId=target.supabaseId||await syncCommissionFromLocal(target);
-        const {data:updated,error:e1}=await supabaseClient.from('commissions').update({required_video_count:req}).eq('id',commissionId).select('completed,completed_at,required_video_count,commission_videos(id)').single();
-        if(e1)throw e1;
-        target.requiredVideoCount=Math.max(1,Number(updated.required_video_count||1));
-        target.attachedVideoCount=(updated.commission_videos||[]).length;
-        target.completed=!!updated.completed; target.completedAt=updated.completed_at||null; target.phase=target.completed?3:Math.max(1,Number(target.phase||1));
-        saveWaitlist(); renderWaitlist(); renderAdminList();
-      }catch(err){console.warn('Required video count sync failed:',err);alert('Could not save required video count: '+err.message);}
+      waitlistEntries[idx].phase = Number(phaseBtn.dataset.phaseVal);
+      saveWaitlist();
+      renderWaitlist();
+      renderAdminList();
       return;
     }
 
@@ -1819,31 +1681,18 @@ refreshCompletedProjectsCount();
       var target=waitlistEntries[ai]; target.attachedVideoCount=Number(target.attachedVideoCount||0)+1; target.lastVideoId=vid;
       if(Number(target.attachedVideoCount)>=Number(target.requiredVideoCount||1)){target.completed=true;target.phase=3;}
       saveWaitlist(); renderWaitlist(); renderAdminList();
-      try{
-        const commissionId=target.supabaseId||await syncCommissionFromLocal(target);
-        const {data:existing}=await supabaseClient.from('commission_videos').select('id').eq('commission_id',commissionId).eq('youtube_id',vid).maybeSingle();
-        if(!existing){const {error:e}=await supabaseClient.from('commission_videos').insert({commission_id:commissionId,youtube_id:vid,title:'Commission video'});if(e)throw e;}
-        // The database trigger now derives completed/completed_at from the real video count.
-        const {data:latest,error:latestErr}=await supabaseClient.from('commissions').select('completed,completed_at,required_video_count,commission_videos(id,youtube_id)').eq('id',commissionId).single();
-        if(latestErr)throw latestErr;
-        target.attachedVideoCount=(latest.commission_videos||[]).length;
-        target.requiredVideoCount=Math.max(1,Number(latest.required_video_count||1));
-        target.completed=!!latest.completed;
-        target.completedAt=latest.completed_at||null;
-        target.phase=target.completed?3:Math.max(1,Number(target.phase||1));
-        saveWaitlist(); renderWaitlist(); renderAdminList();
-        await loadSupabaseCommissions();
-      }catch(err){console.warn('Commission video sync failed:',err);alert('Video added locally, but Supabase sync failed: '+err.message);}
+      if(target.clientId){supabaseClient.from('commissions').select('id').eq('local_reference',target.id).maybeSingle().then(({data})=>{if(data)supabaseClient.from('commission_videos').insert({commission_id:data.id,youtube_id:vid,title:'Commission video'}).then(()=>supabaseClient.from('commissions').update({completed:true,completed_at:new Date().toISOString()}).eq('id',data.id));});}
       return;
     }
 
     var completeBtn = e.target.closest('[data-toggle-complete]');
     if(completeBtn){
       var idx = Number(completeBtn.dataset.toggleComplete);
-      waitlistEntries[idx].completed=!waitlistEntries[idx].completed;
-      if(waitlistEntries[idx].completed){waitlistEntries[idx].phase=3;waitlistEntries[idx].completedAt=new Date().toISOString();}else waitlistEntries[idx].completedAt=null;
-      saveWaitlist();renderWaitlist();renderAdminList();
-      try{const target=waitlistEntries[idx];const id=target.supabaseId||await syncCommissionFromLocal(target);const {error}=await supabaseClient.from('commissions').update({completed:target.completed,completed_at:target.completed?target.completedAt:null}).eq('id',id);if(error)throw error;await loadSupabaseCommissions();}catch(err){console.warn('Commission completion sync failed:',err);}
+      waitlistEntries[idx].completed = !waitlistEntries[idx].completed;
+      if(waitlistEntries[idx].completed) waitlistEntries[idx].phase = 3;
+      saveWaitlist();
+      renderWaitlist();
+      renderAdminList();
       return;
     }
   });
@@ -1861,6 +1710,7 @@ refreshCompletedProjectsCount();
     nav_tos:{en:"TOS",jp:"利用規約"},
     nav_contact:{en:"Contact",jp:"連絡先"},
     hero_status:{en:"Commissions Open 🌙",jp:"依頼受付中 🌙"},
+    hero_stat_label:{en:"Commissions Successfully Delivered",jp:"件のご依頼を納品完了"},
     hero_title:{en:"Hello! It's me, Yujin.",jp:"こんにちは、ユジンです。"},
     hero_tagline:{en:"A space where dreams come to life through magic.",jp:"魔法で夢が形になる場所。"},
     hero_cta_order:{en:"Order Here",jp:"依頼する"},
@@ -1874,8 +1724,6 @@ refreshCompletedProjectsCount();
     service_2_copy:{en:"I'll craft customized MVs designed to elevate your content. Let's create something unforgettable together!",jp:"あなたのコンテンツを引き立てるオリジナルMVを制作します。一緒に忘れられない作品を作りましょう!"},
     works_eyebrow:{en:"Selected videos",jp:"作品セレクション"},
     works_title:{en:"Works",jp:"作品"},
-    completed_projects_label:{en:"Projects Completed",jp:"完了したプロジェクト"},
-    completed_projects_note:{en:"Commissioned projects delivered",jp:"納品済みのご依頼"},
     prices_eyebrow:{en:"Commission tiers",jp:"料金プラン"},
     prices_title:{en:"Price List",jp:"料金表"},
     price_cta:{en:"Inquire",jp:"お問い合わせ"},
@@ -1962,7 +1810,6 @@ refreshCompletedProjectsCount();
 // ---------- Supabase client auth, profiles, commissions & reviews ----------
 const SUPABASE_URL = 'https://glbfboefoxoimjuwmokm.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_HsS28YR6a_GBXKYoOK9-bA_o1SvLHAU';
-const AUTH_REDIRECT = 'https://yujinyb.vercel.app/';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 let currentUser = null;
 
@@ -1974,11 +1821,21 @@ function commissionProgress(c){
   const required = Math.max(1, Number(c.required_video_count || 1));
   return Math.min(100, Math.round(attached / required * 100));
 }
+const FALLBACK_DELIVERED_COUNT = 26;
+async function loadDeliveredCount(){
+  const el = document.getElementById('heroStatCount'); if(!el) return;
+  try{
+    const {count, error} = await supabaseClient.from('commissions').select('id', {count:'exact', head:true}).eq('completed', true);
+    if(error || count === null) return; // keep fallback number on screen
+    el.textContent = Math.max(count, FALLBACK_DELIVERED_COUNT) + '+';
+  }catch(e){ /* keep fallback number on screen */ }
+}
 async function loadSupabaseUI(){
   const {data:{session}} = await supabaseClient.auth.getSession();
   currentUser = session ? session.user : null;
   updateAuthUI();
   await loadPublicReviews();
+  await loadDeliveredCount();
   if(currentUser) await loadAccount();
 }
 function updateAuthUI(){
@@ -2005,11 +1862,11 @@ async function emailSignup(){
 async function magicLink(){
   const email=document.getElementById('authEmail').value.trim();
   if(!email)return setAuthMessage('Enter your email address.');
-  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:AUTH_REDIRECT}});
+  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
   setAuthMessage(error?error.message:'Magic link sent — check your email.');
 }
 async function googleLogin(){
-  const {error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo:AUTH_REDIRECT}});
+  const {error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
   if(error)setAuthMessage(error.message);
 }
 async function loadAccount(){
@@ -2080,19 +1937,8 @@ document.getElementById('emailSignupBtn').onclick=emailSignup;
 document.getElementById('magicLinkBtn').onclick=magicLink;
 document.getElementById('googleLoginBtn').onclick=googleLogin;
 document.getElementById('submitReviewBtn').onclick=submitReview;
-supabaseClient.auth.onAuthStateChange((_event,session)=>{
-  currentUser=session?.user||null;
-  updateAuthUI();
-  setTimeout(async()=>{
-    if(currentUser){await loadSupabaseCommissions().catch(err=>console.warn('Commission load:',err));loadAccount().catch(err=>console.warn('Account load:',err));}
-    loadPublicReviews().catch(err=>console.warn('Reviews load:',err));
-  },0);
-});
-loadSupabaseUI().then(async()=>{
-  await loadSupabaseCommissions().catch(err=>console.warn('Commission load:',err));
-  await loadPortfolioWorksFromSupabase();
-  await migrateLocalPortfolioWorksToSupabase();
-}).catch(err=>console.warn('Initial Supabase load:',err));
+supabaseClient.auth.onAuthStateChange(async (_event,session)=>{currentUser=session?.user||null;updateAuthUI();if(currentUser)await loadAccount();await loadPublicReviews();});
+loadSupabaseUI();
 </script>
 </body>
 </html>
