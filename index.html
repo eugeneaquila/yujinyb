@@ -258,9 +258,47 @@
   .video-service{font:500 .72rem 'IBM Plex Mono',monospace;color:var(--accent-moon);margin-bottom:.35rem;letter-spacing:.04em;}.video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
   
   /* Payment Modal Overrides */
-  .payment-modal-card{width:min(500px,100%);padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
-  .payment-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;margin-bottom:.5rem;}
-  .payment-subtitle{color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem;}
+  .payment-modal-card{width:min(520px,100%);padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
+  .payment-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;margin-bottom:.3rem;}
+  .payment-subtitle{color:var(--text-muted);font-size:.88rem;margin-bottom:1.2rem;}
+  
+  /* Deposit Selector Toggle */
+  .deposit-toggle-container{
+    display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.5rem;
+    background:rgba(0,0,0,0.25);padding:6px;border-radius:14px;border:1px solid var(--line);
+  }
+  .deposit-btn{
+    padding:.7rem .5rem;border-radius:10px;font-size:.82rem;font-family:'IBM Plex Mono',monospace;
+    color:var(--text-muted);border:1px solid transparent;transition:all .2s;text-align:center;
+  }
+  .deposit-btn strong{display:block;font-size:.95rem;color:var(--text);}
+  .deposit-btn.is-selected{
+    background:var(--bg-panel-2);border-color:var(--accent-gold);color:var(--accent-gold);
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  }
+  .deposit-btn.is-selected strong{color:var(--accent-gold);}
+
+  /* ---------- waitlist section ---------- */
+  .waitlist-card{
+    background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;
+    padding:2.5rem;box-shadow:var(--shadow-card);max-width:720px;margin:0 auto;
+  }
+  .waitlist-form{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+  .waitlist-form .full{grid-column:1/-1;}
+  .waitlist-form input, .waitlist-form select, .waitlist-form textarea{
+    width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text);font:inherit;font-size:.9rem;
+  }
+  .waitlist-form input:focus, .waitlist-form select:focus, .waitlist-form textarea:focus{
+    border-color:var(--accent-gold);outline:none;
+  }
+  .waitlist-display{margin-top:2.5rem;display:grid;gap:.8rem;}
+  .waitlist-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1rem 1.25rem;border-radius:14px;background:var(--bg-panel-2);border:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:.85rem;
+  }
+  .waitlist-item-num{color:var(--accent-gold);font-weight:700;margin-right:1rem;}
   
   /* ---------- Admin Panel Styles ---------- */
   .admin-panel{display:none;margin-top:2.5rem;padding:1.75rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:20px;box-shadow:var(--shadow-card);}
@@ -283,7 +321,7 @@
   .admin-item small{color:var(--text-muted);display:block;margin-top:2px;}
   .admin-actions{display:flex;gap:.6rem;flex-wrap:wrap;}
   .admin-note{font-size:.78rem;color:var(--text-muted);margin-top:.8rem;}
-  @media(max-width:700px){.admin-grid{grid-template-columns:1fr}.admin-grid .full{grid-column:auto}.video-modal{padding:.6rem}.video-modal-info{padding:1.2rem}.video-modal-info h3{font-size:1.75rem;}}
+  @media(max-width:700px){.waitlist-form{grid-template-columns:1fr;}.waitlist-form .full{grid-column:auto;}.admin-grid{grid-template-columns:1fr}.admin-grid .full{grid-column:auto}.video-modal{padding:.6rem}.video-modal-info{padding:1.2rem}.video-modal-info h3{font-size:1.75rem;}}
 
   /* ---------- works / reel gallery ---------- */
   .works{background:var(--bg-panel);}
@@ -420,6 +458,7 @@
       <a href="#home" data-i18n="nav_home">Home</a>
       <a href="#works" data-i18n="nav_works">Works</a>
       <a href="#prices" data-i18n="nav_prices">Prices</a>
+      <a href="#waitlist">Waitlist</a>
       <a href="#tos" data-i18n="nav_tos">TOS</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
       <button class="lang-toggle" id="langToggle" type="button">EN / <span class="lang-jp">JP</span></button>
@@ -474,7 +513,7 @@
     <h2 class="section-title">Embedded Videos</h2>
     <div class="gallery" id="embeddedGallery"></div>
     <div id="adminPanel" class="admin-panel">
-      <strong style="font-size:1.1rem;color:var(--accent-gold);">Video Manager</strong>
+      <strong style="font-size:1.1rem;color:var(--accent-gold);">Video Manager &amp; Waitlist Admin</strong>
       <div class="admin-grid" style="margin-top:1.2rem">
         <input id="videoTitleInput" placeholder="Title (auto-filled from YouTube)">
         <input id="videoUrlInput" placeholder="YouTube URL or video ID">
@@ -508,7 +547,11 @@
         <button type="button" class="btn btn-ghost" id="logoutAdminBtn">Lock Admin</button>
       </div>
       <div id="adminList" class="admin-list"></div>
-      <p class="admin-note">Public visitors cannot add videos. This static version stores manager data in this browser only. For secure cross-device admin publishing, connect an authenticated backend.</p>
+
+      <hr style="border-color:var(--line);margin:1.5rem 0;">
+      <strong style="color:var(--accent-gold);">Waitlist Entries:</strong>
+      <div id="adminWaitlist" class="admin-list"></div>
+      <p class="admin-note">Public visitors cannot modify videos or waitlist entries without unlocking admin mode.</p>
     </div>
   </div>
 </section>
@@ -530,7 +573,7 @@
           <li>Simple motion</li>
         </ul>
         <p class="price-eta">ETA · 1–2 weeks</p>
-        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('MV Simple', '100')" data-i18n="price_cta">Inquire</button>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('MV Simple', 100)" data-i18n="price_cta">Inquire</button>
       </div>
 
       <div class="price-card">
@@ -545,7 +588,7 @@
           <li>Complex 3D camera</li>
         </ul>
         <p class="price-eta">ETA · 4–6 weeks</p>
-        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('MV Complex', '300')" data-i18n="price_cta">Inquire</button>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('MV Complex', 300)" data-i18n="price_cta">Inquire</button>
       </div>
 
       <div class="price-card">
@@ -560,7 +603,7 @@
           <li>Complex 3D camera</li>
         </ul>
         <p class="price-eta">ETA · 2–3 weeks</p>
-        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Debut Trailer / PV / Lore', '30')" data-i18n="price_cta">Inquire</button>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Debut Trailer / PV / Lore', 30)" data-i18n="price_cta">Inquire</button>
       </div>
 
       <div class="price-card">
@@ -573,9 +616,40 @@
           <li>3D camera movement</li>
         </ul>
         <p class="price-eta">ETA · 1–2 weeks</p>
-        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Puppet Animation', '30')" data-i18n="price_cta">Inquire</button>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Puppet Animation', 30)" data-i18n="price_cta">Inquire</button>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- Automatic Waitlist Section -->
+<section id="waitlist" class="works">
+  <div class="section-inner">
+    <span class="eyebrow">Queue &amp; Slot Reservation</span>
+    <h2 class="section-title">Commission Waitlist</h2>
+    
+    <div class="waitlist-card">
+      <p style="color:var(--text-muted);font-size:.95rem;">Join the automatic waitlist to save your queue position for upcoming commission openings!</p>
+      
+      <form id="waitlistForm" class="waitlist-form">
+        <input type="text" id="wlName" placeholder="Your Name / Handle" required>
+        <input type="email" id="wlEmail" placeholder="Your Email address" required>
+        <select id="wlService" class="full" required>
+          <option value="">Select Desired Service</option>
+          <option value="MV Simple">MV Simple — $100</option>
+          <option value="MV Complex">MV Complex — $300</option>
+          <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore — $30</option>
+          <option value="Puppet Animation">Puppet Animation — $30</option>
+        </select>
+        <textarea id="wlNotes" class="full" placeholder="Project details or special requests (optional)"></textarea>
+        <button type="submit" class="btn btn-primary full">Join Automatic Waitlist</button>
+      </form>
+
+      <div style="margin-top:2.5rem;">
+        <strong style="font-size:1.1rem;color:var(--accent-gold);display:block;margin-bottom:1rem;">Current Public Queue:</strong>
+        <div id="waitlistPublicQueue" class="waitlist-display"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -667,23 +741,74 @@
   </div>
 </div>
 
-<!-- Payment Checkout Modal -->
+<!-- Payment Checkout Modal with 50% Deposit Selector -->
 <div class="video-modal" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
   <div class="payment-modal-card">
     <button class="video-modal-close" id="paymentModalClose" type="button" aria-label="Close">×</button>
-    <h3 class="payment-title" id="paymentModalTitle">Inquire & Pay</h3>
-    <p class="payment-subtitle" id="paymentModalSubtitle">Select payment method via PayPal or Debit / Credit Card.</p>
+    <h3 class="payment-title" id="paymentModalTitle">Inquire &amp; Reserve Slot</h3>
+    <p class="payment-subtitle" id="paymentModalSubtitle">Select payment option:</p>
+
+    <!-- 50% Deposit vs Full Payment Selector -->
+    <div class="deposit-toggle-container">
+      <button type="button" class="deposit-btn is-selected" id="btnDeposit50" onclick="setPaymentMode('deposit')">
+        <strong id="deposit50Label">50% Deposit</strong>
+        <span>Save Slot</span>
+      </button>
+      <button type="button" class="deposit-btn" id="btnDepositFull" onclick="setPaymentMode('full')">
+        <strong id="depositFullLabel">100% Full Price</strong>
+        <span>Pay Upfront</span>
+      </button>
+    </div>
+
     <div id="paypal-button-container"></div>
   </div>
 </div>
 
 <script>
-// PayPal Modal Logic
-function openPaymentModal(serviceName, price) {
-  var modal = document.getElementById('paymentModal');
+// PayPal & Payment Modal State
+var currentService = '';
+var currentFullPrice = 0;
+var isDepositMode = true;
+
+function openPaymentModal(serviceName, priceNum) {
+  currentService = serviceName;
+  currentFullPrice = Number(priceNum);
+  isDepositMode = true;
+
   document.getElementById('paymentModalTitle').textContent = 'Inquire — ' + serviceName;
-  document.getElementById('paymentModalSubtitle').textContent = 'Total: $' + price + ' USD (Includes PayPal / Debit / Credit Card options)';
-  
+  updateDepositUI();
+
+  var modal = document.getElementById('paymentModal');
+  modal.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function setPaymentMode(mode) {
+  isDepositMode = (mode === 'deposit');
+  updateDepositUI();
+}
+
+function updateDepositUI() {
+  var depositAmount = (currentFullPrice * 0.5).toFixed(2);
+  var fullAmount = currentFullPrice.toFixed(2);
+
+  document.getElementById('deposit50Label').textContent = '50% Deposit ($' + depositAmount + ')';
+  document.getElementById('depositFullLabel').textContent = 'Full Amount ($' + fullAmount + ')';
+
+  document.getElementById('btnDeposit50').classList.toggle('is-selected', isDepositMode);
+  document.getElementById('btnDepositFull').classList.toggle('is-selected', !isDepositMode);
+
+  var finalPayAmount = isDepositMode ? depositAmount : fullAmount;
+  var descriptionText = isDepositMode 
+    ? 'Pay 50% deposit to secure your slot for ' + currentService
+    : 'Pay full amount for ' + currentService;
+
+  document.getElementById('paymentModalSubtitle').textContent = descriptionText + ' — Total: $' + finalPayAmount + ' USD';
+
+  renderPayPalButtons(finalPayAmount, currentService + (isDepositMode ? ' (50% Deposit)' : ' (Full)'));
+}
+
+function renderPayPalButtons(amount, label) {
   var container = document.getElementById('paypal-button-container');
   container.innerHTML = '';
 
@@ -700,8 +825,8 @@ function openPaymentModal(serviceName, price) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: price,
-            service: serviceName
+            amount: amount,
+            service: label
           })
         });
         const order = await response.json();
@@ -709,7 +834,7 @@ function openPaymentModal(serviceName, price) {
       },
       onApprove: async function(data, actions) {
         const details = await actions.order.capture();
-        alert('Thank you ' + details.payer.name.given_name + '! Your order has been placed successfully.');
+        alert('Thank you ' + details.payer.name.given_name + '! Your ' + (isDepositMode ? 'slot deposit' : 'payment') + ' of $' + amount + ' was received.');
         closePaymentModal();
       },
       onError: function(err) {
@@ -717,9 +842,6 @@ function openPaymentModal(serviceName, price) {
       }
     }).render('#paypal-button-container');
   }
-
-  modal.classList.add('is-open');
-  document.body.style.overflow = 'hidden';
 }
 
 function closePaymentModal() {
@@ -731,6 +853,57 @@ function closePaymentModal() {
 
 document.getElementById('paymentModalClose').addEventListener('click', closePaymentModal);
 document.getElementById('paymentModal').addEventListener('click', function(e){ if(e.target===this) closePaymentModal(); });
+
+// Automatic Waitlist System
+var waitlistEntries = JSON.parse(localStorage.getItem('yujin_waitlist_entries') || '[]');
+
+function saveWaitlist(){
+  localStorage.setItem('yujin_waitlist_entries', JSON.stringify(waitlistEntries));
+}
+
+function renderWaitlist(){
+  var queue = document.getElementById('waitlistPublicQueue');
+  if(!queue) return;
+
+  if(!waitlistEntries.length){
+    queue.innerHTML = '<p style="color:var(--text-muted);">The waitlist is currently empty. Be the first to claim a spot!</p>';
+    return;
+  }
+
+  queue.innerHTML = waitlistEntries.map(function(item, index){
+    return '<div class="waitlist-item">'
+      + '<div><span class="waitlist-item-num">#'+(index+1)+'</span> <strong>'+escapeHtml(item.name)+'</strong> <span style="color:var(--text-muted);">('+escapeHtml(item.service)+')</span></div>'
+      + '<span style="color:var(--accent-moon);font-size:.78rem;">Saved Slot</span>'
+      + '</div>';
+  }).join('');
+}
+
+document.getElementById('waitlistForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('wlName').value.trim();
+  var email = document.getElementById('wlEmail').value.trim();
+  var service = document.getElementById('wlService').value;
+  var notes = document.getElementById('wlNotes').value.trim();
+
+  if(!name || !email || !service) return;
+
+  waitlistEntries.push({
+    name: name,
+    email: email,
+    service: service,
+    notes: notes,
+    date: new Date().toLocaleDateString()
+  });
+
+  saveWaitlist();
+  renderWaitlist();
+  if(typeof renderAdminList === 'function') renderAdminList();
+
+  alert('You have successfully joined the waitlist! You are #' + waitlistEntries.length + ' in queue.');
+  this.reset();
+});
+
+renderWaitlist();
 
 (function(){
   // Predefined Tag options
@@ -957,7 +1130,7 @@ document.getElementById('paymentModal').addEventListener('click', function(e){ i
     return m?m[1]:(/^[A-Za-z0-9_-]{11}$/.test(v)?v:'');
   }
 
-  function renderAdminList(){
+  window.renderAdminList = function(){
     var list=document.getElementById('adminList'); if(!list) return;
     
     var embeddedItems = embeddedVideos.map(function(v,i){
@@ -977,6 +1150,14 @@ document.getElementById('paymentModal').addEventListener('click', function(e){ i
     }).join('');
 
     list.innerHTML = embeddedItems + (defaultItems ? '<hr style="border-color:var(--line);margin:1.5rem 0;"><strong style="color:var(--accent-gold);display:block;margin-bottom:.5rem;">Edit Tags for Main Works Gallery (Hold Ctrl/Cmd for multiple):</strong>' + defaultItems : '');
+
+    // Admin waitlist list
+    var wlList = document.getElementById('adminWaitlist');
+    if(wlList){
+      wlList.innerHTML = waitlistEntries.map(function(item, i){
+        return '<div class="admin-item"><div><strong>#'+(i+1)+' '+escapeHtml(item.name)+' ('+escapeHtml(item.email)+')</strong><small>Service: '+escapeHtml(item.service)+' | Date: '+escapeHtml(item.date||'N/A')+'</small><small>Notes: '+escapeHtml(item.notes||'None')+'</small></div><button class="btn btn-ghost" type="button" data-remove-waitlist="'+i+'">Remove</button></div>';
+      }).join('') || '<p style="color:var(--text-muted);">No waitlist entries.</p>';
+    }
   }
 
   function unlockAdmin(){
@@ -1039,13 +1220,22 @@ document.getElementById('paymentModal').addEventListener('click', function(e){ i
   });
   document.getElementById('clearVideoBtn').addEventListener('click',function(){if(window.confirm('Remove all added videos from this browser?')){embeddedVideos=[];localStorage.removeItem('yujin_embedded_videos');renderEmbedded();renderTagFilterBar();renderAdminList();}});
   
-  document.getElementById('adminList').addEventListener('click',function(e){
+  document.getElementById('adminPanel').addEventListener('click',function(e){
     var b=e.target.closest('[data-remove-video]');
     if(b){
       embeddedVideos.splice(Number(b.dataset.removeVideo),1);
       localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos));
       renderEmbedded();
       renderTagFilterBar();
+      renderAdminList();
+      return;
+    }
+
+    var wlBtn = e.target.closest('[data-remove-waitlist]');
+    if(wlBtn){
+      waitlistEntries.splice(Number(wlBtn.dataset.removeWaitlist),1);
+      saveWaitlist();
+      renderWaitlist();
       renderAdminList();
       return;
     }
