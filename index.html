@@ -244,6 +244,58 @@
   .reel-card.is-playing .thumb-wrap,.reel-card.is-playing{cursor:default;}
   .reel-card iframe{width:100%;aspect-ratio:16/9;display:block;border:0;}
 
+
+  /* ---------- embedded video cards ---------- */
+  .works-toolbar{display:flex;justify-content:flex-end;margin:-1rem 0 1.5rem;}
+  .manage-videos-btn{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:.7rem 1rem;border:1px solid var(--line);border-radius:10px;background:var(--bg-panel-2);}
+  .manage-videos-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
+  .reel-card{padding:0;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
+  .reel-card:hover{transform:translateY(-3px);border-color:rgba(239,193,122,.55);box-shadow:0 12px 35px rgba(0,0,0,.22);}
+  .reel-meta{padding:1rem 1rem 1.1rem;}
+  .reel-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.25rem;line-height:1.2;}
+  .reel-price{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent-gold);margin-top:.4rem;}
+  .reel-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.7rem;}
+  .reel-tag{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--text-muted);border:1px solid var(--line);border-radius:999px;padding:.2rem .45rem;}
+  .video-modal{position:fixed;inset:0;z-index:100;background:rgba(6,4,14,.82);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1rem;}
+  .video-modal.is-open{display:flex;}
+  .video-dialog{width:min(960px,100%);max-height:calc(100vh - 2rem);overflow:auto;background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.5);}
+  .video-player{aspect-ratio:16/9;background:#000;}
+  .video-player iframe{width:100%;height:100%;display:block;border:0;}
+  .video-info{padding:1.4rem;}
+  .video-info-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;}
+  .video-info h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;line-height:1.15;}
+  .video-description{color:var(--text-muted);margin:1rem 0;white-space:pre-wrap;}
+  .video-price{font-family:'IBM Plex Mono',monospace;color:var(--accent-gold);font-size:.9rem;}
+  .video-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1.2rem;}
+  .video-cta{display:inline-flex;}
+  .modal-close{width:40px;height:40px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-size:1.4rem;flex-shrink:0;}
+  .modal-close:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
+  .video-editor{position:fixed;inset:0;z-index:110;background:rgba(6,4,14,.88);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1rem;}
+  .video-editor.is-open{display:flex;}
+  .editor-dialog{width:min(760px,100%);max-height:calc(100vh - 2rem);overflow:auto;background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;padding:1.5rem;}
+  .editor-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;}
+  .editor-head h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.8rem;}
+  .editor-list{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.25rem;}
+  .editor-row{display:grid;grid-template-columns:72px 1fr auto;gap:.8rem;align-items:center;background:var(--bg-panel-2);border:1px solid var(--line);border-radius:12px;padding:.55rem;}
+  .editor-row img{width:72px;aspect-ratio:16/9;object-fit:cover;border-radius:7px;}
+  .editor-row strong{display:block;font-size:.86rem;}
+  .editor-row small{display:block;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;font-size:.64rem;margin-top:.2rem;}
+  .editor-form{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+  .editor-form .full{grid-column:1/-1;}
+  .editor-form label{display:flex;flex-direction:column;gap:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--text-muted);}
+  .editor-form input,.editor-form textarea{width:100%;border:1px solid var(--line);background:#0f0c1d;color:var(--text);border-radius:9px;padding:.75rem;outline:none;}
+  .editor-form textarea{min-height:100px;resize:vertical;}
+  .editor-form input:focus,.editor-form textarea:focus{border-color:var(--accent-moon);}
+  .editor-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap;}
+  .editor-hint{color:var(--text-muted);font-size:.75rem;margin:.7rem 0 0;}
+  .danger-btn{border-color:rgba(255,110,110,.35)!important;}
+  @media(max-width:620px){
+    .editor-form{grid-template-columns:1fr;}
+    .editor-form .full{grid-column:auto;}
+    .video-info h3{font-size:1.6rem;}
+    .video-info-head{gap:.5rem;}
+  }
+
   /* ---------- prices ---------- */
   .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;}
   .price-card{
@@ -496,6 +548,65 @@
   <span data-i18n="footer_status">Commissions Open 🌙 — thank you for visiting.</span>
 </footer>
 
+
+<!-- Embedded video detail modal -->
+<div class="video-modal" id="videoModal" aria-hidden="true">
+  <div class="video-dialog" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+    <div class="video-player" id="videoPlayer"></div>
+    <div class="video-info">
+      <div class="video-info-head">
+        <div>
+          <h3 id="videoModalTitle"></h3>
+          <p class="video-price" id="videoModalPrice"></p>
+        </div>
+        <button class="modal-close" id="videoModalClose" type="button" aria-label="Close">×</button>
+      </div>
+      <p class="video-description" id="videoModalDescription"></p>
+      <div class="video-tags" id="videoModalTags"></div>
+      <a class="btn btn-primary video-cta" id="videoModalCta" href="#" target="_blank" rel="noopener">Inquire</a>
+    </div>
+  </div>
+</div>
+
+<!-- Video management modal -->
+<div class="video-editor" id="videoEditor" aria-hidden="true">
+  <div class="editor-dialog" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <div class="editor-head">
+      <h3 id="editorTitle">Manage embedded videos</h3>
+      <button class="modal-close" id="editorClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="editor-list" id="editorList"></div>
+    <form class="editor-form" id="videoForm">
+      <label class="full">YouTube URL or video ID
+        <input id="videoIdInput" required placeholder="https://www.youtube.com/watch?v=...">
+      </label>
+      <label>Title
+        <input id="videoTitleInput" required placeholder="Video title">
+      </label>
+      <label>Price
+        <input id="videoPriceInput" placeholder="$150 / Starting at $100">
+      </label>
+      <label class="full">Description
+        <textarea id="videoDescriptionInput" placeholder="Describe the video, what you made, the scope, etc."></textarea>
+      </label>
+      <label>CTA text
+        <input id="videoCtaInput" placeholder="Inquire about this video">
+      </label>
+      <label>CTA URL
+        <input id="videoCtaUrlInput" placeholder="https://...">
+      </label>
+      <label class="full">Tags
+        <input id="videoTagsInput" placeholder="MV, 3D, motion design">
+      </label>
+      <div class="editor-actions full">
+        <button class="btn btn-ghost" id="exportVideosBtn" type="button">Export JSON</button>
+        <button class="btn btn-primary" type="submit">Add video</button>
+      </div>
+    </form>
+    <p class="editor-hint">Video changes are saved in this browser. Use Export JSON if you want to back up or move your video list to another device.</p>
+  </div>
+</div>
+
 <script>
 (function(){
   // ---------- mobile nav ----------
@@ -523,30 +634,188 @@
   window.addEventListener('resize', updatePhase);
   updatePhase();
 
-  // ---------- works gallery (click-to-load, so 26 iframes never load at once) ----------
-  var videos = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
-  var gallery = document.getElementById('gallery');
-  gallery.innerHTML = videos.map(function(id, i){
-    return '<button class="reel-card" type="button" data-id="'+id+'" aria-label="Play work '+(i+1)+'">'
-      + '<span class="reel-edge"></span>'
-      + '<span class="thumb-wrap">'
-        + '<img loading="lazy" src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="Work sample '+(i+1)+'">'
-        + '<span class="play-glyph"></span>'
-      + '</span>'
-      + '<span class="reel-edge"></span>'
-    + '</button>';
-  }).join('');
-
-  gallery.addEventListener('click', function(e){
-    var card = e.target.closest('.reel-card');
-    if (!card || card.classList.contains('is-playing')) return;
-    var id = card.dataset.id;
-    card.classList.add('is-playing');
-    card.innerHTML = '<span class="reel-edge"></span>'
-      + '<iframe src="https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0&modestbranding=1&playsinline=1" '
-      + 'title="Yujin work sample" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
-      + '<span class="reel-edge"></span>';
+  // ---------- embedded video gallery ----------
+  var defaultVideos = [
+    "16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI",
+    "5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo",
+    "AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw",
+    "3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc",
+    "ELoZRxNhE5Y","BLYdjq50ISE"
+  ].map(function(id,i){
+    return {
+      id:id,
+      title:"Work "+(i+1),
+      description:"Click to watch this work and view its details.",
+      price:"",
+      ctaText:"Inquire",
+      ctaUrl:"#contact",
+      tags:[]
+    };
   });
+
+  var storageKey = 'yujin_embedded_videos_v1';
+  var gallery = document.getElementById('gallery');
+  var videoModal = document.getElementById('videoModal');
+  var videoEditor = document.getElementById('videoEditor');
+  var videoPlayer = document.getElementById('videoPlayer');
+
+  function loadVideos(){
+    try{
+      var saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      if (Array.isArray(saved)) return saved;
+    }catch(e){}
+    return defaultVideos.slice();
+  }
+  var videos = loadVideos();
+
+  function saveVideos(){
+    localStorage.setItem(storageKey, JSON.stringify(videos));
+  }
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function getYoutubeId(value){
+    var v = String(value || '').trim();
+    var match = v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/);
+    return match ? match[1] : v.replace(/[^A-Za-z0-9_-]/g,'');
+  }
+
+  function renderGallery(){
+    gallery.innerHTML = videos.length ? videos.map(function(video,i){
+      var tags = (video.tags || []).slice(0,4).map(function(tag){
+        return '<span class="reel-tag">'+escapeHtml(tag)+'</span>';
+      }).join('');
+      return '<button class="reel-card" type="button" data-index="'+i+'">'
+        + '<span class="reel-edge"></span>'
+        + '<span class="thumb-wrap">'
+          + '<img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(video.id)+'/hqdefault.jpg" alt="'+escapeHtml(video.title)+'">'
+          + '<span class="play-glyph"></span>'
+        + '</span>'
+        + '<span class="reel-edge"></span>'
+        + '<span class="reel-meta">'
+          + '<span class="reel-title">'+escapeHtml(video.title)+'</span>'
+          + (video.price ? '<span class="reel-price">'+escapeHtml(video.price)+'</span>' : '')
+          + (tags ? '<span class="reel-tags">'+tags+'</span>' : '')
+        + '</span>'
+      + '</button>';
+    }).join('') : '<p style="color:var(--text-muted)">No embedded videos yet.</p>';
+  }
+
+  function openVideo(video){
+    var id = getYoutubeId(video.id);
+    document.getElementById('videoModalTitle').textContent = video.title || 'Video';
+    document.getElementById('videoModalPrice').textContent = video.price || '';
+    document.getElementById('videoModalDescription').textContent = video.description || '';
+    document.getElementById('videoModalTags').innerHTML = (video.tags || []).map(function(tag){
+      return '<span class="reel-tag">'+escapeHtml(tag)+'</span>';
+    }).join('');
+    var cta = document.getElementById('videoModalCta');
+    cta.textContent = video.ctaText || 'Inquire';
+    cta.href = video.ctaUrl || '#contact';
+    videoPlayer.innerHTML = '<iframe src="https://www.youtube.com/embed/'+encodeURIComponent(id)+'?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="'+escapeHtml(video.title || 'YouTube video')+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    videoModal.classList.add('is-open');
+    videoModal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeVideo(){
+    videoModal.classList.remove('is-open');
+    videoModal.setAttribute('aria-hidden','true');
+    videoPlayer.innerHTML='';
+    if (!videoEditor.classList.contains('is-open')) document.body.style.overflow='';
+  }
+
+  gallery.addEventListener('click',function(e){
+    var card=e.target.closest('.reel-card');
+    if(!card) return;
+    var video=videos[Number(card.dataset.index)];
+    if(video) openVideo(video);
+  });
+
+  function renderEditor(){
+    var list=document.getElementById('editorList');
+    list.innerHTML=videos.map(function(video,i){
+      return '<div class="editor-row">'
+        + '<img src="https://i.ytimg.com/vi/'+encodeURIComponent(getYoutubeId(video.id))+'/mqdefault.jpg" alt="">'
+        + '<div><strong>'+escapeHtml(video.title)+'</strong><small>'+escapeHtml(video.price || video.id)+'</small></div>'
+        + '<button class="btn btn-ghost danger-btn" type="button" data-remove="'+i+'">Remove</button>'
+      + '</div>';
+    }).join('');
+  }
+
+  function openEditor(){
+    renderEditor();
+    videoEditor.classList.add('is-open');
+    videoEditor.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeEditor(){
+    videoEditor.classList.remove('is-open');
+    videoEditor.setAttribute('aria-hidden','true');
+    if(!videoModal.classList.contains('is-open')) document.body.style.overflow='';
+  }
+
+  document.getElementById('manageVideosBtn').addEventListener('click',openEditor);
+  document.getElementById('videoModalClose').addEventListener('click',closeVideo);
+  document.getElementById('editorClose').addEventListener('click',closeEditor);
+  videoModal.addEventListener('click',function(e){if(e.target===videoModal) closeVideo();});
+  videoEditor.addEventListener('click',function(e){if(e.target===videoEditor) closeEditor();});
+
+  document.getElementById('editorList').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-remove]');
+    if(!btn) return;
+    var i=Number(btn.dataset.remove);
+    if(confirm('Remove "'+(videos[i] ? videos[i].title : 'this video')+'"?')){
+      videos.splice(i,1);
+      saveVideos();
+      renderGallery();
+      renderEditor();
+    }
+  });
+
+  document.getElementById('videoForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var rawId=document.getElementById('videoIdInput').value.trim();
+    var id=getYoutubeId(rawId);
+    if(!id){ alert('Please enter a valid YouTube URL or video ID.'); return; }
+    var ctaUrl=document.getElementById('videoCtaUrlInput').value.trim() || '#contact';
+    videos.push({
+      id:id,
+      title:document.getElementById('videoTitleInput').value.trim(),
+      description:document.getElementById('videoDescriptionInput').value.trim(),
+      price:document.getElementById('videoPriceInput').value.trim(),
+      ctaText:document.getElementById('videoCtaInput').value.trim() || 'Inquire',
+      ctaUrl:ctaUrl,
+      tags:document.getElementById('videoTagsInput').value.split(',').map(function(t){return t.trim();}).filter(Boolean)
+    });
+    saveVideos();
+    renderGallery();
+    renderEditor();
+    this.reset();
+  });
+
+  document.getElementById('exportVideosBtn').addEventListener('click',function(){
+    var blob=new Blob([JSON.stringify(videos,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='yujin-embedded-videos.json';
+    a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},500);
+  });
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      if(videoModal.classList.contains('is-open')) closeVideo();
+      else if(videoEditor.classList.contains('is-open')) closeEditor();
+    }
+  });
+
+  renderGallery();
 
   // ---------- EN / JP toggle ----------
   var dict = {
