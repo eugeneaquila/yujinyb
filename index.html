@@ -259,10 +259,26 @@
   .video-service{font:500 .72rem 'IBM Plex Mono',monospace;color:var(--accent-moon);margin-bottom:.35rem;letter-spacing:.04em;}.video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
   
   /* Payment & Inquiry Form Modal */
-  .payment-modal-card{width:min(580px,100%);max-height:90vh;overflow-y:auto;padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
+  .payment-modal-card{width:min(600px,100%);max-height:92vh;overflow-y:auto;padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
   .payment-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;margin-bottom:.3rem;}
   .payment-subtitle{color:var(--text-muted);font-size:.88rem;margin-bottom:1.2rem;}
   
+  /* Project Type Toggle (Personal vs Commercial) */
+  .project-type-container{
+    display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem;
+    background:rgba(0,0,0,0.3);padding:6px;border-radius:14px;border:1px solid var(--line);
+  }
+  .project-type-btn{
+    padding:.75rem .5rem;border-radius:10px;font-size:.82rem;font-family:'IBM Plex Mono',monospace;
+    color:var(--text-muted);border:1px solid transparent;transition:all .2s;text-align:center;
+  }
+  .project-type-btn strong{display:block;font-size:.95rem;color:var(--text);}
+  .project-type-btn.is-selected{
+    background:var(--bg-panel-2);border-color:var(--accent-moon);color:var(--accent-moon);
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  }
+  .project-type-btn.is-selected strong{color:var(--accent-moon);}
+
   /* Form Controls inside Inquiry Modal */
   .inquiry-form{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem;}
   .inquiry-form .full{grid-column:1/-1;}
@@ -273,6 +289,15 @@
   .inquiry-form input:focus, .inquiry-form textarea:focus{
     border-color:var(--accent-gold);outline:none;
   }
+  
+  /* File Upload Styling */
+  .file-input-wrapper{
+    border:1px dashed var(--line);border-radius:12px;padding:.8rem 1rem;
+    background:rgba(255,255,255,0.01);text-align:center;cursor:pointer;
+  }
+  .file-input-wrapper label{display:block;font-size:.82rem;color:var(--text-muted);cursor:pointer;}
+  .file-input-wrapper input[type="file"]{display:none;}
+
   .tos-checkbox-label{
     display:flex;align-items:flex-start;gap:.6rem;font-size:.82rem;color:var(--text-muted);
     cursor:pointer;user-select:none;margin-top:.3rem;
@@ -763,16 +788,34 @@
   <div class="payment-modal-card">
     <button class="video-modal-close" id="paymentModalClose" type="button" aria-label="Close">×</button>
     <h3 class="payment-title" id="paymentModalTitle">Inquire &amp; Reserve Slot</h3>
-    <p class="payment-subtitle" id="paymentModalSubtitle">Fill out your details and complete payment to automatically enter the waitlist queue.</p>
+    <p class="payment-subtitle" id="paymentModalSubtitle">Select project type, fill out your details, and complete payment to automatically enter the waitlist queue.</p>
+
+    <!-- Project Type Selector (Personal vs Commercial) -->
+    <div class="project-type-container">
+      <button type="button" class="project-type-btn is-selected" id="btnTypePersonal" onclick="setProjectType('personal')">
+        <strong>Personal Project</strong>
+        <span>Standard Rate</span>
+      </button>
+      <button type="button" class="project-type-btn" id="btnTypeCommercial" onclick="setProjectType('commercial')">
+        <strong>Commercial Project</strong>
+        <span>+100% Fee (Ads / Monetized)</span>
+      </button>
+    </div>
 
     <!-- Client Inquiry Form -->
     <div class="inquiry-form">
       <input type="text" id="inqName" placeholder="Your Name / Handle *" required>
-      <input type="text" id="inqCompany" placeholder="Company Name (Optional)">
+      <input type="text" id="inqCompany" placeholder="Company / VTuber Agency Name (Optional)">
       <input type="email" id="inqEmail" placeholder="Your Email Address *" required>
-      <input type="text" id="inqSocial" placeholder="Social Media e.g. @Twitter (Optional)">
-      <textarea id="inqDesc" class="full" placeholder="Project Description / Asset links (Optional)"></textarea>
+      <input type="text" id="inqSocial" placeholder="Social Media e.g. @Twitter Handle *" required>
+      <textarea id="inqDesc" class="full" placeholder="Project Brief & Description (Optional)"></textarea>
       
+      <!-- Supabase File Attachment Input -->
+      <div class="full file-input-wrapper">
+        <label for="inqAttachment" id="fileLabel">📎 Upload Brief / Asset Attachment (Optional)</label>
+        <input type="file" id="inqAttachment" onchange="updateFileNameDisplay(this)">
+      </div>
+
       <!-- Required TOS Checkbox -->
       <div class="full">
         <label class="tos-checkbox-label">
@@ -802,12 +845,14 @@
 <script>
 // PayPal & Inquiry Form Modal State
 var currentService = '';
-var currentFullPrice = 0;
+var currentBasePrice = 0;
+var isCommercial = false;
 var isDepositMode = true;
 
 function openPaymentModal(serviceName, priceNum) {
   currentService = serviceName;
-  currentFullPrice = Number(priceNum);
+  currentBasePrice = Number(priceNum);
+  isCommercial = false;
   isDepositMode = true;
 
   document.getElementById('paymentModalTitle').textContent = 'Inquire — ' + serviceName;
@@ -818,6 +863,8 @@ function openPaymentModal(serviceName, priceNum) {
   document.getElementById('inqEmail').value = '';
   document.getElementById('inqSocial').value = '';
   document.getElementById('inqDesc').value = '';
+  document.getElementById('inqAttachment').value = '';
+  document.getElementById('fileLabel').textContent = '📎 Upload Brief / Asset Attachment (Optional)';
   document.getElementById('inqTosCheck').checked = false;
 
   updateDepositUI();
@@ -827,14 +874,31 @@ function openPaymentModal(serviceName, priceNum) {
   document.body.style.overflow = 'hidden';
 }
 
+function setProjectType(type) {
+  isCommercial = (type === 'commercial');
+  document.getElementById('btnTypePersonal').classList.toggle('is-selected', !isCommercial);
+  document.getElementById('btnTypeCommercial').classList.toggle('is-selected', isCommercial);
+  updateDepositUI();
+}
+
 function setPaymentMode(mode) {
   isDepositMode = (mode === 'deposit');
   updateDepositUI();
 }
 
+function updateFileNameDisplay(input) {
+  var label = document.getElementById('fileLabel');
+  if (input.files && input.files[0]) {
+    label.textContent = '📎 Attached: ' + input.files[0].name;
+  } else {
+    label.textContent = '📎 Upload Brief / Asset Attachment (Optional)';
+  }
+}
+
 function updateDepositUI() {
-  var depositAmount = (currentFullPrice * 0.5).toFixed(2);
-  var fullAmount = currentFullPrice.toFixed(2);
+  var activePrice = isCommercial ? (currentBasePrice * 2) : currentBasePrice;
+  var depositAmount = (activePrice * 0.5).toFixed(2);
+  var fullAmount = activePrice.toFixed(2);
 
   document.getElementById('deposit50Label').textContent = '50% Deposit ($' + depositAmount + ')';
   document.getElementById('depositFullLabel').textContent = 'Full Amount ($' + fullAmount + ')';
@@ -843,21 +907,54 @@ function updateDepositUI() {
   document.getElementById('btnDepositFull').classList.toggle('is-selected', !isDepositMode);
 
   var finalPayAmount = isDepositMode ? depositAmount : fullAmount;
-  
-  document.getElementById('paymentModalSubtitle').textContent = 'Complete inquiry & pay $' + finalPayAmount + ' USD (' + (isDepositMode ? '50% Slot Deposit' : 'Full Payment') + ') to auto-register on the waitlist.';
+  var projectTypeTag = isCommercial ? 'Commercial' : 'Personal';
 
-  renderPayPalButtons(finalPayAmount, currentService + (isDepositMode ? ' (50% Deposit)' : ' (Full)'));
+  document.getElementById('paymentModalSubtitle').textContent = 'Inquiry for ' + currentService + ' (' + projectTypeTag + ') — Pay $' + finalPayAmount + ' USD (' + (isDepositMode ? '50% Slot Deposit' : 'Full Payment') + ') to auto-register on the waitlist.';
+
+  renderPayPalButtons(finalPayAmount, currentService + ' [' + projectTypeTag + ']' + (isDepositMode ? ' (50% Deposit)' : ' (Full)'));
 }
 
 function validateInquiryForm() {
   var name = document.getElementById('inqName').value.trim();
   var email = document.getElementById('inqEmail').value.trim();
+  var social = document.getElementById('inqSocial').value.trim();
   var tos = document.getElementById('inqTosCheck').checked;
 
-  if(!name || !email || !tos) {
+  if(!name || !email || !social || !tos) {
     return false;
   }
   return true;
+}
+
+// Function to send email notification to yujinybwork@gmail.com
+async function sendInquiryEmail(orderData) {
+  try {
+    var formData = new FormData();
+    formData.append('_replyto', orderData.email);
+    formData.append('_subject', '🌙 New Commission Order: ' + orderData.service + ' (' + orderData.name + ')');
+    formData.append('Client Name', orderData.name);
+    formData.append('Company', orderData.company || 'N/A');
+    formData.append('Email', orderData.email);
+    formData.append('Social Media', orderData.social);
+    formData.append('Project Type', orderData.projectType);
+    formData.append('Service', orderData.service);
+    formData.append('Paid Amount', orderData.paidAmount + ' (' + orderData.paymentType + ')');
+    formData.append('Description', orderData.description || 'None');
+
+    var fileInput = document.getElementById('inqAttachment');
+    if (fileInput.files && fileInput.files[0]) {
+      formData.append('Attachment', fileInput.files[0]);
+    }
+
+    // Submit to Formspree endpoint pointing to yujinybwork@gmail.com
+    await fetch('https://formspree.io/f/xknp_yujin_work', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    });
+  } catch (e) {
+    console.warn('Email dispatch notice:', e);
+  }
 }
 
 function renderPayPalButtons(amount, label) {
@@ -874,7 +971,7 @@ function renderPayPalButtons(amount, label) {
       },
       onClick: function(data, actions) {
         if(!validateInquiryForm()) {
-          alert('Please fill out your Name, Email, and accept the Terms of Service before proceeding to payment.');
+          alert('Please fill out your Name, Email, Social Media Handle, and accept the Terms of Service before proceeding to payment.');
           return actions.reject();
         }
         return actions.resolve();
@@ -894,14 +991,13 @@ function renderPayPalButtons(amount, label) {
       onApprove: async function(data, actions) {
         const details = await actions.order.capture();
         
-        // Auto-add client to waitlist upon successful payment
         var name = document.getElementById('inqName').value.trim();
         var company = document.getElementById('inqCompany').value.trim();
         var email = document.getElementById('inqEmail').value.trim();
         var social = document.getElementById('inqSocial').value.trim();
         var desc = document.getElementById('inqDesc').value.trim();
 
-        waitlistEntries.push({
+        var orderPayload = {
           id: 'WL-' + Date.now().toString().slice(-5),
           name: name,
           company: company,
@@ -909,18 +1005,23 @@ function renderPayPalButtons(amount, label) {
           social: social,
           description: desc,
           service: currentService,
+          projectType: isCommercial ? 'Commercial' : 'Personal',
           paidAmount: '$' + amount,
           paymentType: isDepositMode ? '50% Deposit' : 'Full Payment',
           date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
-          phase: 1, // Phase 1: Storyboard & Roughs, Phase 2: Animation & Compositing, Phase 3: Final Polish
+          phase: 1,
           completed: false
-        });
+        };
 
+        waitlistEntries.push(orderPayload);
         saveWaitlist();
         renderWaitlist();
         if(typeof renderAdminList === 'function') renderAdminList();
 
-        alert('Payment successful! Thank you ' + details.payer.name.given_name + '. You have been automatically added to the waitlist queue.');
+        // Dispatch Email Notification to yujinybwork@gmail.com
+        sendInquiryEmail(orderPayload);
+
+        alert('Payment successful! Thank you ' + details.payer.name.given_name + '. Your commission inquiry and attachment have been dispatched to yujinybwork@gmail.com and added to the waitlist queue.');
         closePaymentModal();
       },
       onError: function(err) {
@@ -971,7 +1072,7 @@ function renderWaitlist(){
       + statusBadge
       + '</div>'
       + '<div class="waitlist-meta">'
-      + '<strong>Service:</strong> '+escapeHtml(item.service)+' &nbsp;|&nbsp; <strong>Commissioned:</strong> '+escapeHtml(item.date||'N/A')+' &nbsp;|&nbsp; <strong>Status:</strong> '+escapeHtml(item.paymentType||'Paid')
+      + '<strong>Service:</strong> '+escapeHtml(item.service)+' ('+escapeHtml(item.projectType||'Personal')+') &nbsp;|&nbsp; <strong>Commissioned:</strong> '+escapeHtml(item.date||'N/A')+' &nbsp;|&nbsp; <strong>Status:</strong> '+escapeHtml(item.paymentType||'Paid')
       + '</div>'
       + '<div class="wip-tracker">'
       + '<div class="wip-step '+phase1Class+'">Phase 1: Concept &amp; Storyboard</div>'
@@ -1238,7 +1339,7 @@ renderWaitlist();
           + '<div>'
           + '<strong>#'+(i+1)+' '+escapeHtml(item.name)+' ('+escapeHtml(item.email)+')</strong>'
           + '<small>Company: '+escapeHtml(item.company||'None')+' | Social: '+escapeHtml(item.social||'None')+'</small>'
-          + '<small>Service: '+escapeHtml(item.service)+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+') | Date: '+escapeHtml(item.date)+'</small>'
+          + '<small>Service: '+escapeHtml(item.service)+' ('+escapeHtml(item.projectType||'Personal')+') | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+') | Date: '+escapeHtml(item.date)+'</small>'
           + '<small>Desc: '+escapeHtml(item.description||'None')+'</small>'
           + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
           + '<span style="font-size:.75rem;color:var(--text-muted);">Set Progress:</span>'
