@@ -285,9 +285,16 @@
     width:100%;padding:.75rem .9rem;border-radius:12px;border:1px solid var(--line);
     background:var(--bg);color:var(--text);font:inherit;font-size:.88rem;
   }
+  .inquiry-form input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+  }
   .inquiry-form input:focus, .inquiry-form textarea:focus{
     border-color:var(--accent-gold);outline:none;
   }
+
+  .field-group{display:flex;flex-direction:column;gap:4px;}
+  .field-label{font-size:.78rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
   
   /* Add-on Checkbox List Styling */
   .addons-container{
@@ -370,7 +377,8 @@
   .status-badge.in-progress{background:rgba(239,193,122,0.15);color:var(--accent-gold);border:1px solid var(--accent-gold);}
   .status-badge.completed{background:rgba(122,239,173,0.15);color:var(--accent-green);border:1px solid var(--accent-green);}
 
-  /* ---------- Redesigned Admin Panel Styles ---------- */
+  /* ---------- Admin Panel Styles ---------- */
+  .admin-wrapper{max-width:var(--container);margin:0 auto;padding:0 clamp(1.25rem, 5vw, 2.5rem);}
   .admin-panel{
     display:none;margin-top:2.5rem;padding:2rem;background:var(--bg-panel);
     border:1px solid var(--line-active);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.6);
@@ -407,6 +415,8 @@
   
   @media(max-width:760px){
     .admin-add-form{grid-template-columns:1fr;}
+    .inquiry-form{grid-template-columns:1fr;}
+    .inquiry-form .full{grid-column:auto;}
   }
 
   .admin-panel input, .admin-panel select{
@@ -619,62 +629,6 @@
   </div>
 </section>
 
-<section id="embedded" class="works">
-  <div class="section-inner">
-    <span class="eyebrow">Featured videos</span>
-    <h2 class="section-title">Embedded Videos</h2>
-    <div class="gallery" id="embeddedGallery"></div>
-
-    <!-- Completely Redesigned Admin Panel -->
-    <div id="adminPanel" class="admin-panel">
-      <div class="admin-header">
-        <div>
-          <h3 class="admin-title">Studio Dashboard</h3>
-          <p style="font-size:.82rem;color:var(--text-muted);">Simplified Video Management &amp; Waitlist Tracker</p>
-        </div>
-        <button type="button" class="btn btn-ghost" id="logoutAdminBtn">🔒 Lock Admin</button>
-      </div>
-
-      <!-- Navigation Tabs -->
-      <div class="admin-tabs">
-        <button type="button" class="admin-tab-btn is-active" onclick="switchAdminTab('videos')">🎬 Video Manager</button>
-        <button type="button" class="admin-tab-btn" onclick="switchAdminTab('waitlist')">📋 Waitlist Queue</button>
-      </div>
-
-      <!-- Tab 1: Video Manager -->
-      <div id="tabAdminVideos" class="admin-tab-content is-active">
-        <!-- Quick Add Form (Only Link & Service Tier Required) -->
-        <div class="admin-add-card">
-          <h4>Add New Video</h4>
-          <p>Paste any YouTube URL or Video ID and select its service tier. Titles, descriptions, and thumbnails are automatically fetched.</p>
-          
-          <div class="admin-add-form">
-            <input id="quickVideoUrl" placeholder="Paste YouTube Link or Video ID (e.g. https://youtu.be/...) *">
-            <select id="quickVideoService">
-              <option value="MV Simple">MV Simple ($100)</option>
-              <option value="MV Complex">MV Complex ($300)</option>
-              <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
-              <option value="Puppet Animation">Puppet Animation ($30)</option>
-            </select>
-            <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
-          </div>
-        </div>
-
-        <strong style="display:block;font-size:1.05rem;color:var(--text);margin-bottom:1rem;">Active Video Gallery</strong>
-        <div id="adminVideoGrid" class="admin-video-grid"></div>
-      </div>
-
-      <!-- Tab 2: Waitlist Manager -->
-      <div id="tabAdminWaitlist" class="admin-tab-content">
-        <strong style="display:block;font-size:1.05rem;color:var(--accent-gold);margin-bottom:.5rem;">Client Waitlist Queue (Paid Orders Only)</strong>
-        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.2rem;">Track client progress, update WIP phases (1–3), or complete commissions once delivered.</p>
-        
-        <div id="adminWaitlistList" class="admin-list"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="prices" class="prices">
   <div class="section-inner">
     <span class="eyebrow" data-i18n="prices_eyebrow">Commission tiers</span>
@@ -823,6 +777,56 @@
   </div>
 </section>
 
+<!-- Private Admin Panel Container (Shortcut: Ctrl + Shift + A to open) -->
+<div class="admin-wrapper">
+  <div id="adminPanel" class="admin-panel">
+    <div class="admin-header">
+      <div>
+        <h3 class="admin-title">Studio Dashboard</h3>
+        <p style="font-size:.82rem;color:var(--text-muted);">Simplified Video Management &amp; Waitlist Tracker</p>
+      </div>
+      <button type="button" class="btn btn-ghost" id="logoutAdminBtn">🔒 Lock Admin</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab-btn is-active" onclick="switchAdminTab('videos')">🎬 Video Manager</button>
+      <button type="button" class="admin-tab-btn" onclick="switchAdminTab('waitlist')">📋 Waitlist Queue</button>
+    </div>
+
+    <!-- Tab 1: Video Manager -->
+    <div id="tabAdminVideos" class="admin-tab-content is-active">
+      <!-- Quick Add Form (Only Link & Service Tier Required) -->
+      <div class="admin-add-card">
+        <h4>Add New Video</h4>
+        <p>Paste any YouTube URL or Video ID and select its service tier. Titles, descriptions, and thumbnails are automatically fetched.</p>
+        
+        <div class="admin-add-form">
+          <input id="quickVideoUrl" placeholder="Paste YouTube Link or Video ID (e.g. https://youtu.be/...) *">
+          <select id="quickVideoService">
+            <option value="MV Simple">MV Simple ($100)</option>
+            <option value="MV Complex">MV Complex ($300)</option>
+            <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
+            <option value="Puppet Animation">Puppet Animation ($30)</option>
+          </select>
+          <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
+        </div>
+      </div>
+
+      <strong style="display:block;font-size:1.05rem;color:var(--text);margin-bottom:1rem;">Active Video Gallery</strong>
+      <div id="adminVideoGrid" class="admin-video-grid"></div>
+    </div>
+
+    <!-- Tab 2: Waitlist Manager -->
+    <div id="tabAdminWaitlist" class="admin-tab-content">
+      <strong style="display:block;font-size:1.05rem;color:var(--accent-gold);margin-bottom:.5rem;">Client Waitlist Queue (Paid Orders Only)</strong>
+      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.2rem;">Track client progress, update WIP phases (1–3), or complete commissions once delivered.</p>
+      
+      <div id="adminWaitlistList" class="admin-list"></div>
+    </div>
+  </div>
+</div>
+
 <footer class="footer">
   <span data-i18n="footer_status">Commissions Open 🌙 — thank you for visiting.</span>
 </footer>
@@ -862,6 +866,13 @@
       <input type="text" id="inqCompany" placeholder="Company / VTuber Agency Name (Optional)">
       <input type="email" id="inqEmail" placeholder="Your Email Address *" required>
       <input type="text" id="inqSocial" placeholder="Social Media e.g. @Twitter Handle *" required>
+      
+      <!-- Deadline Picker Input -->
+      <div class="field-group full">
+        <label class="field-label" id="deadlineLabel" data-i18n="inq_deadline_label">Target Deadline / Preferred Delivery Date (Optional):</label>
+        <input type="date" id="inqDeadline">
+      </div>
+
       <textarea id="inqDesc" class="full" placeholder="Project Brief & Description (Optional)"></textarea>
       
       <!-- Add-on Checkboxes Driven by TOS -->
@@ -935,6 +946,7 @@ function openPaymentModal(serviceName, priceNum) {
   document.getElementById('inqCompany').value = '';
   document.getElementById('inqEmail').value = '';
   document.getElementById('inqSocial').value = '';
+  document.getElementById('inqDeadline').value = '';
   document.getElementById('inqDesc').value = '';
   document.getElementById('addonCommercial').checked = false;
   document.getElementById('addonRush').checked = false;
@@ -1029,6 +1041,7 @@ async function sendInquiryEmail(orderData) {
     formData.append('Company', orderData.company || 'N/A');
     formData.append('Email', orderData.email);
     formData.append('Social Media', orderData.social);
+    formData.append('Target Deadline', orderData.deadline || 'Flexible / Not Specified');
     formData.append('Service', orderData.service);
     formData.append('Add-ons Selected', orderData.addons || 'None');
     formData.append('Paid Amount', orderData.paidAmount + ' (' + orderData.paymentType + ')');
@@ -1088,6 +1101,7 @@ function renderPayPalButtons(amount, label) {
         var company = document.getElementById('inqCompany').value.trim();
         var email = document.getElementById('inqEmail').value.trim();
         var social = document.getElementById('inqSocial').value.trim();
+        var deadline = document.getElementById('inqDeadline').value;
         var desc = document.getElementById('inqDesc').value.trim();
 
         var addonsList = [];
@@ -1101,6 +1115,7 @@ function renderPayPalButtons(amount, label) {
           company: company,
           email: email,
           social: social,
+          deadline: deadline || 'Flexible',
           description: desc,
           service: currentService,
           addons: addonsList.join(', ') || 'None',
@@ -1178,7 +1193,7 @@ function renderWaitlist(){
       + statusBadge
       + '</div>'
       + '<div class="waitlist-meta">'
-      + '<strong>' + (isJp ? 'サービス:' : 'Service:') + '</strong> '+escapeHtml(item.service)+' '+ (item.addons && item.addons!=='None' ? '<small style="color:var(--accent-moon)">['+escapeHtml(item.addons)+']</small>' : '') +' &nbsp;|&nbsp; <strong>' + (isJp ? 'ご依頼日:' : 'Commissioned:') + '</strong> '+escapeHtml(item.date||'N/A')+' &nbsp;|&nbsp; <strong>' + (isJp ? '状態:' : 'Status:') + '</strong> '+escapeHtml(item.paymentType||'Paid')
+      + '<strong>' + (isJp ? 'サービス:' : 'Service:') + '</strong> '+escapeHtml(item.service)+' '+ (item.addons && item.addons!=='None' ? '<small style="color:var(--accent-moon)">['+escapeHtml(item.addons)+']</small>' : '') +' &nbsp;|&nbsp; <strong>' + (isJp ? '希望納期:' : 'Deadline:') + '</strong> '+escapeHtml(item.deadline||'Flexible')+' &nbsp;|&nbsp; <strong>' + (isJp ? 'ご依頼日:' : 'Commissioned:') + '</strong> '+escapeHtml(item.date||'N/A')
       + '</div>'
       + '<div class="wip-tracker">'
       + '<div class="wip-step '+phase1Class+'">'+phase1Text+'</div>'
@@ -1389,41 +1404,6 @@ renderWaitlist();
   }());
 
   var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
-  var embeddedGallery = document.getElementById('embeddedGallery');
-  function renderEmbedded(){
-    if(!embeddedGallery) return;
-    embeddedGallery.innerHTML=embeddedVideos.map(function(v,i){
-      var tagsOverlay = (v.tags || []).map(function(t){ return '<span class="thumb-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
-      return '<button class="reel-card" type="button" data-embedded-index="'+i+'" aria-label="Open '+escapeHtml(v.title||'video')+'">'
-        +'<span class="reel-edge"></span>'
-        +'<span class="thumb-wrap">'
-        +(tagsOverlay ? '<div class="thumb-tags-overlay">'+tagsOverlay+'</div>' : '')
-        +'<img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title||'Video')+'">'
-        +'<span class="play-glyph"></span>'
-        +'</span>'
-        +'<span class="reel-edge"></span>'
-        +'<span class="reel-title" style="display:block;padding:.85rem .9rem;text-align:left;font-size:.9rem;color:var(--text);font-weight:500;">'+escapeHtml(v.title||'Video')+'</span>'
-        +'</button>';
-    }).join('') || '<p style="color:var(--text-muted)">No featured videos yet.</p>';
-  }
-  if(embeddedGallery){
-    embeddedGallery.addEventListener('click',function(e){
-      var card=e.target.closest('[data-embedded-index]'); if(!card) return;
-      var item=embeddedVideos[Number(card.dataset.embeddedIndex)];
-      openVideoModal(item);
-      fetchYouTubeMetadata(item.id).then(function(info){
-        var modal=document.getElementById('videoModal');
-        if(modal && modal.classList.contains('is-open')){
-          document.getElementById('videoModalTitle').textContent=info.title||item.title||'YouTube Video';
-          document.getElementById('videoModalDescription').textContent=info.description||item.description||'No YouTube description available.';
-        }
-        item.youtubeTitle=info.title||item.youtubeTitle||'';
-        item.youtubeDescription=info.description||item.youtubeDescription||'';
-        if(info.description && !item.description){ item.description=info.description; localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); }
-      }).catch(function(){});
-    });
-    renderEmbedded();
-  }
 
   // ---------- Redesigned Private Video & Waitlist Manager ----------
   var adminPanel = document.getElementById('adminPanel');
@@ -1496,7 +1476,7 @@ renderWaitlist();
           + '<div>'
           + '<strong>#'+(i+1)+' '+escapeHtml(item.name)+' ('+escapeHtml(item.email)+')</strong>'
           + '<small>Company: '+escapeHtml(item.company||'None')+' | Social: '+escapeHtml(item.social||'None')+'</small>'
-          + '<small>Service: '+escapeHtml(item.service)+' | Add-ons: '+escapeHtml(item.addons||'None')+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+') | Date: '+escapeHtml(item.date)+'</small>'
+          + '<small>Service: '+escapeHtml(item.service)+' | Deadline: '+escapeHtml(item.deadline||'Flexible')+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+')</small>'
           + '<small>Desc: '+escapeHtml(item.description||'None')+'</small>'
           + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
           + '<span style="font-size:.75rem;color:var(--text-muted);">Set Phase:</span>'
@@ -1544,7 +1524,6 @@ renderWaitlist();
 
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
       document.getElementById('quickVideoUrl').value = '';
-      renderEmbedded();
       renderTagFilterBar();
       renderAdminList();
       window.alert('Video successfully added!');
@@ -1560,7 +1539,6 @@ renderWaitlist();
       var idx = Number(removeEmbeddedBtn.dataset.removeVideo);
       embeddedVideos.splice(idx, 1);
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
-      renderEmbedded();
       renderTagFilterBar();
       renderAdminList();
       return;
@@ -1647,6 +1625,7 @@ renderWaitlist();
     modal_order_btn:{en:"Inquire & Order This Service",jp:"このサービスを依頼・注文する"},
     modal_inquire_title:{en:"Inquire & Reserve Slot",jp:"お問合せ・制作枠の予約"},
     modal_inquire_sub:{en:"Fill out your details, select add-ons per TOS, and complete payment to automatically enter the waitlist queue.",jp:"詳細を入力し、規約オプションを選択の上決済を完了すると、自動的にウェイティングリストに登録されます。"},
+    inq_deadline_label:{en:"Target Deadline / Preferred Delivery Date (Optional):",jp:"希望納期 / 納品希望日 (任意):"},
     addons_header:{en:"TOS Add-ons & Custom Options:",jp:"利用規約オプション & 追加指定:"},
     addon_commercial:{en:"💼 Commercial Use License (+100%)",jp:"💼 商用利用ライセンス (+100%)"},
     addon_rush:{en:"⚡ Rush Order Acceleration (+50%)",jp:"⚡ お急ぎ特急納品 (+50%)"},
@@ -1661,7 +1640,7 @@ renderWaitlist();
     waitlist_intro:{en:"This waitlist automatically updates when a client secures a slot via payment. Track WIP progress live across 3 production phases below!",jp:"このリストは決済完了時に自動更新されます。以下の3つのフェーズで制作進捗をリアルタイムに確認できます！"},
     tos_title:{en:"Terms of Service",jp:"利用規約"},
     contact_title:{en:"Contact",jp:"連絡先"},
-    contact_copy:{en:"Commissions are currently open! Reach out below to inquire about a slot.",jp:"現在依頼を受付中です！下記よりお気軽にお問い合わせください。"},
+    contact_copy:{en:"Commissions are currently open! Reach out below to inquire about a slot.",jp:"現在依頼受付中です！下記よりお気軽にお問い合わせください。"},
     footer_status:{en:"Commissions Open 🌙 — thank you for visiting.",jp:"依頼受付中 🌙 — ご訪問ありがとうございます。"},
     tos_intro:{en:"By commissioning me, you agree to the following terms of service! Failure to follow said TOS will result in a block & you will no longer be able to commission me for future projects.",jp:"ご依頼いただく際は、以下の利用規約に同意したものとみなされます。規約に違反した場合、ブロック対象となり、今後のご依頼をお受けできなくなります。"},
     tos_h_payments:{en:"Payments",jp:"お支払いについて"},
