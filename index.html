@@ -259,6 +259,21 @@
   .video-modal-frame iframe{width:100%;height:100%;border:0;display:block;}
   .video-modal-info{padding:1.5rem 1.75rem 1rem;}
   .video-modal-info h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:2.2rem;margin-bottom:.5rem;}
+
+  /* YouTuber Channel Header */
+  .youtuber-header{
+    display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;padding-bottom:.8rem;border-bottom:1px solid var(--line);
+  }
+  .youtuber-avatar{
+    width:42px;height:42px;border-radius:50%;background:var(--bg-panel-2);
+    border:1px solid var(--accent-gold);display:flex;align-items:center;justify-content:center;
+    font-size:1.2rem;color:var(--accent-gold);flex-shrink:0;overflow:hidden;
+  }
+  .youtuber-details{display:flex;flex-direction:column;}
+  .youtuber-name{font-weight:600;font-size:.95rem;color:var(--text);}
+  .youtuber-link{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--accent-moon);transition:all .15s;}
+  .youtuber-link:hover{color:var(--accent-gold);text-decoration:underline;}
+
   .video-modal-description{color:var(--text-muted);white-space:pre-wrap;margin-bottom:1.2rem;font-size:.93rem;}
   .video-modal-meta{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1rem;}
   .video-tag{font:500 .7rem 'IBM Plex Mono',monospace;padding:.35rem .65rem;border:1px solid rgba(201,182,255,0.3);border-radius:999px;color:var(--accent-moon);background:rgba(201,182,255,0.08);}
@@ -868,6 +883,16 @@
     
     <div class="video-modal-info">
       <h3 id="videoModalTitle">Video</h3>
+
+      <!-- YouTuber Channel Profile Section -->
+      <div class="youtuber-header" id="youtuberHeader">
+        <div class="youtuber-avatar" id="youtuberAvatar">▶</div>
+        <div class="youtuber-details">
+          <span class="youtuber-name" id="youtuberName">YouTube Creator</span>
+          <a class="youtuber-link" id="youtuberLink" href="#" target="_blank" rel="noopener">Visit Channel ↗</a>
+        </div>
+      </div>
+
       <p class="video-modal-description" id="videoModalDescription"></p>
       <div class="video-modal-meta" id="videoModalTags"></div>
       <div class="video-service" id="videoModalService"></div>
@@ -1446,22 +1471,23 @@ renderWaitlist();
   });
 
   function fetchYouTubeMetadata(id){
-    if(workMetadata[id] && workMetadata[id].title){
+    if(workMetadata[id] && workMetadata[id].title && workMetadata[id].channelTitle){
       return Promise.resolve(workMetadata[id]);
     }
     return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
       .then(function(r){return r.json();})
       .then(function(info){
         var meta={
-          title:info.title||'',
-          description:(workMetadata[id] && workMetadata[id].description) || ('Watch on YouTube: https://www.youtube.com/watch?v=' + id),
-          channelTitle:info.author_name||''
+          title: info.title || '',
+          description: (workMetadata[id] && workMetadata[id].description) || ('Watch on YouTube: https://www.youtube.com/watch?v=' + id),
+          channelTitle: info.author_name || 'YouTube Channel',
+          channelUrl: info.author_url || ('https://www.youtube.com/watch?v=' + id)
         };
         workMetadata[id]=meta; 
         renderWorks(); 
         return meta;
       }).catch(function(){
-        var meta={ title:'', description:'Watch on YouTube: https://www.youtube.com/watch?v=' + id, channelTitle:'' };
+        var meta={ title:'', description:'Watch on YouTube: https://www.youtube.com/watch?v=' + id, channelTitle:'YouTube Channel', channelUrl:'https://www.youtube.com/watch?v=' + id };
         workMetadata[id]=meta;
         return meta;
       });
@@ -1483,8 +1509,17 @@ renderWaitlist();
     var tags=document.getElementById('videoModalTags');
     var cta=document.getElementById('videoModalCta');
     
+    var chName = document.getElementById('youtuberName');
+    var chLink = document.getElementById('youtuberLink');
+    var chAvatar = document.getElementById('youtuberAvatar');
+
     title.textContent=item.title||'YouTube Video';
     desc.textContent=item.description || ('Watch on YouTube: https://www.youtube.com/watch?v=' + item.id);
+    
+    chName.textContent = item.channelTitle || 'YouTube Channel';
+    chLink.href = item.channelUrl || ('https://www.youtube.com/watch?v=' + item.id);
+    chAvatar.textContent = (item.channelTitle && item.channelTitle[0]) ? item.channelTitle[0].toUpperCase() : '▶';
+
     service.textContent=item.service ? 'SERVICE · '+item.service : '';
     service.style.display=item.service?'block':'none';
     price.textContent=item.price ? 'PRICE · '+item.price : '';
@@ -1529,11 +1564,23 @@ renderWaitlist();
     var workTags = WORK_TAGS[id] || [];
     var detectedService = workTags[0] || 'MV Simple';
 
-    openVideoModal({id:id,title:meta.title||'Loading title…',description:meta.description||('Watch on YouTube: https://www.youtube.com/watch?v=' + id),tags:workTags,service:detectedService});
+    openVideoModal({
+      id: id,
+      title: meta.title || 'Loading title…',
+      description: meta.description || ('Watch on YouTube: https://www.youtube.com/watch?v=' + id),
+      channelTitle: meta.channelTitle || 'YouTube Channel',
+      channelUrl: meta.channelUrl || ('https://www.youtube.com/watch?v=' + id),
+      tags: workTags,
+      service: detectedService
+    });
+
     fetchYouTubeMetadata(id).then(function(info){
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
         document.getElementById('videoModalTitle').textContent=info.title||'YouTube Video';
+        document.getElementById('youtuberName').textContent=info.channelTitle||'YouTube Channel';
+        document.getElementById('youtuberLink').href=info.channelUrl||('https://www.youtube.com/watch?v=' + id);
+        document.getElementById('youtuberAvatar').textContent=(info.channelTitle && info.channelTitle[0]) ? info.channelTitle[0].toUpperCase() : '▶';
       }
     });
   });
