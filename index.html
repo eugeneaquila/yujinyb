@@ -15,6 +15,8 @@
 
 <!-- PayPal SDK Integration -->
 <script src="https://www.paypal.com/sdk/js?client-id=BAAnbHzcIYU_4RZTawb0AxKVfFazyHzcrnIadOF0ZCibxPbKRjqmaUR5YW9aGc57S2DlOSFM1NYs3fiyYM&currency=USD"></script>
+
+<!-- Supabase JS SDK Integration -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -149,7 +151,7 @@
     letter-spacing:.02em;
   }
   .brand-moon{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF6E0,var(--accent-gold));box-shadow:0 0 12px 3px rgba(239,193,122,.55);}
-  .nav-links{display:flex;align-items:center;gap:2rem;}
+  .nav-links{display:flex;align-items:center;gap:1.5rem;}
   .nav-links a{font-size:.92rem;color:var(--text-muted);font-weight:500;transition:all .15s;}
   .nav-links a:hover{color:var(--text);text-shadow:0 0 10px rgba(243,239,251,0.3);}
   .lang-toggle{
@@ -162,7 +164,16 @@
   .nav-toggle{display:none;flex-direction:column;gap:5px;padding:8px;}
   .nav-toggle span{width:20px;height:2px;background:var(--text);border-radius:2px;}
 
-  @media (max-width:760px){
+  /* User Auth Navigation Avatar Widget */
+  .user-nav-badge{
+    display:flex;align-items:center;gap:.5rem;padding:.3rem .7rem .3rem .4rem;
+    border:1px solid var(--line-active);border-radius:999px;background:var(--bg-panel-2);
+    cursor:pointer;transition:all .2s;font-size:.82rem;
+  }
+  .user-nav-badge:hover{border-color:var(--accent-gold);transform:scale(1.02);}
+  .user-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-gold);}
+
+  @media (max-width:880px){
     .nav-toggle{display:flex;}
     .nav-links{
       position:fixed;top:var(--nav-h);left:0;right:0;
@@ -171,8 +182,8 @@
       border-bottom:1px solid var(--line);
       max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .nav-links.is-open{max-height:400px;}
-    .nav-links a{width:100%;padding:1rem clamp(1.25rem,5vw,2.5rem);border-top:1px solid var(--line);}
+    .nav-links.is-open{max-height:480px;}
+    .nav-links a,.nav-links button.btn-auth{width:100%;padding:1rem clamp(1.25rem,5vw,2.5rem);border-top:1px solid var(--line);}
     .lang-toggle{margin:1rem clamp(1.25rem,5vw,2.5rem) 1.25rem;}
     .moon-rail{display:none;}
   }
@@ -196,7 +207,7 @@
   @media (max-width:640px){
     .hero-moon{width:96px;height:96px;top:5%;right:6%;}
   }
-  .hero-inner{position:relative;z-index:2;max-width:680px;}
+  .hero-inner{position:relative;z-index:2;max-width:720px;}
   .status-pill{
     display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.06em;
     padding:.5rem 1.2rem;border:1px solid var(--line-active);border-radius:999px;color:var(--accent-gold);
@@ -205,25 +216,18 @@
   }
   .hero-title{font-family:'Instrument Serif',serif;font-size:clamp(2.6rem,7.5vw,4.5rem);line-height:1.08;margin-bottom:1.2rem;}
   .hero-title em{font-style:italic;background:linear-gradient(135deg, #FFF, var(--accent-moon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .hero-tagline{color:var(--text-muted);font-size:clamp(1rem,2vw,1.15rem);max-width:36ch;margin:0 auto 2.5rem;font-weight:400;}
+  .hero-tagline{color:var(--text-muted);font-size:clamp(1rem,2vw,1.15rem);max-width:36ch;margin:0 auto 1.8rem;font-weight:400;}
+
+  /* Dynamic Completion Tracker Badge in Hero */
+  .completion-counter-bar{
+    display:inline-flex;align-items:center;gap:.8rem;padding:.6rem 1.4rem;
+    border-radius:999px;background:rgba(20,17,38,0.85);border:1px solid var(--line-active);
+    backdrop-filter:blur(10px);margin-bottom:2rem;box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  }
+  .completion-num{font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent-gold);}
+  .completion-text{font-size:.84rem;color:var(--text-muted);}
+
   .hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-  .stat-badge{
-    display:inline-flex;align-items:center;gap:.55rem;
-    margin:1.6rem auto 0;padding:.55rem 1.3rem .55rem .6rem;
-    border:1px solid var(--line);border-radius:999px;
-    background:rgba(241,237,251,0.04);
-    width:max-content;
-  }
-  .stat-badge-count{
-    display:inline-flex;align-items:center;justify-content:center;
-    min-width:2.2rem;padding:.15rem .5rem;
-    border-radius:999px;
-    background:rgba(239,193,122,0.14);
-    color:var(--accent-gold);
-    font-family:'IBM Plex Mono',monospace;
-    font-weight:600;font-size:.95rem;
-  }
-  .stat-badge-label{color:var(--text-muted);font-size:.85rem;}
 
   .btn{
     display:inline-flex;align-items:center;justify-content:center;
@@ -299,7 +303,7 @@
   /* Form Controls inside Inquiry Modal */
   .inquiry-form{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem;}
   .inquiry-form .full{grid-column:1/-1;}
-  .inquiry-form input, .inquiry-form textarea{
+  .inquiry-form input, .inquiry-form textarea, .inquiry-form select{
     width:100%;padding:.75rem .9rem;border-radius:12px;border:1px solid var(--line);
     background:var(--bg);color:var(--text);font:inherit;font-size:.88rem;
   }
@@ -307,7 +311,7 @@
     filter: invert(1);
     cursor: pointer;
   }
-  .inquiry-form input:focus, .inquiry-form textarea:focus{
+  .inquiry-form input:focus, .inquiry-form textarea:focus, .inquiry-form select:focus{
     border-color:var(--accent-gold);outline:none;
   }
 
@@ -394,6 +398,31 @@
   }
   .status-badge.in-progress{background:rgba(239,193,122,0.15);color:var(--accent-gold);border:1px solid var(--accent-gold);}
   .status-badge.completed{background:rgba(122,239,173,0.15);color:var(--accent-green);border:1px solid var(--accent-green);}
+
+  /* ---------- Client Reviews UI Section ---------- */
+  .reviews{background:var(--bg-panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .reviews-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:1.5rem;margin-top:2rem;}
+  .review-card{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:20px;
+    padding:1.6rem;display:flex;flex-direction:column;gap:1rem;box-shadow:var(--shadow-card);
+  }
+  .review-header{display:flex;align-items:center;gap:.8rem;}
+  .review-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-moon);}
+  .review-user-info strong{display:block;font-size:.95rem;color:var(--text);}
+  .review-user-info small{color:var(--text-muted);font-size:.78rem;}
+  .review-rating{color:var(--accent-gold);font-size:.88rem;letter-spacing:2px;}
+  .review-text{color:var(--text-muted);font-size:.92rem;line-height:1.6;}
+  .review-service-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:.7rem;padding:3px 8px;border-radius:6px;
+    background:rgba(201,182,255,0.08);color:var(--accent-moon);align-self:flex-start;
+  }
+
+  /* Review Submission Panel */
+  .add-review-box{
+    margin-top:2.5rem;background:var(--bg-panel);border:1px solid var(--line-active);
+    border-radius:20px;padding:1.8rem;max-width:760px;margin-left:auto;margin-right:auto;
+  }
+  .add-review-box h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.6rem;margin-bottom:.5rem;}
 
   /* ---------- Admin Panel Styles ---------- */
   .admin-wrapper{max-width:var(--container);margin:0 auto;padding:0 clamp(1.25rem, 5vw, 2.5rem);}
@@ -577,15 +606,6 @@
     .stars,.scroll-cue span{animation:none;}
     *{transition-duration:.001ms !important;}
   }
-
-  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  .profile-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--line-active);background:var(--bg-panel-2);}
-  .commission-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin:.65rem 0;}
-  .commission-progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent-gold),var(--accent-moon));transition:width .3s;}
-  .review-card{background:var(--bg-panel-2);border:1px solid var(--line);border-radius:16px;padding:1.3rem;}
-  .review-stars{color:var(--accent-gold);letter-spacing:.08em;}
-  .account-commission{padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02);margin-top:.8rem;}
-  @media(max-width:760px){.profile-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -608,9 +628,15 @@
       <a href="#works" data-i18n="nav_works">Works</a>
       <a href="#prices" data-i18n="nav_prices">Prices</a>
       <a href="#waitlist" data-i18n="nav_waitlist">Waitlist</a>
+      <a href="#reviews" data-i18n="nav_reviews">Reviews</a>
       <a href="#tos" data-i18n="nav_tos">TOS</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
-      <button class="btn btn-ghost" id="authButton" type="button" style="padding:.45rem .85rem;font-size:.78rem;">Login</button>
+      
+      <!-- User Auth Profile Widget / Login Button -->
+      <div id="authNavContainer">
+        <button type="button" class="btn btn-ghost btn-auth" onclick="openAuthModal()" style="padding:.45rem clamp(.8rem, 2vw, 1.1rem);font-size:.82rem;">🔑 <span data-i18n="nav_login">Login</span></button>
+      </div>
+
       <button class="lang-toggle" id="langToggle" type="button">EN / <span class="lang-jp">JP</span></button>
     </div>
   </div>
@@ -622,13 +648,16 @@
     <p class="status-pill" data-i18n="hero_status">Commissions Open 🌙</p>
     <h1 class="hero-title"><em data-i18n="hero_title">Hello! It's me, Yujin.</em></h1>
     <p class="hero-tagline" data-i18n="hero_tagline">A space where dreams come to life through magic.</p>
+
+    <!-- Dynamic Total Commission Completions Counter -->
+    <div class="completion-counter-bar">
+      <span class="completion-num" id="heroCommissionCount">26+</span>
+      <span class="completion-text" data-i18n="hero_completed_counter">Commissions Successfully Delivered</span>
+    </div>
+
     <div class="hero-actions">
       <a href="#prices" class="btn btn-primary" data-i18n="hero_cta_order">Order Here</a>
       <a href="#works" class="btn btn-ghost" data-i18n="hero_cta_works">See Works</a>
-    </div>
-    <div class="stat-badge" id="heroStatBadge">
-      <span class="stat-badge-count" id="heroStatCount">26+</span>
-      <span class="stat-badge-label" data-i18n="hero_stat_label">Commissions Successfully Delivered</span>
     </div>
   </div>
   <div class="scroll-cue"><span data-i18n="scroll_down">Scroll down</span></div>
@@ -742,58 +771,26 @@
   </div>
 </section>
 
-
-<section id="account" class="works" style="display:none;" aria-live="polite">
+<!-- Completed Commission Reviews Section -->
+<section id="reviews" class="reviews">
   <div class="section-inner">
-    <span class="eyebrow">Client account</span>
-    <h2 class="section-title">Your profile & commissions</h2>
-    <div id="accountPanel" class="waitlist-card"></div>
+    <span class="eyebrow" data-i18n="reviews_eyebrow">Client Testimonials</span>
+    <h2 class="section-title" data-i18n="reviews_title">Client Reviews</h2>
+    
+    <!-- Reviews Grid -->
+    <div id="reviewsGrid" class="reviews-grid"></div>
+
+    <!-- Review Form for Authenticated Users -->
+    <div class="add-review-box">
+      <h3 data-i18n="review_form_title">Leave a Review</h3>
+      <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1.2rem;" data-i18n="review_form_sub">Have you received a completed video commission? Log in with your email or Gmail to share your feedback!</p>
+      
+      <div id="reviewBoxContent">
+        <!-- Dynamic content: User review inputs if logged in, otherwise Login prompt -->
+      </div>
+    </div>
   </div>
 </section>
-
-<section id="reviews" class="works">
-  <div class="section-inner">
-    <span class="eyebrow">Client reviews</span>
-    <h2 class="section-title">What clients say</h2>
-    <div id="reviewsList" class="gallery"></div>
-    <div id="reviewCta" style="margin-top:1.5rem;"></div>
-  </div>
-</section>
-
-<div class="video-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
-  <div class="payment-modal-card">
-    <button class="video-modal-close" id="authModalClose" type="button" aria-label="Close">×</button>
-    <h3 class="payment-title" id="authModalTitle">Sign in</h3>
-    <p class="payment-subtitle">Use email/password or continue with Google.</p>
-    <div class="inquiry-form" style="grid-template-columns:1fr;">
-      <input type="email" id="authEmail" placeholder="Email address">
-      <input type="password" id="authPassword" placeholder="Password (for email login)">
-    </div>
-    <div style="display:grid;gap:.7rem;">
-      <button class="btn btn-primary btn-block" id="emailLoginBtn" type="button">Sign in with Email</button>
-      <button class="btn btn-ghost btn-block" id="emailSignupBtn" type="button">Create Email Account</button>
-      <button class="btn btn-ghost btn-block" id="googleLoginBtn" type="button">Continue with Google</button>
-      <button class="btn btn-ghost btn-block" id="magicLinkBtn" type="button">Send Magic Link</button>
-    </div>
-    <p id="authMessage" style="color:var(--text-muted);font-size:.8rem;margin-top:1rem;"></p>
-  </div>
-</div>
-
-<div class="video-modal" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
-  <div class="payment-modal-card">
-    <button class="video-modal-close" id="reviewModalClose" type="button" aria-label="Close">×</button>
-    <h3 class="payment-title" id="reviewModalTitle">Leave a review</h3>
-    <p class="payment-subtitle" id="reviewCommissionLabel"></p>
-    <div class="inquiry-form" style="grid-template-columns:1fr;">
-      <select id="reviewCommissionSelect"></select>
-      <select id="reviewRating"><option value="5">★★★★★ — 5</option><option value="4">★★★★☆ — 4</option><option value="3">★★★☆☆ — 3</option><option value="2">★★☆☆☆ — 2</option><option value="1">★☆☆☆☆ — 1</option></select>
-      <input id="reviewTitle" placeholder="Review title (optional)">
-      <textarea id="reviewBody" placeholder="Tell others about your experience..."></textarea>
-    </div>
-    <button class="btn btn-primary btn-block" id="submitReviewBtn" type="button">Publish Review</button>
-    <p id="reviewMessage" style="color:var(--text-muted);font-size:.8rem;margin-top:1rem;"></p>
-  </div>
-</div>
 
 <section id="tos" class="tos">
   <div class="section-inner">
@@ -916,6 +913,62 @@
   <span data-i18n="footer_status">Commissions Open 🌙 — thank you for visiting.</span>
 </footer>
 
+<!-- Supabase Auth Login Modal -->
+<div class="video-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+  <div class="payment-modal-card" style="max-width:440px;">
+    <button class="video-modal-close" onclick="closeAuthModal()" type="button" aria-label="Close">×</button>
+    <h3 class="payment-title" id="authModalTitle">Client Login</h3>
+    <p class="payment-subtitle">Sign in via Gmail or Email to customize your profile &amp; post commission reviews.</p>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <button type="button" class="btn btn-ghost" onclick="loginWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;background:rgba(255,255,255,0.05);">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.5s.7 2.8 1.9 5.2l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 22.3 12 22.3z"/></svg>
+        Sign in with Google / Gmail
+      </button>
+
+      <div style="text-align:center;font-size:.78rem;color:var(--text-muted);margin:.2rem 0;">— OR EMAIL SIGN IN —</div>
+
+      <input type="email" id="authEmail" placeholder="Your Email Address *" required style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
+      <input type="password" id="authPassword" placeholder="Your Password *" required style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
+
+      <button type="button" class="btn btn-primary" onclick="loginWithEmail()" style="width:100%;">Sign In / Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Customization Modal -->
+<div class="video-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+  <div class="payment-modal-card" style="max-width:480px;">
+    <button class="video-modal-close" onclick="closeProfileModal()" type="button" aria-label="Close">×</button>
+    <h3 class="payment-title" id="profileModalTitle">Profile Customization</h3>
+    <p class="payment-subtitle">Update your display name, social handle, and profile picture avatar.</p>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.5rem;">
+        <img id="profilePreviewAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--accent-gold);">
+        <div>
+          <strong id="profileEmailDisplay" style="font-size:.9rem;display:block;">user@gmail.com</strong>
+          <span style="font-size:.78rem;color:var(--text-muted);">Logged in client</span>
+        </div>
+      </div>
+
+      <input type="text" id="profileDisplayName" placeholder="Display Name / VTuber Handle *" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
+      <input type="text" id="profileSocialHandle" placeholder="Social Media Handle (e.g. @yujinyb) *" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
+      <input type="url" id="profileAvatarUrl" placeholder="Profile Image URL (Optional)" onchange="document.getElementById('profilePreviewAvatar').src=this.value;" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
+      
+      <div class="file-input-wrapper">
+        <label for="profileAvatarFile" id="profileFileLabel">📎 Upload Custom Profile Photo</label>
+        <input type="file" id="profileAvatarFile" accept="image/*" onchange="handleProfilePhotoUpload(this)">
+      </div>
+
+      <div style="display:flex;gap:1rem;margin-top:.5rem;">
+        <button type="button" class="btn btn-primary" onclick="saveProfileCustomization()" style="flex:1;">Save Profile</button>
+        <button type="button" class="btn btn-danger" onclick="logoutUser()" style="padding:.8rem 1.2rem;">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Works Video Preview Modal with Sticky Floating Order Bar -->
 <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
   <div class="video-modal-card">
@@ -1013,6 +1066,245 @@
 </div>
 
 <script>
+// Supabase Auth Configuration
+const SUPABASE_URL = 'https://glbfboefoxoimjuwmokm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_HsS28YR6a_GBXKYoOK9-bA_o1SvLHAU';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+var currentUser = null;
+var currentProfile = null;
+var ADMIN_EMAIL = 'yujinybwork@gmail.com';
+
+function profileAvatar(user){
+  return (user && user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
+}
+
+async function refreshCurrentProfile(){
+  if(!currentUser){ currentProfile = null; return; }
+  var {data} = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+  currentProfile = data || null;
+}
+
+async function updateAuthUI() {
+  const container = document.getElementById('authNavContainer');
+  const reviewBox = document.getElementById('reviewBoxContent');
+
+  if (currentUser) {
+    await refreshCurrentProfile();
+    var avatar = (currentProfile && currentProfile.avatar_url) || profileAvatar(currentUser);
+    var name = (currentProfile && currentProfile.display_name) || currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+
+    container.innerHTML = `
+      <div class="user-nav-badge" onclick="openProfileModal()">
+        <img class="user-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}"/>
+        <span style="color:var(--text);font-weight:600;">${escapeHtml(name)}</span>
+      </div>
+    `;
+
+    if (reviewBox) {
+      var {data: eligible} = await supabase.from('commissions')
+        .select('id,service,completed,required_video_count,commission_videos(id)')
+        .eq('client_id', currentUser.id).order('created_at', {ascending:false});
+      var completedList = (eligible||[]).filter(function(c){
+        return c.completed || (c.commission_videos||[]).length >= Math.max(1, c.required_video_count||1);
+      });
+
+      if(!completedList.length){
+        reviewBox.innerHTML = '<p style="color:var(--text-muted);">You can leave a review once a commission of yours is marked completed.</p>';
+      } else {
+        var options = completedList.map(function(c){
+          return '<option value="'+c.id+'">'+escapeHtml(c.service||'Commission')+' — '+(c.commission_videos||[]).length+' video(s)</option>';
+        }).join('');
+        reviewBox.innerHTML = `
+          <div style="display:grid;gap:1rem;">
+            <div style="display:flex;align-items:center;gap:.8rem;">
+              <img src="${escapeHtml(avatar)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-gold);">
+              <div>
+                <strong>Posting as ${escapeHtml(name)}</strong>
+                <small style="color:var(--text-muted);display:block;">${escapeHtml((currentProfile && currentProfile.social_handle) || currentUser.email)}</small>
+              </div>
+            </div>
+            <select id="reviewCommissionSelect" style="padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">${options}</select>
+            <select id="reviewRatingSelect" style="padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
+              <option value="5">★★★★★ (5/5 Stars)</option>
+              <option value="4">★★★★☆ (4/5 Stars)</option>
+              <option value="3">★★★☆☆ (3/5 Stars)</option>
+              <option value="2">★★☆☆☆ (2/5 Stars)</option>
+              <option value="1">★☆☆☆☆ (1/5 Stars)</option>
+            </select>
+            <textarea id="reviewTextInput" placeholder="Write your feedback regarding Yujin's animation, compositing, and turnaround speed..." style="padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;min-height:90px;"></textarea>
+            <button type="button" class="btn btn-primary" onclick="submitClientReview()">Submit Review</button>
+          </div>
+        `;
+      }
+    }
+  } else {
+    container.innerHTML = `
+      <button type="button" class="btn btn-ghost btn-auth" onclick="openAuthModal()" style="padding:.45rem clamp(.8rem, 2vw, 1.1rem);font-size:.82rem;">🔑 <span data-i18n="nav_login">Login</span></button>
+    `;
+
+    if (reviewBox) {
+      reviewBox.innerHTML = `
+        <button type="button" class="btn btn-ghost" onclick="openAuthModal()" style="width:100%;padding:1rem;border-color:var(--accent-gold);color:var(--accent-gold);">
+          🔑 Login via Gmail / Email to Post a Review
+        </button>
+      `;
+    }
+  }
+}
+
+function openAuthModal(){ document.getElementById('authModal').classList.add('is-open'); }
+function closeAuthModal(){ document.getElementById('authModal').classList.remove('is-open'); }
+
+async function openProfileModal(){
+  if(!currentUser) return openAuthModal();
+  await refreshCurrentProfile();
+  var avatar = (currentProfile && currentProfile.avatar_url) || profileAvatar(currentUser);
+  var name = (currentProfile && currentProfile.display_name) || currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+  document.getElementById('profileEmailDisplay').textContent = currentUser.email;
+  document.getElementById('profileDisplayName').value = name || '';
+  document.getElementById('profileSocialHandle').value = (currentProfile && currentProfile.social_handle) || '';
+  document.getElementById('profileAvatarUrl').value = '';
+  document.getElementById('profilePreviewAvatar').src = avatar;
+  document.getElementById('profileModal').classList.add('is-open');
+}
+function closeProfileModal(){ document.getElementById('profileModal').classList.remove('is-open'); }
+
+async function loginWithGoogle() {
+  var {error} = await supabase.auth.signInWithOAuth({ provider: 'google', options:{ redirectTo: window.location.href } });
+  if(error) window.alert(error.message);
+}
+
+async function loginWithEmail() {
+  var email = document.getElementById('authEmail').value.trim();
+  var password = document.getElementById('authPassword').value;
+  if(!email || !password) return window.alert('Please enter your email and password.');
+
+  var {error} = await supabase.auth.signInWithPassword({email, password});
+  if(error){
+    // No account yet with these credentials — try registering instead.
+    var {error: signUpError} = await supabase.auth.signUp({email, password});
+    if(signUpError) return window.alert(signUpError.message);
+    window.alert('Account created! Check your email if confirmation is required, otherwise you are now signed in.');
+  }
+  closeAuthModal();
+}
+
+function handleProfilePhotoUpload(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('profilePreviewAvatar').src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function saveProfileCustomization() {
+  if(!currentUser) return;
+  var name = document.getElementById('profileDisplayName').value.trim() || currentUser.email.split('@')[0];
+  var social = document.getElementById('profileSocialHandle').value.trim();
+  var urlField = document.getElementById('profileAvatarUrl').value.trim();
+  var file = document.getElementById('profileAvatarFile').files[0];
+  var avatar = (currentProfile && currentProfile.avatar_url) || profileAvatar(currentUser);
+
+  if(file){
+    var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    var path = currentUser.id + '/avatar.' + ext;
+    var {error: upErr} = await supabase.storage.from('avatars').upload(path, file, {upsert:true, cacheControl:'3600', contentType:file.type});
+    if(upErr) return window.alert(upErr.message);
+    var {data: urlData} = supabase.storage.from('avatars').getPublicUrl(path);
+    avatar = urlData.publicUrl + '?v=' + Date.now();
+  } else if(urlField){
+    avatar = urlField;
+  }
+
+  var {error} = await supabase.from('profiles').upsert({id: currentUser.id, display_name: name, avatar_url: avatar, social_handle: social}, {onConflict:'id'});
+  if(error) return window.alert(error.message);
+  await supabase.auth.updateUser({data:{full_name:name, avatar_url:avatar}});
+
+  await updateAuthUI();
+  closeProfileModal();
+  window.alert('Profile updated successfully!');
+}
+
+async function logoutUser() {
+  await supabase.auth.signOut();
+  closeProfileModal();
+}
+
+// Client Reviews System (backed by Supabase `reviews` + `profiles`)
+async function renderReviews() {
+  var grid = document.getElementById('reviewsGrid');
+  if(!grid) return;
+
+  var {data, error} = await supabase.from('reviews')
+    .select('id,rating,body,created_at,commissions(service),profiles(display_name,avatar_url,social_handle)')
+    .eq('published', true).order('created_at', {ascending:false}).limit(12);
+
+  if(error){ grid.innerHTML = '<p style="color:var(--text-muted);">Reviews are unavailable right now.</p>'; return; }
+  if(!data || !data.length){ grid.innerHTML = '<p style="color:var(--text-muted);">No reviews yet — be the first!</p>'; return; }
+
+  grid.innerHTML = data.map(function(r){
+    var name = (r.profiles && r.profiles.display_name) || 'Client';
+    var avatar = (r.profiles && r.profiles.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
+    var social = (r.profiles && r.profiles.social_handle) || '';
+    var service = (r.commissions && r.commissions.service) || 'Commission';
+    var stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    return '<div class="review-card">'
+      + '<div class="review-header">'
+      + '<img class="review-avatar" src="'+escapeHtml(avatar)+'" alt="'+escapeHtml(name)+'"/>'
+      + '<div class="review-user-info"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(social)+'</small></div>'
+      + '</div>'
+      + '<span class="review-service-badge">'+escapeHtml(service)+'</span>'
+      + '<div class="review-rating">'+stars+'</div>'
+      + '<p class="review-text">"'+escapeHtml(r.body)+'"</p>'
+      + '</div>';
+  }).join('');
+}
+
+async function submitClientReview() {
+  if(!currentUser) return openAuthModal();
+  var commissionId = document.getElementById('reviewCommissionSelect').value;
+  var rating = Number(document.getElementById('reviewRatingSelect').value);
+  var text = document.getElementById('reviewTextInput').value.trim();
+
+  if(!commissionId || !text) return window.alert('Please choose a completed commission and write your review.');
+
+  var {error} = await supabase.from('reviews').upsert({
+    commission_id: commissionId, user_id: currentUser.id, rating: rating, body: text, published: true
+  }, {onConflict:'commission_id,user_id'});
+
+  if(error) return window.alert(error.message);
+  document.getElementById('reviewTextInput').value = '';
+  await renderReviews();
+  window.alert('Thank you! Your review has been posted.');
+}
+
+async function loadDeliveredCount(){
+  var el = document.getElementById('heroCommissionCount');
+  if(!el) return;
+  try{
+    var {count, error} = await supabase.from('commissions').select('id', {count:'exact', head:true}).eq('completed', true);
+    if(error || count === null) return;
+    el.textContent = Math.max(count, 26) + '+';
+  }catch(e){ /* keep fallback number on screen */ }
+}
+
+async function initSupabaseAuth(){
+  var {data:{session}} = await supabase.auth.getSession();
+  currentUser = session ? session.user : null;
+  await updateAuthUI();
+  await renderReviews();
+  await loadDeliveredCount();
+  supabase.auth.onAuthStateChange(async function(_event, session){
+    currentUser = session ? session.user : null;
+    await updateAuthUI();
+    await renderReviews();
+  });
+}
+initSupabaseAuth();
+
 // PayPal & Inquiry Form Modal State
 var currentService = '';
 var currentBasePrice = 0;
@@ -1026,11 +1318,18 @@ function openPaymentModal(serviceName, priceNum) {
   var titleEl = document.getElementById('paymentModalTitle');
   titleEl.textContent = (document.documentElement.lang === 'jp' ? 'お問合せ・枠確保 — ' : 'Inquire — ') + currentService;
   
-  // Reset Form & Add-ons
-  document.getElementById('inqName').value = '';
+  // Auto-fill from logged in profile
+  if(currentUser) {
+    document.getElementById('inqName').value = (currentProfile && currentProfile.display_name) || currentUser.user_metadata?.full_name || '';
+    document.getElementById('inqEmail').value = currentUser.email || '';
+    document.getElementById('inqSocial').value = (currentProfile && currentProfile.social_handle) || '';
+  } else {
+    document.getElementById('inqName').value = '';
+    document.getElementById('inqEmail').value = '';
+    document.getElementById('inqSocial').value = '';
+  }
+
   document.getElementById('inqCompany').value = '';
-  document.getElementById('inqEmail').value = '';
-  document.getElementById('inqSocial').value = '';
   document.getElementById('inqDeadline').value = '';
   document.getElementById('inqDesc').value = '';
   document.getElementById('addonCommercial').checked = false;
@@ -1209,17 +1508,28 @@ function renderPayPalButtons(amount, label) {
           date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
           phase: 1,
           completed: false,
-          clientId: currentUser ? currentUser.id : null,
+          attachedVideoCount: 0,
           requiredVideoCount: 1
         };
 
         waitlistEntries.push(orderPayload);
         saveWaitlist();
-        if (currentUser) {
-          supabaseClient.from('commissions').insert({client_id:currentUser.id,service:currentService,client_name:name,client_email:email,required_video_count:1,completed:false,local_reference:orderPayload.id}).then(({error})=>{ if(error) console.warn('Supabase commission sync:',error.message); });
-        }
         renderWaitlist();
+        updateCommissionCounter();
         if(typeof renderAdminList === 'function') renderAdminList();
+
+        // Mirror this commission into Supabase so admin actions (video attach, completion) can track it
+        if(supabase){
+          supabase.from('commissions').insert({
+            client_id: currentUser ? currentUser.id : null,
+            client_name: name,
+            client_email: email,
+            service: currentService,
+            required_video_count: 1,
+            completed: false,
+            local_reference: orderPayload.id
+          }).then(function(res){ if(res.error) console.warn('Supabase commission sync:', res.error.message); });
+        }
 
         // Dispatch Email Notification to yujinybwork@gmail.com
         sendInquiryEmail(orderPayload);
@@ -1282,7 +1592,8 @@ function renderWaitlist(){
       + '<div><span class="waitlist-item-num">#'+(index+1)+'</span> <strong>'+escapeHtml(item.name)+'</strong> '+ (item.company ? '<small style="color:var(--text-muted)">['+escapeHtml(item.company)+']</small>' : '') +'</div>'
       + statusBadge
       + '</div>'
-      + '<div class="waitlist-meta"><strong>' + (isJp ? '動画進捗:' : 'Video completion:') + '</strong> ' + Number(item.attachedVideoCount||0) + '/' + Number(item.requiredVideoCount||1) + ' &nbsp;|&nbsp; ' + '<strong>' + (isJp ? 'サービス:' : 'Service:') + '</strong> '+escapeHtml(item.service)+' '+ (item.addons && item.addons!=='None' ? '<small style="color:var(--accent-moon)">['+escapeHtml(item.addons)+']</small>' : '') +' &nbsp;|&nbsp; <strong>' + (isJp ? '希望納期:' : 'Deadline:') + '</strong> '+escapeHtml(item.deadline||'Flexible')+' &nbsp;|&nbsp; <strong>' + (isJp ? 'ご依頼日:' : 'Commissioned:') + '</strong> '+escapeHtml(item.date||'N/A')
+      + '<div class="waitlist-meta">'
+      + '<strong>' + (isJp ? '動画進捗:' : 'Video completion:') + '</strong> ' + Number(item.attachedVideoCount||0) + '/' + Number(item.requiredVideoCount||1) + ' &nbsp;|&nbsp; ' + '<strong>' + (isJp ? 'サービス:' : 'Service:') + '</strong> '+escapeHtml(item.service)+' '+ (item.addons && item.addons!=='None' ? '<small style="color:var(--accent-moon)">['+escapeHtml(item.addons)+']</small>' : '') +' &nbsp;|&nbsp; <strong>' + (isJp ? '希望納期:' : 'Deadline:') + '</strong> '+escapeHtml(item.deadline||'Flexible')+' &nbsp;|&nbsp; <strong>' + (isJp ? 'ご依頼日:' : 'Commissioned:') + '</strong> '+escapeHtml(item.date||'N/A')
       + '</div>'
       + '<div class="wip-tracker">'
       + '<div class="wip-step '+phase1Class+'">'+phase1Text+'</div>'
@@ -1292,6 +1603,9 @@ function renderWaitlist(){
       + '</div>';
   }).join('');
 }
+
+// Live commission counter is handled by loadDeliveredCount() via initSupabaseAuth()
+function updateCommissionCounter(){ loadDeliveredCount(); }
 
 renderWaitlist();
 
@@ -1331,23 +1645,34 @@ renderWaitlist();
 
   // ---------- works gallery ----------
   var videos = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
+  var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
   var gallery = document.getElementById('gallery');
   var workMetadata = JSON.parse(localStorage.getItem('yujin_work_youtube_metadata') || '{}');
   var activeFilterTag = 'all';
 
+  function allWorkIds(){ return videos.concat(embeddedVideos.map(function(v){ return v.id; })); }
+  function findEmbedded(id){ return embeddedVideos.filter(function(v){ return v.id === id; })[0]; }
+  function workTags(id){
+    var ev = findEmbedded(id);
+    if (ev) return ev.tags || [];
+    return (workMetadata[id] && workMetadata[id].tags) || [];
+  }
+
   function saveWorkMetadata(){ localStorage.setItem('yujin_work_youtube_metadata', JSON.stringify(workMetadata)); }
-  function workTitle(id, i){ return (workMetadata[id] && workMetadata[id].title) || ('Work '+(i+1)); }
+  function workTitle(id, i){
+    var ev = findEmbedded(id);
+    if (ev) return ev.title || ('Work '+(i+1));
+    return (workMetadata[id] && workMetadata[id].title) || ('Work '+(i+1));
+  }
 
   function renderWorks(){
-    var filtered = videos.filter(function(id){
+    var filtered = allWorkIds().filter(function(id){
       if (activeFilterTag === 'all') return true;
-      var tags = (workMetadata[id] && workMetadata[id].tags) || [];
-      return tags.indexOf(activeFilterTag) !== -1;
+      return workTags(id).indexOf(activeFilterTag) !== -1;
     });
 
     gallery.innerHTML = filtered.map(function(id, i){
-      var meta = workMetadata[id] || {};
-      var tags = meta.tags || [];
+      var tags = workTags(id);
       var tagsOverlay = tags.map(function(t){ return '<span class="thumb-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
 
       return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open '+escapeHtml(workTitle(id,i))+'">'
@@ -1465,6 +1790,11 @@ renderWaitlist();
   gallery.addEventListener('click', function(e){
     var card=e.target.closest('.reel-card'); if(!card) return;
     var id=card.dataset.id;
+    var ev=findEmbedded(id);
+    if(ev){
+      openVideoModal({id:id,title:ev.title||'YouTube Video',description:ev.description||'No YouTube description available.',tags:ev.tags||[],service:ev.service||(ev.tags&&ev.tags[0])||'MV Simple',price:ev.price});
+      return;
+    }
     var meta=workMetadata[id]||{};
     var detectedService = (meta.tags && meta.tags[0]) || 'MV Simple';
 
@@ -1483,7 +1813,7 @@ renderWaitlist();
 
   // Preload works
   (function preloadAllWorks(){
-    var queue=videos.slice();
+    var queue=allWorkIds();
     function next(){
       if(!queue.length) return;
       var batch=queue.splice(0,3);
@@ -1492,11 +1822,8 @@ renderWaitlist();
     next();
   }());
 
-  var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
-
   // ---------- Redesigned Private Video & Waitlist Manager ----------
   var adminPanel = document.getElementById('adminPanel');
-  var ADMIN_EMAIL = 'yujinybwork@gmail.com';
 
   function youtubeId(value){
     var v = String(value||'').trim();
@@ -1567,12 +1894,13 @@ renderWaitlist();
           + '<small>Company: '+escapeHtml(item.company||'None')+' | Social: '+escapeHtml(item.social||'None')+'</small>'
           + '<small>Service: '+escapeHtml(item.service)+' | Deadline: '+escapeHtml(item.deadline||'Flexible')+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+')</small>'
           + '<small>Desc: '+escapeHtml(item.description||'None')+'</small>'
-          + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
+          + '<small style="color:var(--accent-gold);">Video progress: '+Number(item.attachedVideoCount||0)+'/'+Number(item.requiredVideoCount||1)+' attached</small>'
+          + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'
           + '<span style="font-size:.75rem;color:var(--text-muted);">Set Phase:</span>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="1">Phase 1</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="2">Phase 2</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="3">Phase 3</button>'
-          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-attach-video="'+i+'">Attach video</button>'
+          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-attach-video="'+i+'">🎬 Attach Video</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;border-color:var(--accent-green);color:var(--accent-green);" type="button" data-toggle-complete="'+i+'">'+(item.completed ? 'Mark In-Progress' : 'Mark Completed')+'</button>'
           + '</div>'
           + '</div>'
@@ -1622,7 +1950,9 @@ renderWaitlist();
 
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
       document.getElementById('quickVideoUrl').value = '';
+      renderWorks();
       renderTagFilterBar();
+      updateCommissionCounter();
       renderAdminList();
       window.alert('Video successfully added!');
     }).catch(function(){
@@ -1637,7 +1967,9 @@ renderWaitlist();
       var idx = Number(removeEmbeddedBtn.dataset.removeVideo);
       embeddedVideos.splice(idx, 1);
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
+      renderWorks();
       renderTagFilterBar();
+      updateCommissionCounter();
       renderAdminList();
       return;
     }
@@ -1650,6 +1982,7 @@ renderWaitlist();
         videos.splice(workIdx, 1);
         renderWorks();
         renderTagFilterBar();
+        updateCommissionCounter();
         renderAdminList();
       }
       return;
@@ -1660,7 +1993,37 @@ renderWaitlist();
       waitlistEntries.splice(Number(wlBtn.dataset.removeWaitlist), 1);
       saveWaitlist();
       renderWaitlist();
+      updateCommissionCounter();
       renderAdminList();
+      return;
+    }
+
+    var attachBtn = e.target.closest('[data-attach-video]');
+    if(attachBtn){
+      var aIdx = Number(attachBtn.dataset.attachVideo);
+      var entry = waitlistEntries[aIdx];
+      var raw = window.prompt('Paste the YouTube link or 11-character video ID for this commission:');
+      var vid = youtubeId(raw);
+      if(!vid){ if(raw !== null) window.alert('Please enter a valid YouTube link or video ID.'); return; }
+
+      supabase.from('commissions').select('id,required_video_count').eq('local_reference', entry.id).maybeSingle().then(function(res){
+        var commission = res.data;
+        if(!commission){ window.alert('No matching commission record found in Supabase for this waitlist entry.'); return; }
+        supabase.from('commission_videos').insert({commission_id: commission.id, youtube_id: vid, title: 'Commission video'}).then(function(){
+          entry.attachedVideoCount = Number(entry.attachedVideoCount||0) + 1;
+          entry.requiredVideoCount = Number(commission.required_video_count || entry.requiredVideoCount || 1);
+          if(entry.attachedVideoCount >= entry.requiredVideoCount){
+            entry.completed = true;
+            entry.phase = 3;
+            supabase.from('commissions').update({completed:true, completed_at:new Date().toISOString()}).eq('id', commission.id);
+          }
+          saveWaitlist();
+          renderWaitlist();
+          updateCommissionCounter();
+          renderAdminList();
+          window.alert('Video attached! ('+entry.attachedVideoCount+'/'+entry.requiredVideoCount+')');
+        });
+      });
       return;
     }
 
@@ -1670,18 +2033,8 @@ renderWaitlist();
       waitlistEntries[idx].phase = Number(phaseBtn.dataset.phaseVal);
       saveWaitlist();
       renderWaitlist();
+      updateCommissionCounter();
       renderAdminList();
-      return;
-    }
-
-    var attachBtn = e.target.closest('[data-attach-video]');
-    if(attachBtn){
-      var ai=Number(attachBtn.dataset.attachVideo), raw=window.prompt('YouTube URL or 11-character video ID');
-      var vid=youtubeId(raw); if(!vid)return;
-      var target=waitlistEntries[ai]; target.attachedVideoCount=Number(target.attachedVideoCount||0)+1; target.lastVideoId=vid;
-      if(Number(target.attachedVideoCount)>=Number(target.requiredVideoCount||1)){target.completed=true;target.phase=3;}
-      saveWaitlist(); renderWaitlist(); renderAdminList();
-      if(target.clientId){supabaseClient.from('commissions').select('id').eq('local_reference',target.id).maybeSingle().then(({data})=>{if(data)supabaseClient.from('commission_videos').insert({commission_id:data.id,youtube_id:vid,title:'Commission video'}).then(()=>supabaseClient.from('commissions').update({completed:true,completed_at:new Date().toISOString()}).eq('id',data.id));});}
       return;
     }
 
@@ -1692,14 +2045,18 @@ renderWaitlist();
       if(waitlistEntries[idx].completed) waitlistEntries[idx].phase = 3;
       saveWaitlist();
       renderWaitlist();
+      updateCommissionCounter();
       renderAdminList();
+      supabase.from('commissions').select('id').eq('local_reference', waitlistEntries[idx].id).maybeSingle().then(function(res){
+        if(res.data) supabase.from('commissions').update({completed: waitlistEntries[idx].completed, completed_at: waitlistEntries[idx].completed ? new Date().toISOString() : null}).eq('id', res.data.id);
+      });
       return;
     }
   });
 
   document.getElementById('videoModalClose').addEventListener('click',closeVideoModal);
   document.getElementById('videoModal').addEventListener('click',function(e){if(e.target===this)closeVideoModal();});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeVideoModal();closePaymentModal();}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeVideoModal();closePaymentModal();closeAuthModal();closeProfileModal();}});
 
   // ---------- EN / JP toggle dictionary ----------
   var dict = {
@@ -1707,12 +2064,14 @@ renderWaitlist();
     nav_works:{en:"Works",jp:"作品"},
     nav_prices:{en:"Prices",jp:"料金"},
     nav_waitlist:{en:"Waitlist",jp:"ウェイティングリスト"},
+    nav_reviews:{en:"Reviews",jp:"レビュー"},
     nav_tos:{en:"TOS",jp:"利用規約"},
     nav_contact:{en:"Contact",jp:"連絡先"},
+    nav_login:{en:"Login",jp:"ログイン"},
     hero_status:{en:"Commissions Open 🌙",jp:"依頼受付中 🌙"},
-    hero_stat_label:{en:"Commissions Successfully Delivered",jp:"件のご依頼を納品完了"},
     hero_title:{en:"Hello! It's me, Yujin.",jp:"こんにちは、ユジンです。"},
     hero_tagline:{en:"A space where dreams come to life through magic.",jp:"魔法で夢が形になる場所。"},
+    hero_completed_counter:{en:"Commissions Successfully Delivered",jp:"納品完了したご依頼実績"},
     hero_cta_order:{en:"Order Here",jp:"依頼する"},
     hero_cta_works:{en:"See Works",jp:"作品を見る"},
     scroll_down:{en:"Scroll down",jp:"スクロール"},
@@ -1732,6 +2091,10 @@ renderWaitlist();
     phase_3:{en:"Full Moon",jp:"満月"},
     phase_4:{en:"New Moon",jp:"新月"},
     phase_5:{en:"Waxing Gibbous",jp:"十三夜月"},
+    reviews_eyebrow:{en:"Client Testimonials",jp:"クライアントの評価"},
+    reviews_title:{en:"Client Reviews",jp:"レビュー & 評価"},
+    review_form_title:{en:"Leave a Review",jp:"レビューを投稿する"},
+    review_form_sub:{en:"Have you received a completed video commission? Log in with your email or Gmail to share your feedback!",jp:"制作物が納品されましたか？メールまたはGmailでログインして評価をご共有ください！"},
     modal_order_btn:{en:"Inquire & Order This Service",jp:"このサービスを依頼・注文する"},
     modal_inquire_title:{en:"Inquire & Reserve Slot",jp:"お問合せ・制作枠の予約"},
     modal_inquire_sub:{en:"Fill out your details, select add-ons per TOS, and complete payment to automatically enter the waitlist queue.",jp:"詳細を入力し、規約オプションを選択の上決済を完了すると、自動的にウェイティングリストに登録されます。"},
@@ -1805,140 +2168,6 @@ renderWaitlist();
     langToggle.classList.toggle('is-jp', currentLang === 'jp');
   });
 })();
-
-
-// ---------- Supabase client auth, profiles, commissions & reviews ----------
-const SUPABASE_URL = 'https://glbfboefoxoimjuwmokm.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_HsS28YR6a_GBXKYoOK9-bA_o1SvLHAU';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-let currentUser = null;
-
-function profileAvatar(user){
-  return (user && user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || '';
-}
-function commissionProgress(c){
-  const attached = Number(c.attached_video_count || 0);
-  const required = Math.max(1, Number(c.required_video_count || 1));
-  return Math.min(100, Math.round(attached / required * 100));
-}
-const FALLBACK_DELIVERED_COUNT = 26;
-async function loadDeliveredCount(){
-  const el = document.getElementById('heroStatCount'); if(!el) return;
-  try{
-    const {count, error} = await supabaseClient.from('commissions').select('id', {count:'exact', head:true}).eq('completed', true);
-    if(error || count === null) return; // keep fallback number on screen
-    el.textContent = Math.max(count, FALLBACK_DELIVERED_COUNT) + '+';
-  }catch(e){ /* keep fallback number on screen */ }
-}
-async function loadSupabaseUI(){
-  const {data:{session}} = await supabaseClient.auth.getSession();
-  currentUser = session ? session.user : null;
-  updateAuthUI();
-  await loadPublicReviews();
-  await loadDeliveredCount();
-  if(currentUser) await loadAccount();
-}
-function updateAuthUI(){
-  const b=document.getElementById('authButton'); if(!b)return;
-  b.textContent=currentUser ? ((currentUser.user_metadata?.full_name||currentUser.email||'Account').split(' ')[0]) : 'Login';
-  b.onclick=()=>currentUser ? document.getElementById('account').scrollIntoView({behavior:'smooth'}) : openAuthModal();
-  const account=document.getElementById('account'); if(account) account.style.display=currentUser?'block':'none';
-}
-function openAuthModal(){document.getElementById('authModal').classList.add('is-open');document.body.style.overflow='hidden';}
-function closeAuthModal(){document.getElementById('authModal').classList.remove('is-open');document.body.style.overflow='';}
-function setAuthMessage(t){document.getElementById('authMessage').textContent=t||'';}
-async function emailLogin(){
-  const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
-  if(!email||!password)return setAuthMessage('Enter your email and password.');
-  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
-  setAuthMessage(error?error.message:'Signed in!'); if(!error) closeAuthModal();
-}
-async function emailSignup(){
-  const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
-  if(!email||password.length<6)return setAuthMessage('Enter an email and a password of at least 6 characters.');
-  const {error}=await supabaseClient.auth.signUp({email,password});
-  setAuthMessage(error?error.message:'Account created. Check your email if confirmation is enabled.');
-}
-async function magicLink(){
-  const email=document.getElementById('authEmail').value.trim();
-  if(!email)return setAuthMessage('Enter your email address.');
-  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
-  setAuthMessage(error?error.message:'Magic link sent — check your email.');
-}
-async function googleLogin(){
-  const {error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
-  if(error)setAuthMessage(error.message);
-}
-async function loadAccount(){
-  const panel=document.getElementById('accountPanel'); if(!panel)return;
-  const {data:profile}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
-  const {data:commissions,error}=await supabaseClient.from('commissions').select('*, commission_videos(*)').eq('client_id',currentUser.id).order('created_at',{ascending:false});
-  const displayName=profile?.display_name || currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Client';
-  const avatar=profile?.avatar_url || profileAvatar(currentUser);
-  const rows=(commissions||[]).map(c=>{
-    const attached=(c.commission_videos||[]).length;
-    const required=Math.max(1,Number(c.required_video_count||1));
-    const pct=Math.min(100,Math.round(attached/required*100));
-    const done=c.completed || attached>=required;
-    return `<div class="account-commission"><div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap"><strong>${escapeHtml(c.service||'Commission')}</strong><span class="status-badge ${done?'completed':'in-progress'}">${done?'✓ Completed':'⚡ In Progress'}</span></div><small style="color:var(--text-muted)">${attached}/${required} video${required===1?'':'s'} attached · ${pct}%</small><div class="commission-progress"><span style="width:${pct}%"></span></div>${done?`<button class="btn btn-primary" style="margin-top:.5rem;padding:.55rem 1rem" data-review-commission="${c.id}">Leave a review</button>`:''}</div>`;
-  }).join('') || '<p style="color:var(--text-muted)">No commissions are linked to this account yet.</p>';
-  panel.innerHTML=`<div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap"><img class="profile-avatar" src="${avatar?escapeHtml(avatar):''}" onerror="this.style.display='none'" alt="Profile"><div><strong style="font-size:1.1rem">${escapeHtml(displayName)}</strong><div style="color:var(--text-muted);font-size:.8rem">${escapeHtml(currentUser.email||'')}</div></div></div><div class="profile-grid" style="margin-top:1.2rem"><div class="field-group"><label class="field-label">Display name</label><input id="profileName" value="${escapeHtml(displayName)}"></div><div class="field-group"><label class="field-label">Profile photo</label><input id="profileAvatar" type="file" accept="image/*"></div></div><div style="display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.8rem"><button class="btn btn-primary" id="saveProfileBtn">Save profile</button><button class="btn btn-ghost" id="logoutBtn">Sign out</button></div><div style="margin-top:1.8rem"><span class="eyebrow">Your commissions</span>${rows}</div>`;
-  document.getElementById('saveProfileBtn').onclick=saveProfile;
-  document.getElementById('logoutBtn').onclick=async()=>{await supabaseClient.auth.signOut();};
-  panel.onclick=(e)=>{const b=e.target.closest('[data-review-commission]');if(b)openReviewModal(b.dataset.reviewCommission);};
-}
-async function saveProfile(){
-  const name=document.getElementById('profileName').value.trim() || 'Client';
-  const file=document.getElementById('profileAvatar').files[0];
-  let avatar=profileAvatar(currentUser);
-  if(file){
-    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
-    const path=`${currentUser.id}/avatar.${ext}`;
-    const {error:upErr}=await supabaseClient.storage.from('avatars').upload(path,file,{upsert:true,cacheControl:'3600',contentType:file.type});
-    if(upErr)return alert(upErr.message);
-    const {data:urlData}=supabaseClient.storage.from('avatars').getPublicUrl(path); avatar=urlData.publicUrl+'?v='+Date.now();
-  }
-  const {error}=await supabaseClient.from('profiles').upsert({id:currentUser.id,display_name:name,avatar_url:avatar},{onConflict:'id'});
-  if(error)return alert(error.message); await supabaseClient.auth.updateUser({data:{full_name:name,avatar_url:avatar}}); await loadAccount();
-}
-async function loadPublicReviews(){
-  const box=document.getElementById('reviewsList'); if(!box)return;
-  const {data,error}=await supabaseClient.from('reviews').select('id,rating,title,body,created_at,profiles(display_name,avatar_url)').eq('published',true).order('created_at',{ascending:false}).limit(12);
-  if(error){box.innerHTML='<p style="color:var(--text-muted)">Reviews are unavailable right now.</p>';return;}
-  box.innerHTML=(data||[]).map(r=>`<article class="review-card"><div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><h3 style="font-family:'Instrument Serif',serif;font-style:italic;font-size:1.3rem;margin:.35rem 0">${escapeHtml(r.title||'Client review')}</h3><p style="color:var(--text-muted)">${escapeHtml(r.body)}</p><small style="display:block;margin-top:.8rem;color:var(--text-muted)">— ${escapeHtml(r.profiles?.display_name||'Client')}</small></article>`).join('') || '<p style="color:var(--text-muted)">No reviews yet.</p>';
-  const cta=document.getElementById('reviewCta'); if(cta)cta.innerHTML=currentUser?'<button class="btn btn-ghost" id="openReviewFromCta">Review a completed commission</button>':'<button class="btn btn-primary" id="loginForReview">Login to write a review</button>';
-  document.getElementById('openReviewFromCta')?.addEventListener('click',()=>openReviewModal());
-  document.getElementById('loginForReview')?.addEventListener('click',openAuthModal);
-}
-async function openReviewModal(preselect){
-  if(!currentUser)return openAuthModal();
-  const {data}=await supabaseClient.from('commissions').select('id,service,completed,required_video_count,commission_videos(id)').eq('client_id',currentUser.id).order('created_at',{ascending:false});
-  const completed=(data||[]).filter(c=>c.completed || (c.commission_videos||[]).length>=Math.max(1,c.required_video_count||1));
-  const sel=document.getElementById('reviewCommissionSelect'); sel.innerHTML=completed.map(c=>`<option value="${c.id}">${escapeHtml(c.service||'Commission')} — ${(c.commission_videos||[]).length} video(s)</option>`).join('');
-  if(preselect)sel.value=preselect;
-  if(!completed.length){alert('You can review a commission after it is completed.');return;}
-  document.getElementById('reviewMessage').textContent=''; document.getElementById('reviewModal').classList.add('is-open');document.body.style.overflow='hidden';
-}
-async function submitReview(){
-  const commissionId=document.getElementById('reviewCommissionSelect').value;
-  const rating=Number(document.getElementById('reviewRating').value); const title=document.getElementById('reviewTitle').value.trim(); const body=document.getElementById('reviewBody').value.trim();
-  if(!commissionId||!body)return document.getElementById('reviewMessage').textContent='Choose a completed commission and write your review.';
-  const {error}=await supabaseClient.from('reviews').upsert({commission_id:commissionId,user_id:currentUser.id,rating,title,body,published:true},{onConflict:'commission_id,user_id'});
-  document.getElementById('reviewMessage').textContent=error?error.message:'Review published — thank you!';
-  if(!error){setTimeout(()=>{closeReviewModal();loadPublicReviews();},500);}
-}
-function closeReviewModal(){document.getElementById('reviewModal').classList.remove('is-open');document.body.style.overflow='';}
-document.getElementById('authModalClose').onclick=closeAuthModal;
-document.getElementById('authModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAuthModal();});
-document.getElementById('reviewModalClose').onclick=closeReviewModal;
-document.getElementById('reviewModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeReviewModal();});
-document.getElementById('emailLoginBtn').onclick=emailLogin;
-document.getElementById('emailSignupBtn').onclick=emailSignup;
-document.getElementById('magicLinkBtn').onclick=magicLink;
-document.getElementById('googleLoginBtn').onclick=googleLogin;
-document.getElementById('submitReviewBtn').onclick=submitReview;
-supabaseClient.auth.onAuthStateChange(async (_event,session)=>{currentUser=session?.user||null;updateAuthUI();if(currentUser)await loadAccount();await loadPublicReviews();});
-loadSupabaseUI();
 </script>
 </body>
 </html>
