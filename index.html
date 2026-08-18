@@ -230,7 +230,7 @@
   .video-modal-description{color:var(--text-muted);white-space:pre-wrap;margin-bottom:1rem;}
   .video-modal-meta{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1rem;}
   .video-tag{font:500 .7rem 'IBM Plex Mono',monospace;padding:.35rem .55rem;border:1px solid var(--line);border-radius:999px;color:var(--accent-moon);}
-  .video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
+  .video-service{font:500 .72rem 'IBM Plex Mono',monospace;color:var(--accent-moon);margin-bottom:.35rem;letter-spacing:.04em}.video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
   .admin-panel{display:none;margin-top:2rem;padding:1.25rem;background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;}
   .admin-panel.is-open{display:block;}
   .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
@@ -392,10 +392,17 @@
     <div id="adminPanel" class="admin-panel">
       <strong>Video Manager</strong>
       <div class="admin-grid" style="margin-top:1rem">
-        <input id="videoTitleInput" placeholder="Title">
+        <input id="videoTitleInput" placeholder="Title (auto-filled from YouTube)">
         <input id="videoUrlInput" placeholder="YouTube URL or video ID">
-        <textarea id="videoDescriptionInput" class="full" placeholder="Description"></textarea>
-        <input id="videoPriceInput" placeholder="Price (e.g. $100)">
+        <select id="videoServiceInput">
+          <option value="">Select service / price</option>
+          <option value="MV Simple">MV Simple — $100</option>
+          <option value="MV Complex">MV Complex — $300</option>
+          <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore — $30</option>
+          <option value="Puppet Animation">Puppet Animation — $30</option>
+        </select>
+        <textarea id="videoDescriptionInput" class="full" placeholder="YouTube description (paste it here; YouTube does not expose descriptions through its public oEmbed endpoint)"></textarea>
+        <input id="videoPriceInput" placeholder="Price" readonly>
         <input id="videoTagsInput" placeholder="Tags, comma separated">
         <input id="videoCtaTextInput" placeholder="CTA text">
         <input id="videoCtaUrlInput" placeholder="CTA URL">
@@ -557,6 +564,7 @@
       <h3 id="videoModalTitle">Video</h3>
       <p class="video-modal-description" id="videoModalDescription"></p>
       <div class="video-modal-meta" id="videoModalTags"></div>
+      <div class="video-service" id="videoModalService"></div>
       <div class="video-price" id="videoModalPrice"></div>
       <a class="btn btn-primary" id="videoModalCta" href="#" target="_blank" rel="noopener">Learn more</a>
     </div>
@@ -606,11 +614,14 @@
     var title=document.getElementById('videoModalTitle');
     var desc=document.getElementById('videoModalDescription');
     var price=document.getElementById('videoModalPrice');
+    var service=document.getElementById('videoModalService');
     var tags=document.getElementById('videoModalTags');
     var cta=document.getElementById('videoModalCta');
-    title.textContent=item.title||'Video';
-    desc.textContent=item.description||'';
-    price.textContent=item.price ? item.price : '';
+    title.textContent=item.title||'YouTube Video';
+    desc.textContent=item.description||'No YouTube description has been provided for this video.';
+    service.textContent=item.service ? 'SERVICE · '+item.service : '';
+    service.style.display=item.service?'block':'none';
+    price.textContent=item.price ? 'PRICE · '+item.price : '';
     price.style.display=item.price?'block':'none';
     tags.innerHTML=(item.tags||[]).map(function(t){return '<span class="video-tag">'+escapeHtml(t)+'</span>';}).join('');
     cta.textContent=item.ctaText||'';
@@ -630,7 +641,14 @@
 
   gallery.addEventListener('click', function(e){
     var card=e.target.closest('.reel-card'); if(!card) return;
-    openVideoModal({id:card.dataset.id,title:'Work',description:'',tags:[]});
+    var id=card.dataset.id;
+    openVideoModal({id:id,title:'Loading YouTube title…',description:'',tags:[]});
+    fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
+      .then(function(r){return r.json();})
+      .then(function(info){
+        var t=document.getElementById('videoModalTitle');
+        if(t && document.getElementById('videoModal').classList.contains('is-open')) t.textContent=info.title||'YouTube Video';
+      }).catch(function(){});
   });
 
   var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
@@ -672,10 +690,28 @@
     if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==='a'){e.preventDefault();unlockAdmin();}
   });
   document.getElementById('logoutAdminBtn').addEventListener('click',function(){adminPanel.classList.remove('is-open');});
+  var SERVICE_PRICES={
+    'MV Simple':'$100',
+    'MV Complex':'$300',
+    'Debut Trailer / PV / Lore':'$30',
+    'Puppet Animation':'$30'
+  };
+  document.getElementById('videoServiceInput').addEventListener('change',function(){
+    document.getElementById('videoPriceInput').value=SERVICE_PRICES[this.value]||'';
+  });
+  document.getElementById('videoUrlInput').addEventListener('change',function(){
+    var id=youtubeId(this.value); if(!id)return;
+    fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
+      .then(function(r){return r.json();})
+      .then(function(info){
+        var input=document.getElementById('videoTitleInput');
+        if(!input.value.trim()) input.value=info.title||'';
+      }).catch(function(){});
+  });
   document.getElementById('addVideoBtn').addEventListener('click',function(){
     var id=youtubeId(document.getElementById('videoUrlInput').value);
     if(!id){window.alert('Enter a valid YouTube URL or 11-character video ID.');return;}
-    embeddedVideos.push({id:id,title:document.getElementById('videoTitleInput').value.trim()||'Video',description:document.getElementById('videoDescriptionInput').value.trim(),price:document.getElementById('videoPriceInput').value.trim(),tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),ctaText:document.getElementById('videoCtaTextInput').value.trim(),ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()});
+    embeddedVideos.push({id:id,title:document.getElementById('videoTitleInput').value.trim()||'Video',description:document.getElementById('videoDescriptionInput').value.trim(),service:document.getElementById('videoServiceInput').value,price:document.getElementById('videoPriceInput').value.trim(),tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),ctaText:document.getElementById('videoCtaTextInput').value.trim(),ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()});
     localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); renderEmbedded(); renderAdminList();
   });
   document.getElementById('clearVideoBtn').addEventListener('click',function(){if(window.confirm('Remove all added videos from this browser?')){embeddedVideos=[];localStorage.removeItem('yujin_embedded_videos');renderEmbedded();renderAdminList();}});
