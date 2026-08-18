@@ -16,9 +16,6 @@
 <!-- PayPal SDK Integration -->
 <script src="https://www.paypal.com/sdk/js?client-id=BAAnbHzcIYU_4RZTawb0AxKVfFazyHzcrnIadOF0ZCibxPbKRjqmaUR5YW9aGc57S2DlOSFM1NYs3fiyYM&currency=USD"></script>
 
-<!-- Supabase JS SDK Integration -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
   :root{
     --bg:#090714;
@@ -151,7 +148,7 @@
     letter-spacing:.02em;
   }
   .brand-moon{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF6E0,var(--accent-gold));box-shadow:0 0 12px 3px rgba(239,193,122,.55);}
-  .nav-links{display:flex;align-items:center;gap:1.5rem;}
+  .nav-links{display:flex;align-items:center;gap:2rem;}
   .nav-links a{font-size:.92rem;color:var(--text-muted);font-weight:500;transition:all .15s;}
   .nav-links a:hover{color:var(--text);text-shadow:0 0 10px rgba(243,239,251,0.3);}
   .lang-toggle{
@@ -164,16 +161,7 @@
   .nav-toggle{display:none;flex-direction:column;gap:5px;padding:8px;}
   .nav-toggle span{width:20px;height:2px;background:var(--text);border-radius:2px;}
 
-  /* User Auth Navigation Avatar Widget */
-  .user-nav-badge{
-    display:flex;align-items:center;gap:.5rem;padding:.3rem .7rem .3rem .4rem;
-    border:1px solid var(--line-active);border-radius:999px;background:var(--bg-panel-2);
-    cursor:pointer;transition:all .2s;font-size:.82rem;
-  }
-  .user-nav-badge:hover{border-color:var(--accent-gold);transform:scale(1.02);}
-  .user-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-gold);}
-
-  @media (max-width:880px){
+  @media (max-width:760px){
     .nav-toggle{display:flex;}
     .nav-links{
       position:fixed;top:var(--nav-h);left:0;right:0;
@@ -182,8 +170,8 @@
       border-bottom:1px solid var(--line);
       max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .nav-links.is-open{max-height:480px;}
-    .nav-links a,.nav-links button.btn-auth{width:100%;padding:1rem clamp(1.25rem,5vw,2.5rem);border-top:1px solid var(--line);}
+    .nav-links.is-open{max-height:400px;}
+    .nav-links a{width:100%;padding:1rem clamp(1.25rem,5vw,2.5rem);border-top:1px solid var(--line);}
     .lang-toggle{margin:1rem clamp(1.25rem,5vw,2.5rem) 1.25rem;}
     .moon-rail{display:none;}
   }
@@ -207,7 +195,7 @@
   @media (max-width:640px){
     .hero-moon{width:96px;height:96px;top:5%;right:6%;}
   }
-  .hero-inner{position:relative;z-index:2;max-width:720px;}
+  .hero-inner{position:relative;z-index:2;max-width:680px;}
   .status-pill{
     display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.06em;
     padding:.5rem 1.2rem;border:1px solid var(--line-active);border-radius:999px;color:var(--accent-gold);
@@ -216,17 +204,7 @@
   }
   .hero-title{font-family:'Instrument Serif',serif;font-size:clamp(2.6rem,7.5vw,4.5rem);line-height:1.08;margin-bottom:1.2rem;}
   .hero-title em{font-style:italic;background:linear-gradient(135deg, #FFF, var(--accent-moon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .hero-tagline{color:var(--text-muted);font-size:clamp(1rem,2vw,1.15rem);max-width:36ch;margin:0 auto 1.8rem;font-weight:400;}
-
-  /* Dynamic Completion Tracker Badge in Hero */
-  .completion-counter-bar{
-    display:inline-flex;align-items:center;gap:.8rem;padding:.6rem 1.4rem;
-    border-radius:999px;background:rgba(20,17,38,0.85);border:1px solid var(--line-active);
-    backdrop-filter:blur(10px);margin-bottom:2rem;box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  }
-  .completion-num{font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent-gold);}
-  .completion-text{font-size:.84rem;color:var(--text-muted);}
-
+  .hero-tagline{color:var(--text-muted);font-size:clamp(1rem,2vw,1.15rem);max-width:36ch;margin:0 auto 2.5rem;font-weight:400;}
   .hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
 
   .btn{
@@ -303,7 +281,7 @@
   /* Form Controls inside Inquiry Modal */
   .inquiry-form{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem;}
   .inquiry-form .full{grid-column:1/-1;}
-  .inquiry-form input, .inquiry-form textarea, .inquiry-form select{
+  .inquiry-form input, .inquiry-form textarea{
     width:100%;padding:.75rem .9rem;border-radius:12px;border:1px solid var(--line);
     background:var(--bg);color:var(--text);font:inherit;font-size:.88rem;
   }
@@ -311,7 +289,7 @@
     filter: invert(1);
     cursor: pointer;
   }
-  .inquiry-form input:focus, .inquiry-form textarea:focus, .inquiry-form select:focus{
+  .inquiry-form input:focus, .inquiry-form textarea:focus{
     border-color:var(--accent-gold);outline:none;
   }
 
@@ -398,31 +376,6 @@
   }
   .status-badge.in-progress{background:rgba(239,193,122,0.15);color:var(--accent-gold);border:1px solid var(--accent-gold);}
   .status-badge.completed{background:rgba(122,239,173,0.15);color:var(--accent-green);border:1px solid var(--accent-green);}
-
-  /* ---------- Client Reviews UI Section ---------- */
-  .reviews{background:var(--bg-panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-  .reviews-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:1.5rem;margin-top:2rem;}
-  .review-card{
-    background:var(--bg-panel);border:1px solid var(--line);border-radius:20px;
-    padding:1.6rem;display:flex;flex-direction:column;gap:1rem;box-shadow:var(--shadow-card);
-  }
-  .review-header{display:flex;align-items:center;gap:.8rem;}
-  .review-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-moon);}
-  .review-user-info strong{display:block;font-size:.95rem;color:var(--text);}
-  .review-user-info small{color:var(--text-muted);font-size:.78rem;}
-  .review-rating{color:var(--accent-gold);font-size:.88rem;letter-spacing:2px;}
-  .review-text{color:var(--text-muted);font-size:.92rem;line-height:1.6;}
-  .review-service-badge{
-    font-family:'IBM Plex Mono',monospace;font-size:.7rem;padding:3px 8px;border-radius:6px;
-    background:rgba(201,182,255,0.08);color:var(--accent-moon);align-self:flex-start;
-  }
-
-  /* Review Submission Panel */
-  .add-review-box{
-    margin-top:2.5rem;background:var(--bg-panel);border:1px solid var(--line-active);
-    border-radius:20px;padding:1.8rem;max-width:760px;margin-left:auto;margin-right:auto;
-  }
-  .add-review-box h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.6rem;margin-bottom:.5rem;}
 
   /* ---------- Admin Panel Styles ---------- */
   .admin-wrapper{max-width:var(--container);margin:0 auto;padding:0 clamp(1.25rem, 5vw, 2.5rem);}
@@ -628,15 +581,8 @@
       <a href="#works" data-i18n="nav_works">Works</a>
       <a href="#prices" data-i18n="nav_prices">Prices</a>
       <a href="#waitlist" data-i18n="nav_waitlist">Waitlist</a>
-      <a href="#reviews" data-i18n="nav_reviews">Reviews</a>
       <a href="#tos" data-i18n="nav_tos">TOS</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
-      
-      <!-- User Auth Profile Widget / Login Button -->
-      <div id="authNavContainer">
-        <button type="button" class="btn btn-ghost btn-auth" onclick="openAuthModal()" style="padding:.45rem clamp(.8rem, 2vw, 1.1rem);font-size:.82rem;">🔑 <span data-i18n="nav_login">Login</span></button>
-      </div>
-
       <button class="lang-toggle" id="langToggle" type="button">EN / <span class="lang-jp">JP</span></button>
     </div>
   </div>
@@ -648,13 +594,6 @@
     <p class="status-pill" data-i18n="hero_status">Commissions Open 🌙</p>
     <h1 class="hero-title"><em data-i18n="hero_title">Hello! It's me, Yujin.</em></h1>
     <p class="hero-tagline" data-i18n="hero_tagline">A space where dreams come to life through magic.</p>
-
-    <!-- Dynamic Total Commission Completions Counter -->
-    <div class="completion-counter-bar">
-      <span class="completion-num" id="heroCommissionCount">26+</span>
-      <span class="completion-text" data-i18n="hero_completed_counter">Commissions Successfully Delivered</span>
-    </div>
-
     <div class="hero-actions">
       <a href="#prices" class="btn btn-primary" data-i18n="hero_cta_order">Order Here</a>
       <a href="#works" class="btn btn-ghost" data-i18n="hero_cta_works">See Works</a>
@@ -767,27 +706,6 @@
       <p style="color:var(--text-muted);font-size:.95rem;" data-i18n="waitlist_intro">This waitlist automatically updates when a client secures a slot via payment. Track WIP progress live across 3 production phases below!</p>
       
       <div id="waitlistPublicQueue" class="waitlist-display"></div>
-    </div>
-  </div>
-</section>
-
-<!-- Completed Commission Reviews Section -->
-<section id="reviews" class="reviews">
-  <div class="section-inner">
-    <span class="eyebrow" data-i18n="reviews_eyebrow">Client Testimonials</span>
-    <h2 class="section-title" data-i18n="reviews_title">Client Reviews</h2>
-    
-    <!-- Reviews Grid -->
-    <div id="reviewsGrid" class="reviews-grid"></div>
-
-    <!-- Review Form for Authenticated Users -->
-    <div class="add-review-box">
-      <h3 data-i18n="review_form_title">Leave a Review</h3>
-      <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1.2rem;" data-i18n="review_form_sub">Have you received a completed video commission? Log in with your email or Gmail to share your feedback!</p>
-      
-      <div id="reviewBoxContent">
-        <!-- Dynamic content: User review inputs if logged in, otherwise Login prompt -->
-      </div>
     </div>
   </div>
 </section>
@@ -913,62 +831,6 @@
   <span data-i18n="footer_status">Commissions Open 🌙 — thank you for visiting.</span>
 </footer>
 
-<!-- Supabase Auth Login Modal -->
-<div class="video-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
-  <div class="payment-modal-card" style="max-width:440px;">
-    <button class="video-modal-close" onclick="closeAuthModal()" type="button" aria-label="Close">×</button>
-    <h3 class="payment-title" id="authModalTitle">Client Login</h3>
-    <p class="payment-subtitle">Sign in via Gmail or Email to customize your profile &amp; post commission reviews.</p>
-
-    <div style="display:flex;flex-direction:column;gap:1rem;">
-      <button type="button" class="btn btn-ghost" onclick="loginWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;background:rgba(255,255,255,0.05);">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.5s.7 2.8 1.9 5.2l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 22.3 12 22.3z"/></svg>
-        Sign in with Google / Gmail
-      </button>
-
-      <div style="text-align:center;font-size:.78rem;color:var(--text-muted);margin:.2rem 0;">— OR EMAIL SIGN IN —</div>
-
-      <input type="email" id="authEmail" placeholder="Your Email Address *" required style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-      <input type="password" id="authPassword" placeholder="Your Password *" required style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-
-      <button type="button" class="btn btn-primary" onclick="loginWithEmail()" style="width:100%;">Sign In / Register</button>
-    </div>
-  </div>
-</div>
-
-<!-- Profile Customization Modal -->
-<div class="video-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
-  <div class="payment-modal-card" style="max-width:480px;">
-    <button class="video-modal-close" onclick="closeProfileModal()" type="button" aria-label="Close">×</button>
-    <h3 class="payment-title" id="profileModalTitle">Profile Customization</h3>
-    <p class="payment-subtitle">Update your display name, social handle, and profile picture avatar.</p>
-
-    <div style="display:flex;flex-direction:column;gap:1rem;">
-      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.5rem;">
-        <img id="profilePreviewAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--accent-gold);">
-        <div>
-          <strong id="profileEmailDisplay" style="font-size:.9rem;display:block;">user@gmail.com</strong>
-          <span style="font-size:.78rem;color:var(--text-muted);">Logged in client</span>
-        </div>
-      </div>
-
-      <input type="text" id="profileDisplayName" placeholder="Display Name / VTuber Handle *" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-      <input type="text" id="profileSocialHandle" placeholder="Social Media Handle (e.g. @yujinyb) *" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-      <input type="url" id="profileAvatarUrl" placeholder="Profile Image URL (Optional)" onchange="document.getElementById('profilePreviewAvatar').src=this.value;" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-      
-      <div class="file-input-wrapper">
-        <label for="profileAvatarFile" id="profileFileLabel">📎 Upload Custom Profile Photo</label>
-        <input type="file" id="profileAvatarFile" accept="image/*" onchange="handleProfilePhotoUpload(this)">
-      </div>
-
-      <div style="display:flex;gap:1rem;margin-top:.5rem;">
-        <button type="button" class="btn btn-primary" onclick="saveProfileCustomization()" style="flex:1;">Save Profile</button>
-        <button type="button" class="btn btn-danger" onclick="logoutUser()" style="padding:.8rem 1.2rem;">Logout</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Works Video Preview Modal with Sticky Floating Order Bar -->
 <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
   <div class="video-modal-card">
@@ -1066,210 +928,6 @@
 </div>
 
 <script>
-// Supabase Auth Configuration
-const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-var currentUser = JSON.parse(localStorage.getItem('yujin_logged_user') || 'null');
-
-function updateAuthUI() {
-  const container = document.getElementById('authNavContainer');
-  const reviewBox = document.getElementById('reviewBoxContent');
-  
-  if (currentUser) {
-    var avatar = currentUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
-    var name = currentUser.display_name || currentUser.email.split('@')[0];
-    
-    container.innerHTML = `
-      <div class="user-nav-badge" onclick="openProfileModal()">
-        <img class="user-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}"/>
-        <span style="color:var(--text);font-weight:600;">${escapeHtml(name)}</span>
-      </div>
-    `;
-
-    if (reviewBox) {
-      reviewBox.innerHTML = `
-        <div style="display:grid;gap:1rem;">
-          <div style="display:flex;align-items:center;gap:.8rem;">
-            <img src="${escapeHtml(avatar)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-gold);">
-            <div>
-              <strong>Posting as ${escapeHtml(name)}</strong>
-              <small style="color:var(--text-muted);display:block;">${escapeHtml(currentUser.social || currentUser.email)}</small>
-            </div>
-          </div>
-          <select id="reviewServiceSelect" style="padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-            <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore</option>
-            <option value="MV Simple">MV Simple</option>
-            <option value="MV Complex">MV Complex</option>
-            <option value="Puppet Animation">Puppet Animation</option>
-          </select>
-          <select id="reviewRatingSelect" style="padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;">
-            <option value="★★★★★ (5/5)">★★★★★ (5/5 Stars)</option>
-            <option value="★★★★☆ (4/5)">★★★★☆ (4/5 Stars)</option>
-          </select>
-          <textarea id="reviewTextInput" placeholder="Write your feedback regarding Yujin's animation, compositing, and turnaround speed..." style="padding:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:#fff;min-height:90px;"></textarea>
-          <button type="button" class="btn btn-primary" onclick="submitClientReview()">Submit Review</button>
-        </div>
-      `;
-    }
-  } else {
-    container.innerHTML = `
-      <button type="button" class="btn btn-ghost btn-auth" onclick="openAuthModal()" style="padding:.45rem clamp(.8rem, 2vw, 1.1rem);font-size:.82rem;">🔑 <span data-i18n="nav_login">Login</span></button>
-    `;
-
-    if (reviewBox) {
-      reviewBox.innerHTML = `
-        <button type="button" class="btn btn-ghost" onclick="openAuthModal()" style="width:100%;padding:1rem;border-color:var(--accent-gold);color:var(--accent-gold);">
-          🔑 Login via Gmail / Email to Post a Review
-        </button>
-      `;
-    }
-  }
-}
-
-function openAuthModal(){ document.getElementById('authModal').classList.add('is-open'); }
-function closeAuthModal(){ document.getElementById('authModal').classList.remove('is-open'); }
-
-function openProfileModal(){
-  if(!currentUser) return openAuthModal();
-  document.getElementById('profileEmailDisplay').textContent = currentUser.email;
-  document.getElementById('profileDisplayName').value = currentUser.display_name || '';
-  document.getElementById('profileSocialHandle').value = currentUser.social || '';
-  document.getElementById('profileAvatarUrl').value = currentUser.avatar_url || '';
-  document.getElementById('profilePreviewAvatar').src = currentUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
-  document.getElementById('profileModal').classList.add('is-open');
-}
-function closeProfileModal(){ document.getElementById('profileModal').classList.remove('is-open'); }
-
-async function loginWithGoogle() {
-  if (supabase) {
-    await supabase.auth.signInWithOAuth({ provider: 'google' });
-  } else {
-    // Fallback Mock Login if Supabase Keys Not Configured Yet
-    currentUser = {
-      email: 'client@gmail.com',
-      display_name: 'Vtuber Star',
-      social: '@vtuber_star',
-      avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
-    };
-    localStorage.setItem('yujin_logged_user', JSON.stringify(currentUser));
-    updateAuthUI();
-    closeAuthModal();
-  }
-}
-
-function loginWithEmail() {
-  var email = document.getElementById('authEmail').value.trim();
-  if(!email) return alert('Please enter your email.');
-
-  currentUser = {
-    email: email,
-    display_name: email.split('@')[0],
-    social: '@' + email.split('@')[0],
-    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
-  };
-  localStorage.setItem('yujin_logged_user', JSON.stringify(currentUser));
-  updateAuthUI();
-  closeAuthModal();
-}
-
-function handleProfilePhotoUpload(input) {
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('profilePreviewAvatar').src = e.target.result;
-      document.getElementById('profileAvatarUrl').value = e.target.result;
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function saveProfileCustomization() {
-  if(!currentUser) return;
-  currentUser.display_name = document.getElementById('profileDisplayName').value.trim() || currentUser.email.split('@')[0];
-  currentUser.social = document.getElementById('profileSocialHandle').value.trim();
-  currentUser.avatar_url = document.getElementById('profileAvatarUrl').value.trim() || currentUser.avatar_url;
-  
-  localStorage.setItem('yujin_logged_user', JSON.stringify(currentUser));
-  updateAuthUI();
-  closeProfileModal();
-  alert('Profile updated successfully!');
-}
-
-function logoutUser() {
-  currentUser = null;
-  localStorage.removeItem('yujin_logged_user');
-  updateAuthUI();
-  closeProfileModal();
-}
-
-// Client Reviews System
-var clientReviews = JSON.parse(localStorage.getItem('yujin_client_reviews') || '[]');
-
-if(!clientReviews.length){
-  clientReviews = [
-    {
-      name: "Astraia Ch.",
-      social: "@AstraiaVT",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-      service: "Debut Trailer / PV",
-      rating: "★★★★★",
-      text: "Yujin brought my debut trailer to life in ways I couldn't even imagine! The 3D camera movements and typography timing were top tier."
-    },
-    {
-      name: "Kaelen Music",
-      social: "@KaelenOfficial",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
-      service: "MV Complex",
-      rating: "★★★★★",
-      text: "Sublime compositing and effects. Delivered well ahead of schedule and handled all revisions smoothly."
-    }
-  ];
-}
-
-function renderReviews() {
-  var grid = document.getElementById('reviewsGrid');
-  if(!grid) return;
-
-  grid.innerHTML = clientReviews.map(r => `
-    <div class="review-card">
-      <div class="review-header">
-        <img class="review-avatar" src="${escapeHtml(r.avatar)}" alt="${escapeHtml(r.name)}"/>
-        <div class="review-user-info">
-          <strong>${escapeHtml(r.name)}</strong>
-          <small>${escapeHtml(r.social)}</small>
-        </div>
-      </div>
-      <span class="review-service-badge">${escapeHtml(r.service)}</span>
-      <div class="review-rating">${escapeHtml(r.rating)}</div>
-      <p class="review-text">"${escapeHtml(r.text)}"</p>
-    </div>
-  `).join('');
-}
-
-function submitClientReview() {
-  var service = document.getElementById('reviewServiceSelect').value;
-  var rating = document.getElementById('reviewRatingSelect').value.split(' ')[0];
-  var text = document.getElementById('reviewTextInput').value.trim();
-
-  if(!text) return alert('Please enter your review text.');
-
-  clientReviews.unshift({
-    name: currentUser.display_name || currentUser.email.split('@')[0],
-    social: currentUser.social || currentUser.email,
-    avatar: currentUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    service: service,
-    rating: rating,
-    text: text
-  });
-
-  localStorage.setItem('yujin_client_reviews', JSON.stringify(clientReviews));
-  renderReviews();
-  document.getElementById('reviewTextInput').value = '';
-  alert('Thank you! Your review has been posted.');
-}
-
 // PayPal & Inquiry Form Modal State
 var currentService = '';
 var currentBasePrice = 0;
@@ -1283,18 +941,11 @@ function openPaymentModal(serviceName, priceNum) {
   var titleEl = document.getElementById('paymentModalTitle');
   titleEl.textContent = (document.documentElement.lang === 'jp' ? 'お問合せ・枠確保 — ' : 'Inquire — ') + currentService;
   
-  // Auto-fill from logged in profile
-  if(currentUser) {
-    document.getElementById('inqName').value = currentUser.display_name || '';
-    document.getElementById('inqEmail').value = currentUser.email || '';
-    document.getElementById('inqSocial').value = currentUser.social || '';
-  } else {
-    document.getElementById('inqName').value = '';
-    document.getElementById('inqEmail').value = '';
-    document.getElementById('inqSocial').value = '';
-  }
-
+  // Reset Form & Add-ons
+  document.getElementById('inqName').value = '';
   document.getElementById('inqCompany').value = '';
+  document.getElementById('inqEmail').value = '';
+  document.getElementById('inqSocial').value = '';
   document.getElementById('inqDeadline').value = '';
   document.getElementById('inqDesc').value = '';
   document.getElementById('addonCommercial').checked = false;
@@ -1478,7 +1129,6 @@ function renderPayPalButtons(amount, label) {
         waitlistEntries.push(orderPayload);
         saveWaitlist();
         renderWaitlist();
-        updateCommissionCounter();
         if(typeof renderAdminList === 'function') renderAdminList();
 
         // Dispatch Email Notification to yujinybwork@gmail.com
@@ -1554,21 +1204,7 @@ function renderWaitlist(){
   }).join('');
 }
 
-// Function to calculate total completed commissions
-function updateCommissionCounter() {
-  var baseVideoCount = 26; // Default video gallery works
-  var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
-  var completedWaitlistCount = waitlistEntries.filter(w => w.completed).length;
-
-  var totalCompletions = baseVideoCount + embeddedVideos.length + completedWaitlistCount;
-  var counterEl = document.getElementById('heroCommissionCount');
-  if(counterEl) counterEl.textContent = totalCompletions + '+';
-}
-
 renderWaitlist();
-renderReviews();
-updateAuthUI();
-updateCommissionCounter();
 
 (function(){
   // Predefined Tag options
@@ -1889,7 +1525,6 @@ updateCommissionCounter();
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
       document.getElementById('quickVideoUrl').value = '';
       renderTagFilterBar();
-      updateCommissionCounter();
       renderAdminList();
       window.alert('Video successfully added!');
     }).catch(function(){
@@ -1905,7 +1540,6 @@ updateCommissionCounter();
       embeddedVideos.splice(idx, 1);
       localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
       renderTagFilterBar();
-      updateCommissionCounter();
       renderAdminList();
       return;
     }
@@ -1918,7 +1552,6 @@ updateCommissionCounter();
         videos.splice(workIdx, 1);
         renderWorks();
         renderTagFilterBar();
-        updateCommissionCounter();
         renderAdminList();
       }
       return;
@@ -1929,7 +1562,6 @@ updateCommissionCounter();
       waitlistEntries.splice(Number(wlBtn.dataset.removeWaitlist), 1);
       saveWaitlist();
       renderWaitlist();
-      updateCommissionCounter();
       renderAdminList();
       return;
     }
@@ -1940,7 +1572,6 @@ updateCommissionCounter();
       waitlistEntries[idx].phase = Number(phaseBtn.dataset.phaseVal);
       saveWaitlist();
       renderWaitlist();
-      updateCommissionCounter();
       renderAdminList();
       return;
     }
@@ -1952,7 +1583,6 @@ updateCommissionCounter();
       if(waitlistEntries[idx].completed) waitlistEntries[idx].phase = 3;
       saveWaitlist();
       renderWaitlist();
-      updateCommissionCounter();
       renderAdminList();
       return;
     }
@@ -1960,7 +1590,7 @@ updateCommissionCounter();
 
   document.getElementById('videoModalClose').addEventListener('click',closeVideoModal);
   document.getElementById('videoModal').addEventListener('click',function(e){if(e.target===this)closeVideoModal();});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeVideoModal();closePaymentModal();closeAuthModal();closeProfileModal();}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeVideoModal();closePaymentModal();}});
 
   // ---------- EN / JP toggle dictionary ----------
   var dict = {
@@ -1968,14 +1598,11 @@ updateCommissionCounter();
     nav_works:{en:"Works",jp:"作品"},
     nav_prices:{en:"Prices",jp:"料金"},
     nav_waitlist:{en:"Waitlist",jp:"ウェイティングリスト"},
-    nav_reviews:{en:"Reviews",jp:"レビュー"},
     nav_tos:{en:"TOS",jp:"利用規約"},
     nav_contact:{en:"Contact",jp:"連絡先"},
-    nav_login:{en:"Login",jp:"ログイン"},
     hero_status:{en:"Commissions Open 🌙",jp:"依頼受付中 🌙"},
     hero_title:{en:"Hello! It's me, Yujin.",jp:"こんにちは、ユジンです。"},
     hero_tagline:{en:"A space where dreams come to life through magic.",jp:"魔法で夢が形になる場所。"},
-    hero_completed_counter:{en:"Commissions Successfully Delivered",jp:"納品完了したご依頼実績"},
     hero_cta_order:{en:"Order Here",jp:"依頼する"},
     hero_cta_works:{en:"See Works",jp:"作品を見る"},
     scroll_down:{en:"Scroll down",jp:"スクロール"},
@@ -1995,10 +1622,6 @@ updateCommissionCounter();
     phase_3:{en:"Full Moon",jp:"満月"},
     phase_4:{en:"New Moon",jp:"新月"},
     phase_5:{en:"Waxing Gibbous",jp:"十三夜月"},
-    reviews_eyebrow:{en:"Client Testimonials",jp:"クライアントの評価"},
-    reviews_title:{en:"Client Reviews",jp:"レビュー & 評価"},
-    review_form_title:{en:"Leave a Review",jp:"レビューを投稿する"},
-    review_form_sub:{en:"Have you received a completed video commission? Log in with your email or Gmail to share your feedback!",jp:"制作物が納品されましたか？メールまたはGmailでログインして評価をご共有ください！"},
     modal_order_btn:{en:"Inquire & Order This Service",jp:"このサービスを依頼・注文する"},
     modal_inquire_title:{en:"Inquire & Reserve Slot",jp:"お問合せ・制作枠の予約"},
     modal_inquire_sub:{en:"Fill out your details, select add-ons per TOS, and complete payment to automatically enter the waitlist queue.",jp:"詳細を入力し、規約オプションを選択の上決済を完了すると、自動的にウェイティングリストに登録されます。"},
