@@ -235,8 +235,10 @@
   .admin-panel.is-open{display:block;}
   .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
   .admin-grid .full{grid-column:1/-1;}
-  .admin-panel input,.admin-panel textarea{width:100%;padding:.75rem .85rem;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;}
+  .admin-panel input,.admin-panel textarea,.admin-panel select{width:100%;padding:.75rem .85rem;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;}
   .admin-panel textarea{min-height:100px;resize:vertical;}
+  .admin-panel select[multiple]{min-height:110px;padding:.5rem;}
+  .admin-panel select option{padding:.3rem .5rem;}
   .admin-list{display:grid;gap:.6rem;margin-top:1rem;}
   .admin-item{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem;border:1px solid var(--line);border-radius:12px;}
   .admin-item small{color:var(--text-muted);display:block;}
@@ -295,18 +297,6 @@
     border-color:var(--accent-gold);color:var(--accent-gold);
     background:rgba(239,193,122,.08);
   }
-
-  /* Quick-tag buttons styling for admin panel */
-  .quick-tag-btn-container{
-    display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem;
-  }
-  .quick-tag-btn{
-    font-family:'IBM Plex Mono',monospace;font-size:.7rem;
-    padding:.25rem .6rem;border-radius:6px;
-    border:1px solid var(--line);background:var(--bg);color:var(--accent-moon);
-    cursor:pointer;
-  }
-  .quick-tag-btn:hover{border-color:var(--accent-moon);background:rgba(201,182,255,.1);}
 
   /* ---------- prices ---------- */
   .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;}
@@ -446,16 +436,15 @@
         <textarea id="videoDescriptionInput" class="full" placeholder="YouTube description (auto-fetched from YouTube; you can edit/override it)"></textarea>
         <input id="videoPriceInput" placeholder="Price" readonly>
         
+        <!-- Multi-select Tag Dropdown -->
         <div class="full">
-          <input id="videoTagsInput" placeholder="Tags, comma separated (e.g. MV Simple, 2D Motion, Typography)">
-          <div class="quick-tag-btn-container">
-            <button type="button" class="quick-tag-btn" onclick="addQuickTag('MV Simple')">+ MV Simple</button>
-            <button type="button" class="quick-tag-btn" onclick="addQuickTag('MV Complex')">+ MV Complex</button>
-            <button type="button" class="quick-tag-btn" onclick="addQuickTag('Debut PV')">+ Debut PV</button>
-            <button type="button" class="quick-tag-btn" onclick="addQuickTag('Puppet Animation')">+ Puppet Animation</button>
-            <button type="button" class="quick-tag-btn" onclick="addQuickTag('Typography')">+ Typography</button>
-            <button type="button" class="quick-tag-btn" onclick="addQuickTag('3D Camera')">+ 3D Camera</button>
-          </div>
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Select Service Tags (Hold Ctrl / Cmd to select multiple):</label>
+          <select id="videoTagsSelect" multiple>
+            <option value="MV Simple">MV Simple</option>
+            <option value="MV Complex">MV Complex</option>
+            <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore</option>
+            <option value="Puppet Animation">Puppet Animation</option>
+          </select>
         </div>
 
         <input id="videoCtaTextInput" placeholder="CTA text">
@@ -626,18 +615,15 @@
 </div>
 
 <script>
-// Helper function for Quick Tag Adder Buttons
-function addQuickTag(tagName) {
-  var input = document.getElementById('videoTagsInput');
-  if (!input) return;
-  var current = input.value ? input.value.split(',').map(function(t){ return t.trim(); }) : [];
-  if (current.indexOf(tagName) === -1) {
-    current.push(tagName);
-    input.value = current.join(', ');
-  }
-}
-
 (function(){
+  // Available predefined tags
+  var TAG_OPTIONS = [
+    "MV Simple",
+    "MV Complex",
+    "Debut Trailer / PV / Lore",
+    "Puppet Animation"
+  ];
+
   // ---------- mobile nav ----------
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
@@ -663,7 +649,7 @@ function addQuickTag(tagName) {
   window.addEventListener('resize', updatePhase);
   updatePhase();
 
-  // ---------- works gallery (all existing works auto-load YouTube metadata) ----------
+  // ---------- works gallery ----------
   var videos = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
   var gallery = document.getElementById('gallery');
   var workMetadata = JSON.parse(localStorage.getItem('yujin_work_youtube_metadata') || '{}');
@@ -697,21 +683,9 @@ function addQuickTag(tagName) {
   function renderTagFilterBar(){
     var filterBar = document.getElementById('tagFilterBar');
     if (!filterBar) return;
-    
-    var allTags = {};
-    videos.forEach(function(id){
-      var tags = (workMetadata[id] && workMetadata[id].tags) || [];
-      tags.forEach(function(t){ allTags[t] = true; });
-    });
 
-    var embeddedList = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
-    embeddedList.forEach(function(item){
-      (item.tags || []).forEach(function(t){ allTags[t] = true; });
-    });
-
-    var tagList = Object.keys(allTags);
     filterBar.innerHTML = '<button type="button" class="tag-filter-btn '+(activeFilterTag === 'all' ? 'is-active' : '')+'" data-tag="all">All</button>'
-      + tagList.map(function(t){
+      + TAG_OPTIONS.map(function(t){
         return '<button type="button" class="tag-filter-btn '+(activeFilterTag === t ? 'is-active' : '')+'" data-tag="'+escapeHtml(t)+'">'+escapeHtml(t)+'</button>';
       }).join('');
   }
@@ -806,7 +780,7 @@ function addQuickTag(tagName) {
     });
   });
 
-  // Preload all 26 existing Works in small batches. Cached metadata prevents repeat API calls.
+  // Preload works
   (function preloadAllWorks(){
     var queue=videos.slice();
     function next(){
@@ -868,11 +842,16 @@ function addQuickTag(tagName) {
 
     var defaultItems = videos.map(function(id, i){
       var meta = workMetadata[id] || {};
-      var tagStr = (meta.tags || []).join(', ');
-      return '<div class="admin-item"><div><strong>'+escapeHtml(workTitle(id, i))+'</strong><small>Works ID: '+id+' | Tags: <input type="text" value="'+escapeHtml(tagStr)+'" data-work-tag-id="'+id+'" placeholder="Tags..." style="padding:.2rem .5rem;font-size:.75rem;width:200px;display:inline-block;margin-left:6px;"></small></div><button class="btn btn-ghost" type="button" data-save-work-tag="'+id+'">Save Tags</button></div>';
+      var curTags = meta.tags || [];
+      var optionsHTML = TAG_OPTIONS.map(function(opt){
+        var selected = curTags.indexOf(opt) !== -1 ? 'selected' : '';
+        return '<option value="'+escapeHtml(opt)+'" '+selected+'>'+escapeHtml(opt)+'</option>';
+      }).join('');
+
+      return '<div class="admin-item"><div><strong>'+escapeHtml(workTitle(id, i))+'</strong><small>Works ID: '+id+'</small><select multiple data-work-tag-select="'+id+'" style="margin-top:6px;font-size:.75rem;min-height:80px;">'+optionsHTML+'</select></div><button class="btn btn-ghost" type="button" data-save-work-tag="'+id+'">Save Tags</button></div>';
     }).join('');
 
-    list.innerHTML = embeddedItems + (defaultItems ? '<hr style="border-color:var(--line);margin:1rem 0;"><strong style="color:var(--accent-gold);">Edit Tags for Main Works Gallery:</strong>' + defaultItems : '');
+    list.innerHTML = embeddedItems + (defaultItems ? '<hr style="border-color:var(--line);margin:1rem 0;"><strong style="color:var(--accent-gold);">Edit Tags for Main Works Gallery (Hold Ctrl/Cmd for multiple):</strong>' + defaultItems : '');
   }
 
   function unlockAdmin(){
@@ -910,6 +889,12 @@ function addQuickTag(tagName) {
   document.getElementById('addVideoBtn').addEventListener('click',function(){
     var id=youtubeId(document.getElementById('videoUrlInput').value);
     if(!id){window.alert('Enter a valid YouTube URL or 11-character video ID.');return;}
+    
+    var select = document.getElementById('videoTagsSelect');
+    var selectedTags = Array.prototype.slice.call(select.options)
+      .filter(function(opt){ return opt.selected; })
+      .map(function(opt){ return opt.value; });
+
     embeddedVideos.push({
       id:id,
       title:document.getElementById('videoTitleInput').value.trim()||'Video',
@@ -918,7 +903,7 @@ function addQuickTag(tagName) {
       youtubeDescription:document.getElementById('videoDescriptionInput').value.trim(),
       service:document.getElementById('videoServiceInput').value,
       price:document.getElementById('videoPriceInput').value.trim(),
-      tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),
+      tags:selectedTags,
       ctaText:document.getElementById('videoCtaTextInput').value.trim(),
       ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()
     });
@@ -943,11 +928,14 @@ function addQuickTag(tagName) {
     var saveWorkBtn = e.target.closest('[data-save-work-tag]');
     if(saveWorkBtn){
       var workId = saveWorkBtn.dataset.saveWorkTag;
-      var input = document.querySelector('[data-work-tag-id="'+workId+'"]');
-      if(input){
-        var newTags = input.value.split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+      var select = document.querySelector('[data-work-tag-select="'+workId+'"]');
+      if(select){
+        var selectedTags = Array.prototype.slice.call(select.options)
+          .filter(function(opt){ return opt.selected; })
+          .map(function(opt){ return opt.value; });
+
         if(!workMetadata[workId]) workMetadata[workId] = {};
-        workMetadata[workId].tags = newTags;
+        workMetadata[workId].tags = selectedTags;
         saveWorkMetadata();
         renderWorks();
         renderTagFilterBar();
