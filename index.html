@@ -29,6 +29,7 @@
     --accent-gold:#EFC17A;
     --accent-gold-dim:rgba(239,193,122,0.22);
     --accent-green:#7AEFAD;
+    --accent-red:#FF7B7B;
     --nav-h:68px;
     --container:1120px;
     --radius-lg:18px;
@@ -215,6 +216,8 @@
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px -6px rgba(239,193,122,.55);filter:brightness(1.05);}
   .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,0.02);backdrop-filter:blur(6px);}
   .btn-ghost:hover{border-color:var(--accent-moon);background:rgba(201,182,255,0.08);transform:translateY(-2px);}
+  .btn-danger{border:1px solid rgba(255,123,123,0.4);color:var(--accent-red);background:rgba(255,123,123,0.06);}
+  .btn-danger:hover{border-color:var(--accent-red);background:rgba(255,123,123,0.15);}
   .btn-block{width:100%;}
 
   .scroll-cue{
@@ -367,28 +370,70 @@
   .status-badge.in-progress{background:rgba(239,193,122,0.15);color:var(--accent-gold);border:1px solid var(--accent-gold);}
   .status-badge.completed{background:rgba(122,239,173,0.15);color:var(--accent-green);border:1px solid var(--accent-green);}
 
-  /* ---------- Admin Panel Styles ---------- */
-  .admin-panel{display:none;margin-top:2.5rem;padding:1.75rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:20px;box-shadow:var(--shadow-card);}
-  .admin-panel.is-open{display:block;}
-  .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  .admin-grid .full{grid-column:1/-1;}
-  .admin-panel input,.admin-panel textarea,.admin-panel select{
-    width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);
-    background:var(--bg);color:var(--text);font:inherit;font-size:.9rem;
-    transition:border-color .15s, box-shadow .15s;
+  /* ---------- Redesigned Admin Panel Styles ---------- */
+  .admin-panel{
+    display:none;margin-top:2.5rem;padding:2rem;background:var(--bg-panel);
+    border:1px solid var(--line-active);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.6);
   }
-  .admin-panel input:focus,.admin-panel textarea:focus,.admin-panel select:focus{
+  .admin-panel.is-open{display:block;}
+  .admin-header{
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    padding-bottom:1.2rem;border-bottom:1px solid var(--line);margin-bottom:1.5rem;
+  }
+  .admin-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.8rem;color:var(--accent-gold);}
+  
+  /* Admin Nav Tabs */
+  .admin-tabs{display:flex;gap:.6rem;margin-bottom:1.5rem;border-bottom:1px solid var(--line);padding-bottom:.8rem;}
+  .admin-tab-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:.82rem;padding:.5rem 1.1rem;
+    border-radius:999px;border:1px solid var(--line);color:var(--text-muted);
+    background:rgba(255,255,255,0.02);transition:all .2s;
+  }
+  .admin-tab-btn.is-active{
+    background:rgba(239,193,122,0.15);border-color:var(--accent-gold);color:var(--accent-gold);font-weight:600;
+  }
+
+  .admin-tab-content{display:none;}
+  .admin-tab-content.is-active{display:block;}
+
+  /* Streamlined Quick Add Card */
+  .admin-add-card{
+    background:var(--bg-panel-2);border:1px solid var(--line-active);border-radius:18px;
+    padding:1.5rem;margin-bottom:2rem;
+  }
+  .admin-add-card h4{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.3rem;margin-bottom:.3rem;}
+  .admin-add-card p{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem;}
+  .admin-add-form{display:grid;grid-template-columns:2fr 1fr auto;gap:1rem;align-items:center;}
+  
+  @media(max-width:760px){
+    .admin-add-form{grid-template-columns:1fr;}
+  }
+
+  .admin-panel input, .admin-panel select{
+    width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text);font:inherit;font-size:.88rem;
+    transition:all .15s;
+  }
+  .admin-panel input:focus, .admin-panel select:focus{
     border-color:var(--accent-gold);box-shadow:0 0 12px rgba(239,193,122,0.2);outline:none;
   }
-  .admin-panel textarea{min-height:100px;resize:vertical;}
-  .admin-panel select[multiple]{min-height:120px;padding:.6rem;}
-  .admin-panel select option{padding:.4rem .6rem;border-radius:6px;margin-bottom:2px;}
-  .admin-list{display:grid;gap:.75rem;margin-top:1.2rem;}
-  .admin-item{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,0.01);}
-  .admin-item small{color:var(--text-muted);display:block;margin-top:2px;}
-  .admin-actions{display:flex;gap:.6rem;flex-wrap:wrap;}
-  .admin-note{font-size:.78rem;color:var(--text-muted);margin-top:.8rem;}
-  @media(max-width:700px){.inquiry-form{grid-template-columns:1fr;}.inquiry-form .full{grid-column:auto;}.admin-grid{grid-template-columns:1fr}.admin-grid .full{grid-column:auto}.video-modal{padding:.6rem}.video-modal-info{padding:1.2rem}.video-modal-info h3{font-size:1.75rem;}}
+
+  /* Admin Video Items Grid */
+  .admin-video-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:1.2rem;}
+  .admin-video-card{
+    background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    display:flex;flex-direction:column;position:relative;
+  }
+  .admin-video-thumb{aspect-ratio:16/9;background:#000;position:relative;overflow:hidden;}
+  .admin-video-thumb img{width:100%;height:100%;object-fit:cover;}
+  .admin-video-details{padding:1rem;display:flex;flex-direction:column;gap:.5rem;flex:1;}
+  .admin-video-details strong{font-size:.9rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .admin-video-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:.7rem;padding:3px 8px;border-radius:6px;
+    background:rgba(201,182,255,0.12);color:var(--accent-moon);border:1px solid rgba(201,182,255,0.3);
+    align-self:flex-start;
+  }
+  .admin-video-actions{padding:.8rem 1rem;border-top:1px solid var(--line);display:flex;justify-content:flex-end;}
 
   /* ---------- works / reel gallery ---------- */
   .works{background:var(--bg-panel);}
@@ -579,46 +624,53 @@
     <span class="eyebrow">Featured videos</span>
     <h2 class="section-title">Embedded Videos</h2>
     <div class="gallery" id="embeddedGallery"></div>
+
+    <!-- Completely Redesigned Admin Panel -->
     <div id="adminPanel" class="admin-panel">
-      <strong style="font-size:1.1rem;color:var(--accent-gold);">Video Manager &amp; Waitlist Admin</strong>
-      <div class="admin-grid" style="margin-top:1.2rem">
-        <input id="videoTitleInput" placeholder="Title (auto-filled from YouTube)">
-        <input id="videoUrlInput" placeholder="YouTube URL or video ID">
-        <select id="videoServiceInput">
-          <option value="">Select service / price</option>
-          <option value="MV Simple">MV Simple — $100</option>
-          <option value="MV Complex">MV Complex — $300</option>
-          <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore — $30</option>
-          <option value="Puppet Animation">Puppet Animation — $30</option>
-        </select>
-        <textarea id="videoDescriptionInput" class="full" placeholder="YouTube description (auto-fetched from YouTube; you can edit/override it)"></textarea>
-        <input id="videoPriceInput" placeholder="Price" readonly>
-        
-        <!-- Multi-select Tag Dropdown -->
-        <div class="full">
-          <label style="font-size:.82rem;color:var(--text-muted);display:block;margin-bottom:6px;">Select Service Tags (Hold Ctrl / Cmd to select multiple):</label>
-          <select id="videoTagsSelect" multiple>
-            <option value="MV Simple">MV Simple</option>
-            <option value="MV Complex">MV Complex</option>
-            <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore</option>
-            <option value="Puppet Animation">Puppet Animation</option>
-          </select>
+      <div class="admin-header">
+        <div>
+          <h3 class="admin-title">Studio Dashboard</h3>
+          <p style="font-size:.82rem;color:var(--text-muted);">Simplified Video Management &amp; Waitlist Tracker</p>
+        </div>
+        <button type="button" class="btn btn-ghost" id="logoutAdminBtn">🔒 Lock Admin</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab-btn is-active" onclick="switchAdminTab('videos')">🎬 Video Manager</button>
+        <button type="button" class="admin-tab-btn" onclick="switchAdminTab('waitlist')">📋 Waitlist Queue</button>
+      </div>
+
+      <!-- Tab 1: Video Manager -->
+      <div id="tabAdminVideos" class="admin-tab-content is-active">
+        <!-- Quick Add Form (Only Link & Service Tier Required) -->
+        <div class="admin-add-card">
+          <h4>Add New Video</h4>
+          <p>Paste any YouTube URL or Video ID and select its service tier. Titles, descriptions, and thumbnails are automatically fetched.</p>
+          
+          <div class="admin-add-form">
+            <input id="quickVideoUrl" placeholder="Paste YouTube Link or Video ID (e.g. https://youtu.be/...) *">
+            <select id="quickVideoService">
+              <option value="MV Simple">MV Simple ($100)</option>
+              <option value="MV Complex">MV Complex ($300)</option>
+              <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
+              <option value="Puppet Animation">Puppet Animation ($30)</option>
+            </select>
+            <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
+          </div>
         </div>
 
-        <input id="videoCtaTextInput" placeholder="CTA text">
-        <input id="videoCtaUrlInput" placeholder="CTA URL">
+        <strong style="display:block;font-size:1.05rem;color:var(--text);margin-bottom:1rem;">Active Video Gallery</strong>
+        <div id="adminVideoGrid" class="admin-video-grid"></div>
       </div>
-      <div class="admin-actions" style="margin-top:1rem">
-        <button type="button" class="btn btn-primary" id="addVideoBtn">Add Video</button>
-        <button type="button" class="btn btn-ghost" id="clearVideoBtn">Remove All Added Videos</button>
-        <button type="button" class="btn btn-ghost" id="logoutAdminBtn">Lock Admin</button>
-      </div>
-      <div id="adminList" class="admin-list"></div>
 
-      <hr style="border-color:var(--line);margin:1.5rem 0;">
-      <strong style="color:var(--accent-gold);display:block;margin-bottom:.5rem;">Waitlist Management (Paid Commissions Only):</strong>
-      <div id="adminWaitlist" class="admin-list"></div>
-      <p class="admin-note">Only clients who completed payment are automatically registered here. You can update WIP phases (Phase 1, Phase 2, Phase 3) or mark projects as Completed.</p>
+      <!-- Tab 2: Waitlist Manager -->
+      <div id="tabAdminWaitlist" class="admin-tab-content">
+        <strong style="display:block;font-size:1.05rem;color:var(--accent-gold);margin-bottom:.5rem;">Client Waitlist Queue (Paid Orders Only)</strong>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.2rem;">Track client progress, update WIP phases (1–3), or complete commissions once delivered.</p>
+        
+        <div id="adminWaitlistList" class="admin-list"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1373,38 +1425,71 @@ renderWaitlist();
     renderEmbedded();
   }
 
-  // ---------- private video & waitlist manager ----------
-  var adminPanel=document.getElementById('adminPanel');
-  var ADMIN_PASSWORD='YujinAdmin-7Qm4!';
+  // ---------- Redesigned Private Video & Waitlist Manager ----------
+  var adminPanel = document.getElementById('adminPanel');
+  var ADMIN_PASSWORD = 'YujinAdmin-7Qm4!';
+
   function youtubeId(value){
-    var v=String(value||'').trim();
-    var m=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
-    return m?m[1]:(/^[A-Za-z0-9_-]{11}$/.test(v)?v:'');
+    var v = String(value||'').trim();
+    var m = v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(v) ? v : '');
   }
 
-  window.renderAdminList = function(){
-    var list=document.getElementById('adminList'); if(!list) return;
-    
-    var embeddedItems = embeddedVideos.map(function(v,i){
-      var tagStr = (v.tags || []).join(', ');
-      return '<div class="admin-item"><div><strong>'+escapeHtml(v.title||'Untitled')+'</strong><small>ID: '+escapeHtml(v.id)+' | Tags: '+escapeHtml(tagStr || 'None')+'</small></div><button class="btn btn-ghost" type="button" data-remove-video="'+i+'">Remove</button></div>';
-    }).join('');
+  window.switchAdminTab = function(tabName){
+    document.querySelectorAll('.admin-tab-btn').forEach(function(b){ b.classList.remove('is-active'); });
+    document.querySelectorAll('.admin-tab-content').forEach(function(c){ c.classList.remove('is-active'); });
 
-    var defaultItems = videos.map(function(id, i){
-      var meta = workMetadata[id] || {};
-      var curTags = meta.tags || [];
-      var optionsHTML = TAG_OPTIONS.map(function(opt){
-        var selected = curTags.indexOf(opt) !== -1 ? 'selected' : '';
-        return '<option value="'+escapeHtml(opt)+'" '+selected+'>'+escapeHtml(opt)+'</option>';
+    if(tabName === 'videos'){
+      document.querySelectorAll('.admin-tab-btn')[0].classList.add('is-active');
+      document.getElementById('tabAdminVideos').classList.add('is-active');
+    } else {
+      document.querySelectorAll('.admin-tab-btn')[1].classList.add('is-active');
+      document.getElementById('tabAdminWaitlist').classList.add('is-active');
+    }
+  };
+
+  window.renderAdminList = function(){
+    var videoGrid = document.getElementById('adminVideoGrid');
+    if(videoGrid){
+      // Render Added Embedded Videos
+      var embeddedCards = embeddedVideos.map(function(v, i){
+        var tagBadge = (v.tags && v.tags[0]) ? '<span class="admin-video-badge">'+escapeHtml(v.tags[0])+'</span>' : '';
+        return '<div class="admin-video-card">'
+          + '<div class="admin-video-thumb"><img src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title)+'"/></div>'
+          + '<div class="admin-video-details">'
+          + tagBadge
+          + '<strong>'+escapeHtml(v.title || 'YouTube Video')+'</strong>'
+          + '<small style="color:var(--text-muted);font-family:\'IBM Plex Mono\',monospace;">ID: '+escapeHtml(v.id)+'</small>'
+          + '</div>'
+          + '<div class="admin-video-actions">'
+          + '<button class="btn btn-danger" type="button" data-remove-video="'+i+'">Remove</button>'
+          + '</div>'
+          + '</div>';
       }).join('');
 
-      return '<div class="admin-item"><div><strong>'+escapeHtml(workTitle(id, i))+'</strong><small>Works ID: '+id+'</small><select multiple data-work-tag-select="'+id+'" style="margin-top:6px;font-size:.75rem;min-height:80px;">'+optionsHTML+'</select></div><button class="btn btn-ghost" type="button" data-save-work-tag="'+id+'">Save Tags</button></div>';
-    }).join('');
+      // Render Default Portfolio Works
+      var mainWorksCards = videos.map(function(id, i){
+        var meta = workMetadata[id] || {};
+        var curTag = (meta.tags && meta.tags[0]) || 'MV Simple';
 
-    list.innerHTML = embeddedItems + (defaultItems ? '<hr style="border-color:var(--line);margin:1.5rem 0;"><strong style="color:var(--accent-gold);display:block;margin-bottom:.5rem;">Edit Tags for Main Works Gallery (Hold Ctrl/Cmd for multiple):</strong>' + defaultItems : '');
+        return '<div class="admin-video-card">'
+          + '<div class="admin-video-thumb"><img src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="'+escapeHtml(workTitle(id,i))+'"/></div>'
+          + '<div class="admin-video-details">'
+          + '<span class="admin-video-badge">'+escapeHtml(curTag)+'</span>'
+          + '<strong>'+escapeHtml(workTitle(id, i))+'</strong>'
+          + '<small style="color:var(--text-muted);font-family:\'IBM Plex Mono\',monospace;">ID: '+id+'</small>'
+          + '</div>'
+          + '<div class="admin-video-actions">'
+          + '<button class="btn btn-danger" type="button" data-remove-main-work="'+id+'">Remove</button>'
+          + '</div>'
+          + '</div>';
+      }).join('');
 
-    // Admin waitlist manager
-    var wlList = document.getElementById('adminWaitlist');
+      videoGrid.innerHTML = embeddedCards + mainWorksCards || '<p style="color:var(--text-muted);">No videos available in gallery.</p>';
+    }
+
+    // Render Admin Waitlist Queue
+    var wlList = document.getElementById('adminWaitlistList');
     if(wlList){
       wlList.innerHTML = waitlistEntries.map(function(item, i){
         return '<div class="admin-item">'
@@ -1414,93 +1499,89 @@ renderWaitlist();
           + '<small>Service: '+escapeHtml(item.service)+' | Add-ons: '+escapeHtml(item.addons||'None')+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+') | Date: '+escapeHtml(item.date)+'</small>'
           + '<small>Desc: '+escapeHtml(item.description||'None')+'</small>'
           + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
-          + '<span style="font-size:.75rem;color:var(--text-muted);">Set Progress:</span>'
+          + '<span style="font-size:.75rem;color:var(--text-muted);">Set Phase:</span>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="1">Phase 1</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="2">Phase 2</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="3">Phase 3</button>'
           + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;border-color:var(--accent-green);color:var(--accent-green);" type="button" data-toggle-complete="'+i+'">'+(item.completed ? 'Mark In-Progress' : 'Mark Completed')+'</button>'
           + '</div>'
           + '</div>'
-          + '<button class="btn btn-ghost" type="button" data-remove-waitlist="'+i+'">Remove</button>'
+          + '<button class="btn btn-danger" type="button" data-remove-waitlist="'+i+'">Remove Slot</button>'
           + '</div>';
       }).join('') || '<p style="color:var(--text-muted);">No paid waitlist entries currently.</p>';
     }
-  }
+  };
 
   function unlockAdmin(){
-    var pw=window.prompt('Admin password');
-    if(pw===ADMIN_PASSWORD){adminPanel.classList.add('is-open');renderAdminList();}
-    else if(pw!==null) window.alert('Incorrect password.');
+    var pw = window.prompt('Admin password');
+    if(pw === ADMIN_PASSWORD){ adminPanel.classList.add('is-open'); renderAdminList(); }
+    else if(pw !== null) window.alert('Incorrect password.');
   }
-  document.addEventListener('keydown',function(e){
-    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==='a'){e.preventDefault();unlockAdmin();}
-  });
-  document.getElementById('logoutAdminBtn').addEventListener('click',function(){adminPanel.classList.remove('is-open');});
-  var SERVICE_PRICES={
-    'MV Simple':'$100',
-    'MV Complex':'$300',
-    'Debut Trailer / PV / Lore':'$30',
-    'Puppet Animation':'$30'
-  };
-  document.getElementById('videoServiceInput').addEventListener('change',function(){
-    document.getElementById('videoPriceInput').value=SERVICE_PRICES[this.value]||'';
-  });
-  document.getElementById('videoUrlInput').addEventListener('change',function(){
-    var id=youtubeId(this.value); if(!id)return;
-    var titleInput=document.getElementById('videoTitleInput');
-    var descInput=document.getElementById('videoDescriptionInput');
-    titleInput.value='Loading YouTube title…';
-    descInput.value='Loading YouTube description…';
-    fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);})
-      .then(function(info){
-        if(!titleInput.value || titleInput.value==='Loading YouTube title…') titleInput.value=info.title||'';
-        if(!descInput.value || descInput.value==='Loading YouTube description…') descInput.value=info.description||'';
-      }).catch(function(){
-        titleInput.value=''; descInput.value='';
-      });
-  });
-  document.getElementById('addVideoBtn').addEventListener('click',function(){
-    var id=youtubeId(document.getElementById('videoUrlInput').value);
-    if(!id){window.alert('Enter a valid YouTube URL or 11-character video ID.');return;}
-    
-    var select = document.getElementById('videoTagsSelect');
-    var selectedTags = Array.prototype.slice.call(select.options)
-      .filter(function(opt){ return opt.selected; })
-      .map(function(opt){ return opt.value; });
 
-    embeddedVideos.push({
-      id:id,
-      title:document.getElementById('videoTitleInput').value.trim()||'Video',
-      description:document.getElementById('videoDescriptionInput').value.trim(),
-      youtubeTitle:document.getElementById('videoTitleInput').value.trim(),
-      youtubeDescription:document.getElementById('videoDescriptionInput').value.trim(),
-      service:document.getElementById('videoServiceInput').value,
-      price:document.getElementById('videoPriceInput').value.trim(),
-      tags:selectedTags,
-      ctaText:document.getElementById('videoCtaTextInput').value.trim(),
-      ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()
-    });
-    localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); 
-    renderEmbedded(); 
-    renderTagFilterBar(); 
-    renderAdminList();
+  document.addEventListener('keydown', function(e){
+    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a'){ e.preventDefault(); unlockAdmin(); }
   });
-  document.getElementById('clearVideoBtn').addEventListener('click',function(){if(window.confirm('Remove all added videos from this browser?')){embeddedVideos=[];localStorage.removeItem('yujin_embedded_videos');renderEmbedded();renderTagFilterBar();renderAdminList();}});
-  
-  document.getElementById('adminPanel').addEventListener('click',function(e){
-    var b=e.target.closest('[data-remove-video]');
-    if(b){
-      embeddedVideos.splice(Number(b.dataset.removeVideo),1);
-      localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos));
+  document.getElementById('logoutAdminBtn').addEventListener('click', function(){ adminPanel.classList.remove('is-open'); });
+
+  // Streamlined Quick Add Video Functionality
+  document.getElementById('quickAddVideoBtn').addEventListener('click', function(){
+    var rawUrl = document.getElementById('quickVideoUrl').value;
+    var id = youtubeId(rawUrl);
+    if(!id){ window.alert('Please enter a valid YouTube link or 11-character video ID.'); return; }
+
+    var selectedService = document.getElementById('quickVideoService').value;
+
+    // Fetch details automatically from YouTube
+    fetchYouTubeMetadata(id).catch(function(){ return fetchYouTubeTitleFallback(id); }).then(function(info){
+      embeddedVideos.unshift({
+        id: id,
+        title: info.title || 'YouTube Video',
+        description: info.description || '',
+        service: selectedService,
+        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : '$30')),
+        tags: [selectedService]
+      });
+
+      localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
+      document.getElementById('quickVideoUrl').value = '';
+      renderEmbedded();
+      renderTagFilterBar();
+      renderAdminList();
+      window.alert('Video successfully added!');
+    }).catch(function(){
+      window.alert('Could not fetch YouTube metadata, but added video using default settings.');
+    });
+  });
+
+  // Admin Event Delegations for Deleting & Updating
+  document.getElementById('adminPanel').addEventListener('click', function(e){
+    var removeEmbeddedBtn = e.target.closest('[data-remove-video]');
+    if(removeEmbeddedBtn){
+      var idx = Number(removeEmbeddedBtn.dataset.removeVideo);
+      embeddedVideos.splice(idx, 1);
+      localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
       renderEmbedded();
       renderTagFilterBar();
       renderAdminList();
       return;
     }
 
+    var removeMainBtn = e.target.closest('[data-remove-main-work]');
+    if(removeMainBtn){
+      var id = removeMainBtn.dataset.removeMainWork;
+      var workIdx = videos.indexOf(id);
+      if(workIdx !== -1){
+        videos.splice(workIdx, 1);
+        renderWorks();
+        renderTagFilterBar();
+        renderAdminList();
+      }
+      return;
+    }
+
     var wlBtn = e.target.closest('[data-remove-waitlist]');
     if(wlBtn){
-      waitlistEntries.splice(Number(wlBtn.dataset.removeWaitlist),1);
+      waitlistEntries.splice(Number(wlBtn.dataset.removeWaitlist), 1);
       saveWaitlist();
       renderWaitlist();
       renderAdminList();
@@ -1526,25 +1607,6 @@ renderWaitlist();
       renderWaitlist();
       renderAdminList();
       return;
-    }
-
-    var saveWorkBtn = e.target.closest('[data-save-work-tag]');
-    if(saveWorkBtn){
-      var workId = saveWorkBtn.dataset.saveWorkTag;
-      var select = document.querySelector('[data-work-tag-select="'+workId+'"]');
-      if(select){
-        var selectedTags = Array.prototype.slice.call(select.options)
-          .filter(function(opt){ return opt.selected; })
-          .map(function(opt){ return opt.value; });
-
-        if(!workMetadata[workId]) workMetadata[workId] = {};
-        workMetadata[workId].tags = selectedTags;
-        saveWorkMetadata();
-        renderWorks();
-        renderTagFilterBar();
-        renderAdminList();
-        window.alert('Tags saved for work: ' + workId);
-      }
     }
   });
 
