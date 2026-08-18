@@ -692,6 +692,21 @@
         <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Puppet Animation', 30)" data-i18n="price_cta">Inquire</button>
       </div>
 
+      <div class="price-card">
+        <div class="price-moon"><span class="moon" style="--phase:.5"></span><small data-i18n="phase_2">First Quarter</small></div>
+        <h3 data-i18n="tier_custom_anim">Custom Animation</h3>
+        <p class="price-amount">$50</p>
+        <p class="price-note" data-i18n="custom_anim_note">Per project / scene</p>
+        <ul class="price-features">
+          <li data-i18n="custom_feat_1">Tailored motion &amp; custom effects</li>
+          <li data-i18n="custom_feat_2">Frame-by-frame / custom rigging</li>
+          <li data-i18n="custom_feat_3">High-quality compositing</li>
+          <li data-i18n="custom_feat_4">Flexible delivery scope</li>
+        </ul>
+        <p class="price-eta">ETA · 2–3 weeks</p>
+        <button type="button" class="btn btn-ghost btn-block" onclick="openPaymentModal('Custom Animation', 50)" data-i18n="price_cta">Inquire</button>
+      </div>
+
     </div>
   </div>
 </section>
@@ -808,6 +823,7 @@
             <option value="MV Complex">MV Complex ($300)</option>
             <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore ($30)</option>
             <option value="Puppet Animation">Puppet Animation ($30)</option>
+            <option value="Custom Animation">Custom Animation ($50)</option>
           </select>
           <button type="button" class="btn btn-primary" id="quickAddVideoBtn">+ Add Video</button>
         </div>
@@ -1220,34 +1236,29 @@ renderWaitlist();
     "MV Simple",
     "MV Complex",
     "Debut Trailer / PV / Lore",
-    "Puppet Animation"
+    "Puppet Animation",
+    "Custom Animation"
   ];
 
   // Service tags for each main portfolio work, baked directly into the page.
-  // This is the single source of truth for the floating tag badges + filter
-  // bar, so every visitor sees the same tags — not just whoever's browser
-  // happened to have them saved in localStorage.
-  // To change a tag: open the Admin panel (Ctrl+Shift+A) -> Video Manager,
-  // pick a new tag from a work's dropdown, then click "Copy Tags Config" and
-  // paste the result over this object in index.html before redeploying.
-var WORK_TAGS = {
+  var WORK_TAGS = {
     "16WINlkPlS0": ["MV Complex"],
     "NwRnEmjJ7ak": ["MV Complex"],
     "kfwqchOXdQw": ["MV Simple"],
     "SsYEiOru_Jc": ["MV Complex"],
-    "rIfANo1yyB0": ["Custom"],
+    "rIfANo1yyB0": ["Custom Animation"],
     "CFeyOj00IeI": ["MV Simple"],
     "5E269noR-XQ": ["MV Simple"],
     "CEKaqofk724": ["Debut Trailer / PV / Lore"],
     "qwSQep_MGYA": ["Debut Trailer / PV / Lore"],
     "dOJLJ1ZKbZA": ["MV Simple"],
-    "sl086KEDgkc": ["Custom"],
+    "sl086KEDgkc": ["Custom Animation"],
     "9huQNtIPPSo": ["Puppet Animation"],
     "qIluf5UaLto": ["MV Complex"],
     "Zxa_zHYC3Gg": ["MV Complex"],
     "BLz32DZ7UyQ": ["Puppet Animation"],
     "gXrc7fBdIoE": ["Puppet Animation"],
-    "pN3eaPwghnw": ["Custom"],
+    "pN3eaPwghnw": ["Custom Animation"],
     "3apE2XB31vY": ["Debut Trailer / PV / Lore"],
     "DgFNTIWB01c": ["Debut Trailer / PV / Lore"],
     "TgpJKNIXVTg": ["Debut Trailer / PV / Lore"],
@@ -1255,15 +1266,10 @@ var WORK_TAGS = {
     "iNo1h9zCsyo": ["Puppet Animation"],
     "7Bj82MA62kc": ["MV Complex"],
     "ELoZRxNhE5Y": ["Debut Trailer / PV / Lore"],
-    "BLYdjq50ISE": ["Custom"]
+    "BLYdjq50ISE": ["Custom Animation"]
   };
   
-  // Local admin draft: tag edits made in the Admin panel are stored here
-  // (via the "Save Changes" button) so they survive a page refresh in this
-  // browser. This is only a personal working copy for editing — visitors,
-  // and this browser too until you save, still see the WORK_TAGS baked in
-  // above. Use "Copy Tags Config" + redeploy to make a draft permanent and
-  // visible to everyone.
+  // Local admin draft storage
   var WORK_TAGS_DRAFT_KEY = 'yujin_admin_work_tags_draft';
   (function applySavedWorkTagsDraft(){
     try{
@@ -1333,17 +1339,12 @@ var WORK_TAGS = {
     }).join('') || '<p style="color:var(--text-muted)">No works match the selected tag.</p>';
   }
 
-  // Builds the filter bar from every tag actually in use across the works
-  // (service tiers + any custom tags), not just the fixed TAG_OPTIONS list,
-  // so custom tags become filterable too. Service tiers (TAG_OPTIONS) are
-  // always listed first in their fixed order; custom tags follow in the
-  // order they're first encountered.
   function getAllUsedTags(){
     var seen = {};
     var customOrdered = [];
     videos.forEach(function(id){
       (WORK_TAGS[id] || []).forEach(function(t){
-        if(TAG_OPTIONS.indexOf(t) !== -1) return; // service tiers handled separately, below
+        if(TAG_OPTIONS.indexOf(t) !== -1) return;
         var k = t.toLowerCase();
         if(!seen[k]){ seen[k] = true; customOrdered.push(t); }
       });
@@ -1433,7 +1434,13 @@ var WORK_TAGS = {
   // Bind Floating Direct Order Button Inside Video Modal
   document.getElementById('videoModalOrderBtn').addEventListener('click', function(){
     var targetService = (currentModalItem && currentModalItem.service) || 'MV Simple';
-    var priceMap = { 'MV Simple': 100, 'MV Complex': 300, 'Debut Trailer / PV / Lore': 30, 'Puppet Animation': 30 };
+    var priceMap = { 
+      'MV Simple': 100, 
+      'MV Complex': 300, 
+      'Debut Trailer / PV / Lore': 30, 
+      'Puppet Animation': 30,
+      'Custom Animation': 50
+    };
     var targetPrice = priceMap[targetService] || 100;
 
     closeVideoModal();
@@ -1546,7 +1553,6 @@ var WORK_TAGS = {
           + '</div>';
       }).join('');
 
-
       videoGrid.innerHTML = embeddedCards + mainWorksCards || '<p style="color:var(--text-muted);">No videos available in gallery.</p>';
     }
 
@@ -1593,14 +1599,13 @@ var WORK_TAGS = {
 
     var selectedService = document.getElementById('quickVideoService').value;
 
-    // Fetch details automatically from YouTube
     fetchYouTubeMetadata(id).catch(function(){ return fetchYouTubeTitleFallback(id); }).then(function(info){
       embeddedVideos.unshift({
         id: id,
         title: info.title || 'YouTube Video',
         description: info.description || '',
         service: selectedService,
-        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : '$30')),
+        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : (selectedService === 'Custom Animation' ? '$50' : '$30'))),
         tags: [selectedService]
       });
 
@@ -1614,7 +1619,6 @@ var WORK_TAGS = {
     });
   });
 
-  // Helper: split a "tag1, tag2" input into a clean, deduped array.
   function parseCustomTags(str, excludeTag){
     var seen = {};
     if(excludeTag) seen[excludeTag.toLowerCase()] = true;
@@ -1627,11 +1631,6 @@ var WORK_TAGS = {
     });
   }
 
-  // Live-update a work's tags when the admin picks a new service from its
-  // dropdown or edits its custom tags field. This updates WORK_TAGS in
-  // memory (so the change previews immediately in this browser), but it
-  // does NOT persist for other visitors on its own — use "Copy Tags
-  // Config" below to make it permanent.
   document.getElementById('adminPanel').addEventListener('change', function(e){
     var tagSelect = e.target.closest('[data-main-work-tag]');
     if(tagSelect){
@@ -1654,9 +1653,6 @@ var WORK_TAGS = {
     }
   });
 
-  // Save the current WORK_TAGS state into this browser's localStorage so
-  // it survives a page refresh, instead of always falling back to the
-  // defaults baked into the file.
   var saveTagsBtn = document.getElementById('saveTagsChangesBtn');
   if(saveTagsBtn){
     saveTagsBtn.addEventListener('click', function(){
@@ -1669,8 +1665,6 @@ var WORK_TAGS = {
     });
   }
 
-  // Discard the locally saved draft and revert to whatever is baked into
-  // WORK_TAGS in the file.
   var resetTagsBtn = document.getElementById('resetTagsDraftBtn');
   if(resetTagsBtn){
     resetTagsBtn.addEventListener('click', function(){
@@ -1680,9 +1674,6 @@ var WORK_TAGS = {
     });
   }
 
-  // Export the current WORK_TAGS object as pasteable source code, so tag
-  // changes made here can be committed to index.html and redeployed —
-  // making them visible to every visitor, not just this browser.
   var copyTagsBtn = document.getElementById('copyTagsConfigBtn');
   if(copyTagsBtn){
     copyTagsBtn.addEventListener('click', function(){
@@ -1791,6 +1782,12 @@ var WORK_TAGS = {
     phase_3:{en:"Full Moon",jp:"満月"},
     phase_4:{en:"New Moon",jp:"新月"},
     phase_5:{en:"Waxing Gibbous",jp:"十三夜月"},
+    tier_custom_anim:{en:"Custom Animation",jp:"カスタムアニメーション"},
+    custom_anim_note:{en:"Per project / scene",jp:"プロジェクト / シーン単位"},
+    custom_feat_1:{en:"Tailored motion & custom effects",jp:"ご要望に応じたモーション & カスタムエフェクト"},
+    custom_feat_2:{en:"Frame-by-frame / custom rigging",jp:"フレームバイフレーム / カスタムリギング"},
+    custom_feat_3:{en:"High-quality compositing",jp:"高品質コンポジット"},
+    custom_feat_4:{en:"Flexible delivery scope",jp:"柔軟な納品仕様"},
     modal_order_btn:{en:"Inquire & Order This Service",jp:"このサービスを依頼・注文する"},
     modal_inquire_title:{en:"Inquire & Reserve Slot",jp:"お問合せ・制作枠の予約"},
     modal_inquire_sub:{en:"Fill out your details, select add-ons per TOS, and complete payment to automatically enter the waitlist queue.",jp:"詳細を入力し、規約オプションを選択の上決済を完了すると、自動的にウェイティングリストに登録されます。"},
@@ -1847,7 +1844,6 @@ var WORK_TAGS = {
       if (dict[key]) el.textContent = dict[key][lang];
     });
 
-    // Translate Placeholders
     document.getElementById('inqName').placeholder = lang === 'jp' ? 'お名前 / ハンドルネーム *' : 'Your Name / Handle *';
     document.getElementById('inqCompany').placeholder = lang === 'jp' ? '会社名 / VTuber事務所名 (任意)' : 'Company / VTuber Agency Name (Optional)';
     document.getElementById('inqEmail').placeholder = lang === 'jp' ? 'メールアドレス *' : 'Your Email Address *';
