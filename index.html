@@ -401,7 +401,7 @@
           <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore — $30</option>
           <option value="Puppet Animation">Puppet Animation — $30</option>
         </select>
-        <textarea id="videoDescriptionInput" class="full" placeholder="YouTube description (paste it here; YouTube does not expose descriptions through its public oEmbed endpoint)"></textarea>
+        <textarea id="videoDescriptionInput" class="full" placeholder="YouTube description (auto-fetched from YouTube; you can edit/override it)"></textarea>
         <input id="videoPriceInput" placeholder="Price" readonly>
         <input id="videoTagsInput" placeholder="Tags, comma separated">
         <input id="videoCtaTextInput" placeholder="CTA text">
@@ -598,15 +598,43 @@
   window.addEventListener('resize', updatePhase);
   updatePhase();
 
-  // ---------- works gallery (click opens modal; existing works preserved) ----------
+  // ---------- works gallery (all existing works auto-load YouTube metadata) ----------
   var videos = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
   var gallery = document.getElementById('gallery');
-  gallery.innerHTML = videos.map(function(id, i){
-    return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open work '+(i+1)+'">'
-      + '<span class="reel-edge"></span><span class="thumb-wrap">'
-      + '<img loading="lazy" src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="Work sample '+(i+1)+'">'
-      + '<span class="play-glyph"></span></span><span class="reel-edge"></span></button>';
-  }).join('');
+  var workMetadata = JSON.parse(localStorage.getItem('yujin_work_youtube_metadata') || '{}');
+  function saveWorkMetadata(){ localStorage.setItem('yujin_work_youtube_metadata', JSON.stringify(workMetadata)); }
+  function workTitle(id, i){ return (workMetadata[id] && workMetadata[id].title) || ('Work '+(i+1)); }
+  function renderWorks(){
+    gallery.innerHTML = videos.map(function(id, i){
+      var meta=workMetadata[id]||{};
+      return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open '+escapeHtml(workTitle(id,i))+'">'
+        + '<span class="reel-edge"></span><span class="thumb-wrap">'
+        + '<img loading="lazy" src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="'+escapeHtml(workTitle(id,i))+'">'
+        + '<span class="play-glyph"></span></span><span class="reel-edge"></span>'
+        + '<span class="reel-title" style="display:block;padding:.65rem .8rem .8rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(workTitle(id,i))+'</span></button>';
+    }).join('');
+  }
+  function fetchYouTubeMetadata(id){
+    if(workMetadata[id] && workMetadata[id].title && workMetadata[id].description !== undefined){
+      return Promise.resolve(workMetadata[id]);
+    }
+    return fetch('/api/youtube?videoId='+encodeURIComponent(id), {headers:{'Accept':'application/json'}})
+      .then(function(r){ if(!r.ok) throw new Error('YouTube metadata unavailable'); return r.json(); })
+      .then(function(data){
+        var meta={title:data.title||'',description:data.description||'',publishedAt:data.publishedAt||'',channelTitle:data.channelTitle||''};
+        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); return meta;
+      });
+  }
+  function fetchYouTubeTitleFallback(id){
+    return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
+      .then(function(r){return r.json();})
+      .then(function(info){
+        var meta={title:info.title||'',description:'',channelTitle:info.author_name||''};
+        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); return meta;
+      });
+  }
+
+  renderWorks();
 
   function openVideoModal(item){
     var modal=document.getElementById('videoModal');
@@ -618,7 +646,7 @@
     var tags=document.getElementById('videoModalTags');
     var cta=document.getElementById('videoModalCta');
     title.textContent=item.title||'YouTube Video';
-    desc.textContent=item.description||'No YouTube description has been provided for this video.';
+    desc.textContent=item.description || 'Loading YouTube description…';
     service.textContent=item.service ? 'SERVICE · '+item.service : '';
     service.style.display=item.service?'block':'none';
     price.textContent=item.price ? 'PRICE · '+item.price : '';
@@ -642,14 +670,30 @@
   gallery.addEventListener('click', function(e){
     var card=e.target.closest('.reel-card'); if(!card) return;
     var id=card.dataset.id;
-    openVideoModal({id:id,title:'Loading YouTube title…',description:'',tags:[]});
-    fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
-      .then(function(r){return r.json();})
-      .then(function(info){
-        var t=document.getElementById('videoModalTitle');
-        if(t && document.getElementById('videoModal').classList.contains('is-open')) t.textContent=info.title||'YouTube Video';
-      }).catch(function(){});
+    var meta=workMetadata[id]||{};
+    openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:[]});
+    fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);}).then(function(info){
+      var modal=document.getElementById('videoModal');
+      if(modal && modal.classList.contains('is-open')){
+        document.getElementById('videoModalTitle').textContent=info.title||'YouTube Video';
+        document.getElementById('videoModalDescription').textContent=info.description||'No YouTube description available.';
+      }
+    }).catch(function(){
+      var modal=document.getElementById('videoModal');
+      if(modal && modal.classList.contains('is-open')) document.getElementById('videoModalDescription').textContent='YouTube description could not be loaded. Please check YOUTUBE_API_KEY.';
+    });
   });
+
+  // Preload all 26 existing Works in small batches. Cached metadata prevents repeat API calls.
+  (function preloadAllWorks(){
+    var queue=videos.slice();
+    function next(){
+      if(!queue.length) return;
+      var batch=queue.splice(0,3);
+      Promise.all(batch.map(function(id){ return fetchYouTubeMetadata(id).catch(function(){ return null; }); })).then(function(){ setTimeout(next,250); });
+    }
+    next();
+  }());
 
   var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
   var embeddedGallery = document.getElementById('embeddedGallery');
@@ -658,13 +702,24 @@
     embeddedGallery.innerHTML=embeddedVideos.map(function(v,i){
       return '<button class="reel-card" type="button" data-embedded-index="'+i+'" aria-label="Open '+escapeHtml(v.title||'video')+'">'
         +'<span class="reel-edge"></span><span class="thumb-wrap"><img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title||'Video')+'"><span class="play-glyph"></span></span>'
-        +'<span class="reel-edge"></span></button>';
+        +'<span class="reel-edge"></span><span class="reel-title" style="display:block;padding:.65rem .8rem .8rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(v.title||'Video')+'</span></button>';
     }).join('') || '<p style="color:var(--text-muted)">No featured videos yet.</p>';
   }
   if(embeddedGallery){
     embeddedGallery.addEventListener('click',function(e){
       var card=e.target.closest('[data-embedded-index]'); if(!card) return;
-      openVideoModal(embeddedVideos[Number(card.dataset.embeddedIndex)]);
+      var item=embeddedVideos[Number(card.dataset.embeddedIndex)];
+      openVideoModal(item);
+      fetchYouTubeMetadata(item.id).then(function(info){
+        var modal=document.getElementById('videoModal');
+        if(modal && modal.classList.contains('is-open')){
+          document.getElementById('videoModalTitle').textContent=info.title||item.title||'YouTube Video';
+          document.getElementById('videoModalDescription').textContent=info.description||item.description||'No YouTube description available.';
+        }
+        item.youtubeTitle=info.title||item.youtubeTitle||'';
+        item.youtubeDescription=info.description||item.youtubeDescription||'';
+        if(info.description && !item.description){ item.description=info.description; localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); }
+      }).catch(function(){});
     });
     renderEmbedded();
   }
@@ -701,17 +756,22 @@
   });
   document.getElementById('videoUrlInput').addEventListener('change',function(){
     var id=youtubeId(this.value); if(!id)return;
-    fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
-      .then(function(r){return r.json();})
+    var titleInput=document.getElementById('videoTitleInput');
+    var descInput=document.getElementById('videoDescriptionInput');
+    titleInput.value='Loading YouTube title…';
+    descInput.value='Loading YouTube description…';
+    fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);})
       .then(function(info){
-        var input=document.getElementById('videoTitleInput');
-        if(!input.value.trim()) input.value=info.title||'';
-      }).catch(function(){});
+        if(!titleInput.value || titleInput.value==='Loading YouTube title…') titleInput.value=info.title||'';
+        if(!descInput.value || descInput.value==='Loading YouTube description…') descInput.value=info.description||'';
+      }).catch(function(){
+        titleInput.value=''; descInput.value='';
+      });
   });
   document.getElementById('addVideoBtn').addEventListener('click',function(){
     var id=youtubeId(document.getElementById('videoUrlInput').value);
     if(!id){window.alert('Enter a valid YouTube URL or 11-character video ID.');return;}
-    embeddedVideos.push({id:id,title:document.getElementById('videoTitleInput').value.trim()||'Video',description:document.getElementById('videoDescriptionInput').value.trim(),service:document.getElementById('videoServiceInput').value,price:document.getElementById('videoPriceInput').value.trim(),tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),ctaText:document.getElementById('videoCtaTextInput').value.trim(),ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()});
+    embeddedVideos.push({id:id,title:document.getElementById('videoTitleInput').value.trim()||'Video',description:document.getElementById('videoDescriptionInput').value.trim(),youtubeTitle:document.getElementById('videoTitleInput').value.trim(),youtubeDescription:document.getElementById('videoDescriptionInput').value.trim(),service:document.getElementById('videoServiceInput').value,price:document.getElementById('videoPriceInput').value.trim(),tags:document.getElementById('videoTagsInput').value.split(',').map(function(x){return x.trim();}).filter(Boolean),ctaText:document.getElementById('videoCtaTextInput').value.trim(),ctaUrl:document.getElementById('videoCtaUrlInput').value.trim()});
     localStorage.setItem('yujin_embedded_videos',JSON.stringify(embeddedVideos)); renderEmbedded(); renderAdminList();
   });
   document.getElementById('clearVideoBtn').addEventListener('click',function(){if(window.confirm('Remove all added videos from this browser?')){embeddedVideos=[];localStorage.removeItem('yujin_embedded_videos');renderEmbedded();renderAdminList();}});
