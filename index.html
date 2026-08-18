@@ -1767,6 +1767,9 @@ var WORK_TAGS = {
       var workIdx = videos.indexOf(id);
       if(workIdx !== -1){
         videos.splice(workIdx, 1);
+        delete WORK_TAGS[id];
+        delete workMetadata[id];
+        saveWorkMetadata();
         renderWorks();
         renderTagFilterBar();
         renderAdminList();
