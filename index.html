@@ -1445,12 +1445,19 @@ renderWaitlist();
     return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
       .then(function(r){return r.json();})
       .then(function(info){
+        var defaultDesc = (info.author_name ? 'Channel: ' + info.author_name + '\n' : '') + 'Watch on YouTube: https://www.youtube.com/watch?v=' + id;
         var meta={
           title:info.title||'',
-          description:'',
+          description:defaultDesc,
           channelTitle:info.author_name||''
         };
-        workMetadata[id]=meta; renderWorks(); return meta;
+        workMetadata[id]=meta; 
+        renderWorks(); 
+        return meta;
+      }).catch(function(){
+        var meta={ title:'', description:'Watch on YouTube: https://www.youtube.com/watch?v=' + id, channelTitle:'' };
+        workMetadata[id]=meta;
+        return meta;
       });
   }
 
@@ -1471,7 +1478,7 @@ renderWaitlist();
     var cta=document.getElementById('videoModalCta');
     
     title.textContent=item.title||'YouTube Video';
-    desc.textContent=item.description || 'Loading video details…';
+    desc.textContent=item.description || ('Watch on YouTube: https://www.youtube.com/watch?v=' + item.id);
     service.textContent=item.service ? 'SERVICE · '+item.service : '';
     service.style.display=item.service?'block':'none';
     price.textContent=item.price ? 'PRICE · '+item.price : '';
@@ -1516,11 +1523,14 @@ renderWaitlist();
     var workTags = WORK_TAGS[id] || [];
     var detectedService = workTags[0] || 'MV Simple';
 
-    openVideoModal({id:id,title:meta.title||'Loading title…',description:meta.description||'',tags:workTags,service:detectedService});
+    openVideoModal({id:id,title:meta.title||'Loading title…',description:meta.description||('Watch on YouTube: https://www.youtube.com/watch?v=' + id),tags:workTags,service:detectedService});
     fetchYouTubeMetadata(id).then(function(info){
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
         document.getElementById('videoModalTitle').textContent=info.title||'YouTube Video';
+        if(info.description) {
+          document.getElementById('videoModalDescription').textContent=info.description;
+        }
       }
     });
   });
