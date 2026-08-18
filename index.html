@@ -16,6 +16,9 @@
 <!-- PayPal SDK Integration -->
 <script src="https://www.paypal.com/sdk/js?client-id=BAAnbHzcIYU_4RZTawb0AxKVfFazyHzcrnIadOF0ZCibxPbKRjqmaUR5YW9aGc57S2DlOSFM1NYs3fiyYM&currency=USD"></script>
 
+<!-- Supabase JS Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
   :root{
     --bg:#090714;
@@ -261,7 +264,6 @@
   .video-tag{font:500 .7rem 'IBM Plex Mono',monospace;padding:.35rem .65rem;border:1px solid rgba(201,182,255,0.3);border-radius:999px;color:var(--accent-moon);background:rgba(201,182,255,0.08);}
   .video-service{font:500 .72rem 'IBM Plex Mono',monospace;color:var(--accent-moon);margin-bottom:.35rem;letter-spacing:.04em;}.video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
   
-  /* Floating / Sticky Order Action Bar Inside Works Modal */
   .modal-actions-bar{
     position:sticky;bottom:0;left:0;right:0;z-index:5;
     display:flex;gap:1rem;flex-wrap:wrap;align-items:center;
@@ -273,12 +275,10 @@
     box-shadow:0 -10px 25px rgba(0,0,0,0.5);
   }
 
-  /* Payment & Inquiry Form Modal */
   .payment-modal-card{width:min(620px,100%);max-height:92vh;overflow-y:auto;padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
   .payment-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;margin-bottom:.3rem;}
   .payment-subtitle{color:var(--text-muted);font-size:.88rem;margin-bottom:1.2rem;}
   
-  /* Form Controls inside Inquiry Modal */
   .inquiry-form{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem;}
   .inquiry-form .full{grid-column:1/-1;}
   .inquiry-form input, .inquiry-form textarea{
@@ -296,7 +296,6 @@
   .field-group{display:flex;flex-direction:column;gap:4px;}
   .field-label{font-size:.78rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;}
   
-  /* Add-on Checkbox List Styling */
   .addons-container{
     display:grid;gap:.6rem;background:rgba(0,0,0,0.25);padding:1rem;border-radius:14px;border:1px solid var(--line);
   }
@@ -308,7 +307,6 @@
     accent-color:var(--accent-gold);width:16px;height:16px;cursor:pointer;
   }
   
-  /* File Upload Styling */
   .file-input-wrapper{
     border:1px dashed var(--line);border-radius:12px;padding:.8rem 1rem;
     background:rgba(255,255,255,0.01);text-align:center;cursor:pointer;
@@ -324,7 +322,6 @@
     accent-color:var(--accent-gold);width:16px;height:16px;margin-top:2px;cursor:pointer;
   }
 
-  /* Deposit Selector Toggle */
   .deposit-toggle-container{
     display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem;
     background:rgba(0,0,0,0.25);padding:6px;border-radius:14px;border:1px solid var(--line);
@@ -340,7 +337,7 @@
   }
   .deposit-btn.is-selected strong{color:var(--accent-gold);}
 
-  /* ---------- waitlist section & WIP progress ---------- */
+  /* ---------- waitlist section ---------- */
   .waitlist-card{
     background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;
     padding:2.2rem;box-shadow:var(--shadow-card);max-width:880px;margin:0 auto;
@@ -357,7 +354,6 @@
   .waitlist-item-num{color:var(--accent-gold);font-weight:700;margin-right:.6rem;}
   .waitlist-meta{font-size:.78rem;color:var(--text-muted);}
 
-  /* 3-Phase WIP Progress Bar */
   .wip-tracker{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.2rem;}
   .wip-step{
     padding:.5rem .6rem;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--line);
@@ -370,14 +366,13 @@
     background:rgba(122,239,173,0.12);border-color:var(--accent-green);color:var(--accent-green);font-weight:600;
   }
   
-  /* Status Badges */
   .status-badge{
     font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:.3rem .7rem;border-radius:999px;font-weight:600;
   }
   .status-badge.in-progress{background:rgba(239,193,122,0.15);color:var(--accent-gold);border:1px solid var(--accent-gold);}
   .status-badge.completed{background:rgba(122,239,173,0.15);color:var(--accent-green);border:1px solid var(--accent-green);}
 
-  /* ---------- Admin Panel Styles ---------- */
+  /* ---------- Admin Panel ---------- */
   .admin-wrapper{max-width:var(--container);margin:0 auto;padding:0 clamp(1.25rem, 5vw, 2.5rem);}
   .admin-panel{
     display:none;margin-top:2.5rem;padding:2rem;background:var(--bg-panel);
@@ -390,7 +385,6 @@
   }
   .admin-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.8rem;color:var(--accent-gold);}
   
-  /* Admin Nav Tabs */
   .admin-tabs{display:flex;gap:.6rem;margin-bottom:1.5rem;border-bottom:1px solid var(--line);padding-bottom:.8rem;}
   .admin-tab-btn{
     font-family:'IBM Plex Mono',monospace;font-size:.82rem;padding:.5rem 1.1rem;
@@ -404,7 +398,6 @@
   .admin-tab-content{display:none;}
   .admin-tab-content.is-active{display:block;}
 
-  /* Streamlined Quick Add Card */
   .admin-add-card{
     background:var(--bg-panel-2);border:1px solid var(--line-active);border-radius:18px;
     padding:1.5rem;margin-bottom:2rem;
@@ -428,7 +421,6 @@
     border-color:var(--accent-gold);box-shadow:0 0 12px rgba(239,193,122,0.2);outline:none;
   }
 
-  /* Admin Video Items Grid */
   .admin-video-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:1.2rem;}
   .admin-video-card{
     background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;
@@ -445,7 +437,7 @@
   }
   .admin-video-actions{padding:.8rem 1rem;border-top:1px solid var(--line);display:flex;justify-content:flex-end;}
 
-  /* ---------- works / reel gallery ---------- */
+  /* ---------- works gallery ---------- */
   .works{background:var(--bg-panel);}
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.6rem;}
   .reel-card{
@@ -467,7 +459,6 @@
   .thumb-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
   .reel-card:hover .thumb-wrap img{transform:scale(1.04);}
   
-  /* Floating Service Tag Overlay on Top of Video Thumbnails */
   .thumb-tags-overlay{
     position:absolute;top:10px;left:10px;z-index:2;
     display:flex;flex-wrap:wrap;gap:5px;max-width:calc(100% - 20px);
@@ -490,10 +481,7 @@
   }
   .play-glyph::after{content:'';border-style:solid;border-width:8px 0 8px 14px;border-color:transparent transparent transparent var(--text);margin-left:4px;}
   .reel-card:hover .play-glyph{border-color:var(--accent-gold);background:rgba(239,193,122,0.2);transform:scale(1.1);}
-  .reel-card.is-playing .thumb-wrap,.reel-card.is-playing{cursor:default;}
-  .reel-card iframe{width:100%;aspect-ratio:16/9;display:block;border:0;}
 
-  /* Tag Filter Buttons Bar */
   .tag-filter-bar{
     display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:2rem;
   }
@@ -542,12 +530,10 @@
   .accordion ul li:last-child{margin-bottom:0;}
   .tos-intro{color:var(--text-muted);max-width:68ch;margin:-1rem 0 2.5rem;font-size:1rem;}
 
-  /* ---------- contact ---------- */
   .contact{background:var(--bg-panel);}
   .contact .section-inner{text-align:center;}
   .contact p{color:var(--text-muted);max-width:46ch;margin:0 auto 2.2rem;font-size:1rem;}
 
-  /* ---------- footer ---------- */
   .footer{
     text-align:center;padding:2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom));
     font-family:'IBM Plex Mono',monospace;font-size:.76rem;color:var(--text-muted);
@@ -622,9 +608,7 @@
     <span class="eyebrow" data-i18n="works_eyebrow">Selected videos</span>
     <h2 class="section-title" data-i18n="works_title">Works</h2>
     
-    <!-- Dynamic Tag Filter Bar -->
     <div class="tag-filter-bar" id="tagFilterBar"></div>
-
     <div class="gallery" id="gallery"></div>
   </div>
 </section>
@@ -711,7 +695,6 @@
   </div>
 </section>
 
-<!-- Automatic Public Waitlist Section (Shows Paid Commissions Only) -->
 <section id="waitlist" class="works">
   <div class="section-inner">
     <span class="eyebrow" data-i18n="waitlist_eyebrow">Active Commission Queue</span>
@@ -792,18 +775,17 @@
   </div>
 </section>
 
-<!-- Private Admin Panel Container (Shortcut: Ctrl + Shift + A to open) -->
+<!-- Admin Panel Container (Ctrl + Shift + A to open) -->
 <div class="admin-wrapper">
   <div id="adminPanel" class="admin-panel">
     <div class="admin-header">
       <div>
         <h3 class="admin-title">Studio Dashboard</h3>
-        <p style="font-size:.82rem;color:var(--text-muted);">Simplified Video Management &amp; Waitlist Tracker</p>
+        <p style="font-size:.82rem;color:var(--text-muted);">Supabase Live Video Management &amp; Waitlist Queue</p>
       </div>
       <button type="button" class="btn btn-ghost" id="logoutAdminBtn">🔒 Lock Admin</button>
     </div>
 
-    <!-- Navigation Tabs -->
     <div class="admin-tabs">
       <button type="button" class="admin-tab-btn is-active" onclick="switchAdminTab('videos')">🎬 Video Manager</button>
       <button type="button" class="admin-tab-btn" onclick="switchAdminTab('waitlist')">📋 Waitlist Queue</button>
@@ -811,10 +793,9 @@
 
     <!-- Tab 1: Video Manager -->
     <div id="tabAdminVideos" class="admin-tab-content is-active">
-      <!-- Quick Add Form (Only Link & Service Tier Required) -->
       <div class="admin-add-card">
-        <h4>Add New Video</h4>
-        <p>Paste any YouTube URL or Video ID and select its service tier. Titles, descriptions, and thumbnails are automatically fetched.</p>
+        <h4>Add New Video to Supabase</h4>
+        <p>Paste any YouTube URL or Video ID and select its service tier. Changes instantly sync to Supabase!</p>
         
         <div class="admin-add-form">
           <input id="quickVideoUrl" placeholder="Paste YouTube Link or Video ID (e.g. https://youtu.be/...) *">
@@ -829,15 +810,10 @@
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
-        <strong style="display:block;font-size:1.05rem;color:var(--text);">Active Video Gallery</strong>
-        <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
-          <button type="button" class="btn btn-ghost" id="resetTagsDraftBtn" title="Discard locally saved tag edits and go back to what's baked into index.html">↺ Reset</button>
-          <button type="button" class="btn btn-primary" id="saveTagsChangesBtn" title="Save tag edits in this browser so they survive a refresh">💾 Save Changes</button>
-          <button type="button" class="btn btn-ghost" id="copyTagsConfigBtn" title="Copy the current service tags as code to paste into index.html and deploy for everyone">📋 Copy Tags Config</button>
-        </div>
+      <div style="margin-bottom:1rem;">
+        <strong style="display:block;font-size:1.05rem;color:var(--text);">Active Gallery Videos</strong>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-top:2px;">Edits and deletions are saved directly to Supabase live for all users.</p>
       </div>
-      <p style="font-size:.78rem;color:var(--text-muted);margin-top:-.6rem;margin-bottom:1rem;">Edit tags below, then click "Save Changes" so they stick in this browser after a refresh. When you're happy with them, click "Copy Tags Config" and paste the result into index.html so the change goes live for every visitor.</p>
       <div id="adminVideoGrid" class="admin-video-grid"></div>
     </div>
 
@@ -855,7 +831,7 @@
   <span data-i18n="footer_status">Commissions Open 🌙 — thank you for visiting.</span>
 </footer>
 
-<!-- Works Video Preview Modal with Sticky Floating Order Bar -->
+<!-- Modals -->
 <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
   <div class="video-modal-card">
     <button class="video-modal-close" id="videoModalClose" type="button" aria-label="Close">×</button>
@@ -869,7 +845,6 @@
       <div class="video-price" id="videoModalPrice"></div>
     </div>
 
-    <!-- Floating Sticky Actions Bar -->
     <div class="modal-actions-bar">
       <button type="button" class="btn btn-primary" id="videoModalOrderBtn" data-i18n="modal_order_btn">Inquire &amp; Order This Service</button>
       <a class="btn btn-ghost" id="videoModalCta" href="#" target="_blank" rel="noopener">Learn more</a>
@@ -877,21 +852,18 @@
   </div>
 </div>
 
-<!-- Inquiry Form & Payment Checkout Modal -->
 <div class="video-modal" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
   <div class="payment-modal-card">
     <button class="video-modal-close" id="paymentModalClose" type="button" aria-label="Close">×</button>
     <h3 class="payment-title" id="paymentModalTitle" data-i18n="modal_inquire_title">Inquire &amp; Reserve Slot</h3>
     <p class="payment-subtitle" id="paymentModalSubtitle" data-i18n="modal_inquire_sub">Fill out your details, select add-ons per TOS, and complete payment to automatically enter the waitlist queue.</p>
 
-    <!-- Client Inquiry Form -->
     <div class="inquiry-form">
       <input type="text" id="inqName" placeholder="Your Name / Handle *" required>
       <input type="text" id="inqCompany" placeholder="Company / VTuber Agency Name (Optional)">
       <input type="email" id="inqEmail" placeholder="Your Email Address *" required>
       <input type="text" id="inqSocial" placeholder="Social Media e.g. @Twitter Handle *" required>
       
-      <!-- Deadline Picker Input -->
       <div class="field-group full">
         <label class="field-label" id="deadlineLabel" data-i18n="inq_deadline_label">Target Deadline / Preferred Delivery Date (Optional):</label>
         <input type="date" id="inqDeadline">
@@ -899,7 +871,6 @@
 
       <textarea id="inqDesc" class="full" placeholder="Project Brief & Description (Optional)"></textarea>
       
-      <!-- Add-on Checkboxes Driven by TOS -->
       <div class="full addons-container">
         <strong style="font-size:.82rem;color:var(--accent-gold);display:block;margin-bottom:2px;" data-i18n="addons_header">TOS Add-ons &amp; Custom Options:</strong>
         
@@ -919,13 +890,11 @@
         </label>
       </div>
 
-      <!-- File Attachment Input -->
       <div class="full file-input-wrapper">
         <label for="inqAttachment" id="fileLabel" data-i18n="file_upload_label">📎 Upload Brief / Asset Attachment (Optional)</label>
         <input type="file" id="inqAttachment" onchange="updateFileNameDisplay(this)">
       </div>
 
-      <!-- Required TOS Checkbox -->
       <div class="full">
         <label class="tos-checkbox-label">
           <input type="checkbox" id="inqTosCheck" onchange="validateInquiryForm()">
@@ -934,7 +903,6 @@
       </div>
     </div>
 
-    <!-- 50% Deposit vs Full Payment Selector -->
     <div class="deposit-toggle-container" id="depositToggleContainer">
       <button type="button" class="deposit-btn is-selected" id="btnDeposit50" onclick="setPaymentMode('deposit')">
         <strong id="deposit50Label">50% Deposit</strong>
@@ -946,13 +914,93 @@
       </button>
     </div>
 
-    <!-- PayPal Buttons Container -->
     <div id="paypal-button-container"></div>
   </div>
 </div>
 
 <script>
-// PayPal & Inquiry Form Modal State
+// Supabase Setup
+const SUPABASE_URL = "https://glbfboefoxoimjuwmokm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsYmZib2Vmb3hvaW1qdXdtb2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNjExMDcsImV4cCI6MjEwMjYzNzEwN30.4StsNio8agFm9J0Rz9qddEPk7C93A5yRTZKKW7tsKOA"; // Replace with your public/anon key from Supabase Dashboard
+
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+var videos = [];
+var WORK_TAGS = {};
+var workMetadata = {};
+
+var TAG_OPTIONS = [
+  "MV Simple",
+  "MV Complex",
+  "Debut Trailer / PV / Lore",
+  "Puppet Animation",
+  "Custom Animation"
+];
+
+// Load works automatically from Supabase
+async function loadWorksFromSupabase() {
+  if(!supabaseClient) return;
+  
+  const { data, error } = await supabaseClient
+    .from('works')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (!error && data && data.length > 0) {
+    videos = data.map(item => item.id);
+    WORK_TAGS = {};
+    workMetadata = {};
+
+    data.forEach(item => {
+      WORK_TAGS[item.id] = item.tags && item.tags.length ? item.tags : [item.service || 'MV Simple'];
+      workMetadata[item.id] = { title: item.title || '' };
+    });
+
+    renderWorks();
+    renderTagFilterBar();
+    if(typeof renderAdminList === 'function') renderAdminList();
+  }
+}
+
+// Add/Update video in Supabase
+async function saveVideoToSupabase(id, title, service, tags) {
+  if(!supabaseClient) return;
+  const { error } = await supabaseClient
+    .from('works')
+    .upsert({ id: id, title: title, service: service, tags: tags });
+
+  if (error) {
+    console.error('Supabase Upsert Error:', error);
+    alert('Error saving to Supabase: ' + error.message);
+  } else {
+    loadWorksFromSupabase();
+  }
+}
+
+// Delete video from Supabase
+async function deleteVideoFromSupabase(id) {
+  if(!supabaseClient) return;
+  const { error } = await supabaseClient
+    .from('works')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Supabase Delete Error:', error);
+    alert('Error deleting from Supabase: ' + error.message);
+  } else {
+    var idx = videos.indexOf(id);
+    if(idx !== -1) videos.splice(idx, 1);
+    delete WORK_TAGS[id];
+    delete workMetadata[id];
+    
+    renderWorks();
+    renderTagFilterBar();
+    if(typeof renderAdminList === 'function') renderAdminList();
+  }
+}
+
+// Global Modal State
 var currentService = '';
 var currentBasePrice = 0;
 var isDepositMode = true;
@@ -965,7 +1013,6 @@ function openPaymentModal(serviceName, priceNum) {
   var titleEl = document.getElementById('paymentModalTitle');
   titleEl.textContent = (document.documentElement.lang === 'jp' ? 'お問合せ・枠確保 — ' : 'Inquire — ') + currentService;
   
-  // Reset Form & Add-ons
   document.getElementById('inqName').value = '';
   document.getElementById('inqCompany').value = '';
   document.getElementById('inqEmail').value = '';
@@ -1024,15 +1071,15 @@ function updateDepositUI() {
   var addonsList = [];
 
   if (document.getElementById('addonCommercial').checked) {
-    multiplier += 1.0; // +100%
+    multiplier += 1.0;
     addonsList.push('Commercial Use');
   }
   if (document.getElementById('addonRush').checked) {
-    multiplier += 0.5; // +50%
+    multiplier += 0.5;
     addonsList.push('Rush Fee');
   }
   if (document.getElementById('addonNda').checked) {
-    multiplier += 0.3; // +30%
+    multiplier += 0.3;
     addonsList.push('Strict NDA');
   }
 
@@ -1105,13 +1152,9 @@ function validateInquiryForm() {
   var social = document.getElementById('inqSocial').value.trim();
   var tos = document.getElementById('inqTosCheck').checked;
 
-  if(!name || !email || !social || !tos) {
-    return false;
-  }
-  return true;
+  return (name && email && social && tos);
 }
 
-// Function to send email notification to yujinybwork@gmail.com
 async function sendInquiryEmail(orderData) {
   try {
     var formData = new FormData();
@@ -1211,7 +1254,6 @@ function renderPayPalButtons(amount, label) {
         renderWaitlist();
         if(typeof renderAdminList === 'function') renderAdminList();
 
-        // Dispatch Email Notification to yujinybwork@gmail.com
         sendInquiryEmail(orderPayload);
 
         var isJp = document.documentElement.lang === 'jp';
@@ -1237,7 +1279,7 @@ function closePaymentModal() {
 document.getElementById('paymentModalClose').addEventListener('click', closePaymentModal);
 document.getElementById('paymentModal').addEventListener('click', function(e){ if(e.target===this) closePaymentModal(); });
 
-// Automatic Waitlist System (Paid Clients Only)
+// Waitlist Queue
 var waitlistEntries = JSON.parse(localStorage.getItem('yujin_waitlist_entries') || '[]');
 
 function saveWaitlist(){
@@ -1287,56 +1329,6 @@ function renderWaitlist(){
 renderWaitlist();
 
 (function(){
-  // Predefined Tag options
-  var TAG_OPTIONS = [
-    "MV Simple",
-    "MV Complex",
-    "Debut Trailer / PV / Lore",
-    "Puppet Animation",
-    "Custom Animation"
-  ];
-
-  // Service tags for each main portfolio work, baked directly into the page.
-var WORK_TAGS = {
-    "16WINlkPlS0": ["MV Complex"],
-    "NwRnEmjJ7ak": ["MV Complex"],
-    "kfwqchOXdQw": ["MV Simple"],
-    "SsYEiOru_Jc": ["MV Complex"],
-    "rIfANo1yyB0": ["Custom Animation"],
-    "CFeyOj00IeI": ["MV Simple"],
-    "5E269noR-XQ": ["MV Simple"],
-    "CEKaqofk724": ["Debut Trailer / PV / Lore"],
-    "qwSQep_MGYA": ["Debut Trailer / PV / Lore"],
-    "dOJLJ1ZKbZA": ["MV Simple"],
-    "sl086KEDgkc": ["Custom Animation"],
-    "9huQNtIPPSo": ["Puppet Animation"],
-    "qIluf5UaLto": ["MV Complex"],
-    "Zxa_zHYC3Gg": ["MV Complex"],
-    "BLz32DZ7UyQ": ["Puppet Animation"],
-    "gXrc7fBdIoE": ["Puppet Animation"],
-    "pN3eaPwghnw": ["Custom Animation"],
-    "3apE2XB31vY": ["Debut Trailer / PV / Lore"],
-    "DgFNTIWB01c": ["Debut Trailer / PV / Lore"],
-    "TgpJKNIXVTg": ["Debut Trailer / PV / Lore"],
-    "WDi4V10TtQg": ["Debut Trailer / PV / Lore"],
-    "iNo1h9zCsyo": ["Puppet Animation"],
-    "7Bj82MA62kc": ["MV Complex"],
-    "ELoZRxNhE5Y": ["Debut Trailer / PV / Lore"],
-    "BLYdjq50ISE": ["Custom Animation"]
-  };
-  
-  // Local admin draft storage
-  var WORK_TAGS_DRAFT_KEY = 'yujin_admin_work_tags_draft';
-  (function applySavedWorkTagsDraft(){
-    try{
-      var saved = JSON.parse(localStorage.getItem(WORK_TAGS_DRAFT_KEY) || 'null');
-      if(saved){
-        Object.keys(saved).forEach(function(id){ WORK_TAGS[id] = saved[id]; });
-      }
-    }catch(e){}
-  }());
-
-  // ---------- mobile nav ----------
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
   navToggle.addEventListener('click', function(){
@@ -1350,7 +1342,6 @@ var WORK_TAGS = {
     });
   });
 
-  // ---------- moon-phase scroll rail ----------
   var railMoon = document.querySelector('.moon-rail .moon');
   function updatePhase(){
     var scrollable = document.body.scrollHeight - window.innerHeight;
@@ -1361,16 +1352,12 @@ var WORK_TAGS = {
   window.addEventListener('resize', updatePhase);
   updatePhase();
 
-  // ---------- works gallery ----------
-  var videos = ["16WINlkPlS0","NwRnEmjJ7ak","kfwqchOXdQw","SsYEiOru_Jc","rIfANo1yyB0","CFeyOj00IeI","5E269noR-XQ","CEKaqofk724","qwSQep_MGYA","dOJLJ1ZKbZA","sl086KEDgkc","9huQNtIPPSo","AX8RwWD_qPY","qIluf5UaLto","Zxa_zHYC3Gg","BLz32DZ7UyQ","gXrc7fBdIoE","pN3eaPwghnw","3apE2XB31vY","DgFNTIWB01c","TgpJKNIXVTg","WDi4V10TtQg","iNo1h9zCsyo","7Bj82MA62kc","ELoZRxNhE5Y","BLYdjq50ISE"];
   var gallery = document.getElementById('gallery');
-  var workMetadata = JSON.parse(localStorage.getItem('yujin_work_youtube_metadata') || '{}');
   var activeFilterTag = 'all';
 
-  function saveWorkMetadata(){ localStorage.setItem('yujin_work_youtube_metadata', JSON.stringify(workMetadata)); }
   function workTitle(id, i){ return (workMetadata[id] && workMetadata[id].title) || ('Work '+(i+1)); }
 
-  function renderWorks(){
+  window.renderWorks = function(){
     var filtered = videos.filter(function(id){
       if (activeFilterTag === 'all') return true;
       var tags = WORK_TAGS[id] || [];
@@ -1393,7 +1380,7 @@ var WORK_TAGS = {
         + '<span class="reel-title" style="display:block;padding:.85rem .9rem;text-align:left;font-size:.9rem;color:var(--text);font-weight:500;">'+escapeHtml(workTitle(id,i))+'</span>'
         + '</button>';
     }).join('') || '<p style="color:var(--text-muted)">No works match the selected tag.</p>';
-  }
+  };
 
   function getAllUsedTags(){
     var seen = {};
@@ -1408,7 +1395,7 @@ var WORK_TAGS = {
     return TAG_OPTIONS.concat(customOrdered);
   }
 
-  function renderTagFilterBar(){
+  window.renderTagFilterBar = function(){
     var filterBar = document.getElementById('tagFilterBar');
     if (!filterBar) return;
 
@@ -1416,7 +1403,7 @@ var WORK_TAGS = {
       + getAllUsedTags().map(function(t){
         return '<button type="button" class="tag-filter-btn '+(activeFilterTag === t ? 'is-active' : '')+'" data-tag="'+escapeHtml(t)+'">'+escapeHtml(t)+'</button>';
       }).join('');
-  }
+  };
 
   document.getElementById('tagFilterBar').addEventListener('click', function(e){
     var btn = e.target.closest('.tag-filter-btn');
@@ -1430,19 +1417,6 @@ var WORK_TAGS = {
     if(workMetadata[id] && workMetadata[id].title && workMetadata[id].description !== undefined){
       return Promise.resolve(workMetadata[id]);
     }
-    return fetch('/api/youtube?videoId='+encodeURIComponent(id), {headers:{'Accept':'application/json'}})
-      .then(function(r){ if(!r.ok) throw new Error('YouTube metadata unavailable'); return r.json(); })
-      .then(function(data){
-        var meta={
-          title:data.title||'',
-          description:data.description||'',
-          publishedAt:data.publishedAt||'',
-          channelTitle:data.channelTitle||''
-        };
-        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
-      });
-  }
-  function fetchYouTubeTitleFallback(id){
     return fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v='+encodeURIComponent(id)+'&format=json')
       .then(function(r){return r.json();})
       .then(function(info){
@@ -1451,12 +1425,12 @@ var WORK_TAGS = {
           description:'',
           channelTitle:info.author_name||''
         };
-        workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
+        workMetadata[id]=meta; renderWorks(); return meta;
       });
   }
 
-  renderWorks();
-  renderTagFilterBar();
+  // Load from Supabase on startup
+  loadWorksFromSupabase();
 
   var currentModalItem = null;
 
@@ -1472,7 +1446,7 @@ var WORK_TAGS = {
     var cta=document.getElementById('videoModalCta');
     
     title.textContent=item.title||'YouTube Video';
-    desc.textContent=item.description || 'Loading YouTube description…';
+    desc.textContent=item.description || 'Loading video details…';
     service.textContent=item.service ? 'SERVICE · '+item.service : '';
     service.style.display=item.service?'block':'none';
     price.textContent=item.price ? 'PRICE · '+item.price : '';
@@ -1487,7 +1461,6 @@ var WORK_TAGS = {
     document.body.style.overflow='hidden';
   }
 
-  // Bind Floating Direct Order Button Inside Video Modal
   document.getElementById('videoModalOrderBtn').addEventListener('click', function(){
     var targetService = (currentModalItem && currentModalItem.service) || 'MV Simple';
     var priceMap = { 
@@ -1518,33 +1491,16 @@ var WORK_TAGS = {
     var workTags = WORK_TAGS[id] || [];
     var detectedService = workTags[0] || 'MV Simple';
 
-    openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:workTags,service:detectedService});
-    fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);}).then(function(info){
+    openVideoModal({id:id,title:meta.title||'Loading title…',description:meta.description||'',tags:workTags,service:detectedService});
+    fetchYouTubeMetadata(id).then(function(info){
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
         document.getElementById('videoModalTitle').textContent=info.title||'YouTube Video';
-        document.getElementById('videoModalDescription').textContent=info.description||'No YouTube description available.';
       }
-    }).catch(function(){
-      var modal=document.getElementById('videoModal');
-      if(modal && modal.classList.contains('is-open')) document.getElementById('videoModalDescription').textContent='YouTube description could not be loaded. Please check YOUTUBE_API_KEY.';
     });
   });
 
-  // Preload works
-  (function preloadAllWorks(){
-    var queue=videos.slice();
-    function next(){
-      if(!queue.length) return;
-      var batch=queue.splice(0,3);
-      Promise.all(batch.map(function(id){ return fetchYouTubeMetadata(id).catch(function(){ return null; }); })).then(function(){ setTimeout(next,250); });
-    }
-    next();
-  }());
-
-  var embeddedVideos = JSON.parse(localStorage.getItem('yujin_embedded_videos') || '[]');
-
-  // ---------- Redesigned Private Video & Waitlist Manager ----------
+  // Admin Dashboard
   var adminPanel = document.getElementById('adminPanel');
   var ADMIN_PASSWORD = 'YujinAdmin-7Qm4!';
 
@@ -1570,27 +1526,9 @@ var WORK_TAGS = {
   window.renderAdminList = function(){
     var videoGrid = document.getElementById('adminVideoGrid');
     if(videoGrid){
-      // Render Added Embedded Videos
-      var embeddedCards = embeddedVideos.map(function(v, i){
-        var tagBadge = (v.tags && v.tags[0]) ? '<span class="admin-video-badge">'+escapeHtml(v.tags[0])+'</span>' : '';
-        return '<div class="admin-video-card">'
-          + '<div class="admin-video-thumb"><img src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title)+'"/></div>'
-          + '<div class="admin-video-details">'
-          + tagBadge
-          + '<strong>'+escapeHtml(v.title || 'YouTube Video')+'</strong>'
-          + '<small style="color:var(--text-muted);font-family:\'IBM Plex Mono\',monospace;">ID: '+escapeHtml(v.id)+'</small>'
-          + '</div>'
-          + '<div class="admin-video-actions">'
-          + '<button class="btn btn-danger" type="button" data-remove-video="'+i+'">Remove</button>'
-          + '</div>'
-          + '</div>';
-      }).join('');
-
-      // Render Default Portfolio Works
-      var mainWorksCards = videos.map(function(id, i){
+      var cards = videos.map(function(id, i){
         var workTagsArr = WORK_TAGS[id] || [];
         var curTag = workTagsArr[0] || 'MV Simple';
-        var customTagsStr = workTagsArr.slice(1).join(', ');
         var tagSelectOptions = TAG_OPTIONS.map(function(t){
           return '<option value="'+escapeHtml(t)+'" '+(t===curTag?'selected':'')+'>'+escapeHtml(t)+'</option>';
         }).join('');
@@ -1601,18 +1539,16 @@ var WORK_TAGS = {
           + '<select class="admin-video-badge" style="width:auto;padding:3px 8px;" data-main-work-tag="'+id+'">'+tagSelectOptions+'</select>'
           + '<strong>'+escapeHtml(workTitle(id, i))+'</strong>'
           + '<small style="color:var(--text-muted);font-family:\'IBM Plex Mono\',monospace;">ID: '+id+'</small>'
-          + '<input type="text" class="admin-custom-tags-input" style="padding:.4rem .6rem;font-size:.76rem;" data-main-work-custom-tags="'+id+'" placeholder="Custom tags, comma separated" value="'+escapeHtml(customTagsStr)+'">'
           + '</div>'
           + '<div class="admin-video-actions">'
-          + '<button class="btn btn-danger" type="button" data-remove-main-work="'+id+'">Remove</button>'
+          + '<button class="btn btn-danger" type="button" data-remove-work="'+id+'">Remove</button>'
           + '</div>'
           + '</div>';
       }).join('');
 
-      videoGrid.innerHTML = embeddedCards + mainWorksCards || '<p style="color:var(--text-muted);">No videos available in gallery.</p>';
+      videoGrid.innerHTML = cards || '<p style="color:var(--text-muted);">No videos currently in Supabase database.</p>';
     }
 
-    // Render Admin Waitlist Queue
     var wlList = document.getElementById('adminWaitlistList');
     if(wlList){
       wlList.innerHTML = waitlistEntries.map(function(item, i){
@@ -1647,7 +1583,7 @@ var WORK_TAGS = {
   });
   document.getElementById('logoutAdminBtn').addEventListener('click', function(){ adminPanel.classList.remove('is-open'); });
 
-  // Streamlined Quick Add Video Functionality
+  // Add new video to Supabase
   document.getElementById('quickAddVideoBtn').addEventListener('click', function(){
     var rawUrl = document.getElementById('quickVideoUrl').value;
     var id = youtubeId(rawUrl);
@@ -1655,123 +1591,34 @@ var WORK_TAGS = {
 
     var selectedService = document.getElementById('quickVideoService').value;
 
-    fetchYouTubeMetadata(id).catch(function(){ return fetchYouTubeTitleFallback(id); }).then(function(info){
-      embeddedVideos.unshift({
-        id: id,
-        title: info.title || 'YouTube Video',
-        description: info.description || '',
-        service: selectedService,
-        price: (selectedService === 'MV Complex' ? '$300' : (selectedService === 'MV Simple' ? '$100' : (selectedService === 'Custom Animation' ? 'Custom Quote' : '$30'))),
-        tags: [selectedService]
-      });
-
-      localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
+    fetchYouTubeMetadata(id).then(function(info){
+      saveVideoToSupabase(id, info.title || 'YouTube Video', selectedService, [selectedService]);
       document.getElementById('quickVideoUrl').value = '';
-      renderTagFilterBar();
-      renderAdminList();
-      window.alert('Video successfully added!');
+      window.alert('Video successfully added to Supabase!');
     }).catch(function(){
-      window.alert('Could not fetch YouTube metadata, but added video using default settings.');
+      saveVideoToSupabase(id, 'YouTube Video', selectedService, [selectedService]);
+      document.getElementById('quickVideoUrl').value = '';
+      window.alert('Video added to Supabase using default title.');
     });
   });
 
-  function parseCustomTags(str, excludeTag){
-    var seen = {};
-    if(excludeTag) seen[excludeTag.toLowerCase()] = true;
-    return String(str||'').split(',').map(function(t){ return t.trim(); }).filter(function(t){
-      if(!t) return false;
-      var k = t.toLowerCase();
-      if(seen[k]) return false;
-      seen[k] = true;
-      return true;
-    });
-  }
-
+  // Admin Tag Selector Handler (Updates Supabase)
   document.getElementById('adminPanel').addEventListener('change', function(e){
     var tagSelect = e.target.closest('[data-main-work-tag]');
     if(tagSelect){
       var id = tagSelect.dataset.mainWorkTag;
-      var customTags = (WORK_TAGS[id] || []).slice(1);
-      WORK_TAGS[id] = [tagSelect.value].concat(customTags);
-      renderWorks();
-      renderTagFilterBar();
-      return;
-    }
-
-    var customInput = e.target.closest('[data-main-work-custom-tags]');
-    if(customInput){
-      var cid = customInput.dataset.mainWorkCustomTags;
-      var serviceTag = (WORK_TAGS[cid] && WORK_TAGS[cid][0]) || TAG_OPTIONS[0];
-      WORK_TAGS[cid] = [serviceTag].concat(parseCustomTags(customInput.value, serviceTag));
-      renderWorks();
-      renderTagFilterBar();
-      return;
+      var selectedService = tagSelect.value;
+      saveVideoToSupabase(id, workTitle(id, 0), selectedService, [selectedService]);
     }
   });
 
-  var saveTagsBtn = document.getElementById('saveTagsChangesBtn');
-  if(saveTagsBtn){
-    saveTagsBtn.addEventListener('click', function(){
-      try{
-        localStorage.setItem(WORK_TAGS_DRAFT_KEY, JSON.stringify(WORK_TAGS));
-        window.alert('Saved! These tags will stick around in this browser even after a refresh.\n\nRemember: this only affects your own browser — use "Copy Tags Config" and redeploy to make them visible to every visitor.');
-      }catch(e){
-        window.alert('Could not save changes in this browser (storage may be full or blocked).');
-      }
-    });
-  }
-
-  var resetTagsBtn = document.getElementById('resetTagsDraftBtn');
-  if(resetTagsBtn){
-    resetTagsBtn.addEventListener('click', function(){
-      if(!window.confirm('Discard your locally saved tag edits and revert to the tags baked into index.html?')) return;
-      localStorage.removeItem(WORK_TAGS_DRAFT_KEY);
-      window.location.reload();
-    });
-  }
-
-  var copyTagsBtn = document.getElementById('copyTagsConfigBtn');
-  if(copyTagsBtn){
-    copyTagsBtn.addEventListener('click', function(){
-      var lines = videos.map(function(id){
-        var tags = WORK_TAGS[id] || ['MV Simple'];
-        return '    "'+id+'": '+JSON.stringify(tags)+',';
-      });
-      var code = 'var WORK_TAGS = {\n' + lines.join('\n').replace(/,$/, '') + '\n  };';
-      var done = function(){ window.alert('Tags config copied! Paste it over the WORK_TAGS object in index.html and redeploy so every visitor sees these tags.'); };
-      var fail = function(){ window.prompt('Copy this and paste it over the WORK_TAGS object in index.html:', code); };
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(code).then(done).catch(fail);
-      } else {
-        fail();
-      }
-    });
-  }
-
-  // Admin Event Delegations for Deleting & Updating
+  // Admin Click Handlers
   document.getElementById('adminPanel').addEventListener('click', function(e){
-    var removeEmbeddedBtn = e.target.closest('[data-remove-video]');
-    if(removeEmbeddedBtn){
-      var idx = Number(removeEmbeddedBtn.dataset.removeVideo);
-      embeddedVideos.splice(idx, 1);
-      localStorage.setItem('yujin_embedded_videos', JSON.stringify(embeddedVideos));
-      renderTagFilterBar();
-      renderAdminList();
-      return;
-    }
-
-    var removeMainBtn = e.target.closest('[data-remove-main-work]');
-    if(removeMainBtn){
-      var id = removeMainBtn.dataset.removeMainWork;
-      var workIdx = videos.indexOf(id);
-      if(workIdx !== -1){
-        videos.splice(workIdx, 1);
-        delete WORK_TAGS[id];
-        delete workMetadata[id];
-        saveWorkMetadata();
-        renderWorks();
-        renderTagFilterBar();
-        renderAdminList();
+    var removeBtn = e.target.closest('[data-remove-work]');
+    if(removeBtn){
+      var id = removeBtn.dataset.removeWork;
+      if(window.confirm('Delete video ' + id + ' from Supabase database?')){
+        deleteVideoFromSupabase(id);
       }
       return;
     }
@@ -1811,7 +1658,7 @@ var WORK_TAGS = {
   document.getElementById('videoModal').addEventListener('click',function(e){if(e.target===this)closeVideoModal();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeVideoModal();closePaymentModal();}});
 
-  // ---------- EN / JP toggle dictionary ----------
+  // Dictionary for EN / JP Toggle
   var dict = {
     nav_home:{en:"Home",jp:"ホーム"},
     nav_works:{en:"Works",jp:"作品"},
