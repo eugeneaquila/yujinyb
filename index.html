@@ -251,7 +251,7 @@
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem;}
   .reel-card{
     display:block;width:100%;background:var(--bg-panel-2);border-radius:14px;overflow:hidden;
-    border:1px solid var(--line);text-align:left;
+    border:1px solid var(--line);text-align:left;position:relative;
   }
   .reel-edge{
     display:block;height:9px;
@@ -259,29 +259,33 @@
     background-size:15px 9px,100% 100%;
     background-repeat:repeat-x,no-repeat;
   }
-  .thumb-wrap{position:relative;aspect-ratio:16/9;background:#000;}
+  .thumb-wrap{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;}
   .thumb-wrap img{width:100%;height:100%;object-fit:cover;}
+  
+  /* Floating Service Tag Overlay on Top of Video Thumbnails */
+  .thumb-tags-overlay{
+    position:absolute;top:8px;left:8px;z-index:2;
+    display:flex;flex-wrap:wrap;gap:4px;max-width:calc(100% - 16px);
+    pointer-events:none;
+  }
+  .thumb-tag-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:600;
+    padding:3px 8px;border-radius:6px;
+    background:rgba(13,11,26,0.85);backdrop-filter:blur(6px);
+    border:1px solid rgba(239,193,122,0.4);
+    color:var(--accent-gold);box-shadow:0 4px 12px rgba(0,0,0,0.5);
+  }
+
   .play-glyph{
     position:absolute;inset:0;margin:auto;width:48px;height:48px;border-radius:50%;
     background:rgba(13,11,26,.55);backdrop-filter:blur(2px);
     display:flex;align-items:center;justify-content:center;
-    border:1px solid rgba(241,237,251,.35);
+    border:1px solid rgba(241,237,251,.35);z-index:1;
   }
   .play-glyph::after{content:'';border-style:solid;border-width:8px 0 8px 14px;border-color:transparent transparent transparent var(--text);margin-left:4px;}
   .reel-card:hover .play-glyph{border-color:var(--accent-gold);}
   .reel-card.is-playing .thumb-wrap,.reel-card.is-playing{cursor:default;}
   .reel-card iframe{width:100%;aspect-ratio:16/9;display:block;border:0;}
-
-  /* Service tags badge styling */
-  .reel-tags{
-    display:flex;flex-wrap:wrap;gap:4px;padding:0 .8rem .7rem;
-  }
-  .reel-tag-badge{
-    font-family:'IBM Plex Mono',monospace;font-size:.65rem;
-    padding:2px 6px;border-radius:4px;
-    background:rgba(201,182,255,0.1);border:1px solid rgba(201,182,255,0.25);
-    color:var(--accent-moon);
-  }
 
   /* Tag Filter Buttons Bar */
   .tag-filter-bar{
@@ -616,7 +620,7 @@
 
 <script>
 (function(){
-  // Available predefined tags
+  // Predefined Tag options
   var TAG_OPTIONS = [
     "MV Simple",
     "MV Complex",
@@ -668,14 +672,17 @@
     gallery.innerHTML = filtered.map(function(id, i){
       var meta = workMetadata[id] || {};
       var tags = meta.tags || [];
-      var tagsHTML = tags.map(function(t){ return '<span class="reel-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
+      var tagsOverlay = tags.map(function(t){ return '<span class="thumb-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
 
       return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open '+escapeHtml(workTitle(id,i))+'">'
-        + '<span class="reel-edge"></span><span class="thumb-wrap">'
+        + '<span class="reel-edge"></span>'
+        + '<span class="thumb-wrap">'
+        + (tagsOverlay ? '<div class="thumb-tags-overlay">'+tagsOverlay+'</div>' : '')
         + '<img loading="lazy" src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="'+escapeHtml(workTitle(id,i))+'">'
-        + '<span class="play-glyph"></span></span><span class="reel-edge"></span>'
-        + '<span class="reel-title" style="display:block;padding:.65rem .8rem .2rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(workTitle(id,i))+'</span>'
-        + (tagsHTML ? '<div class="reel-tags">'+tagsHTML+'</div>' : '')
+        + '<span class="play-glyph"></span>'
+        + '</span>'
+        + '<span class="reel-edge"></span>'
+        + '<span class="reel-title" style="display:block;padding:.75rem .8rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(workTitle(id,i))+'</span>'
         + '</button>';
     }).join('') || '<p style="color:var(--text-muted)">No works match the selected tag.</p>';
   }
@@ -796,11 +803,16 @@
   function renderEmbedded(){
     if(!embeddedGallery) return;
     embeddedGallery.innerHTML=embeddedVideos.map(function(v,i){
-      var tagsHTML = (v.tags || []).map(function(t){ return '<span class="reel-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
+      var tagsOverlay = (v.tags || []).map(function(t){ return '<span class="thumb-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
       return '<button class="reel-card" type="button" data-embedded-index="'+i+'" aria-label="Open '+escapeHtml(v.title||'video')+'">'
-        +'<span class="reel-edge"></span><span class="thumb-wrap"><img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title||'Video')+'"><span class="play-glyph"></span></span>'
-        +'<span class="reel-edge"></span><span class="reel-title" style="display:block;padding:.65rem .8rem .2rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(v.title||'Video')+'</span>'
-        +(tagsHTML ? '<div class="reel-tags">'+tagsHTML+'</div>' : '')
+        +'<span class="reel-edge"></span>'
+        +'<span class="thumb-wrap">'
+        +(tagsOverlay ? '<div class="thumb-tags-overlay">'+tagsOverlay+'</div>' : '')
+        +'<img loading="lazy" src="https://i.ytimg.com/vi/'+encodeURIComponent(v.id)+'/hqdefault.jpg" alt="'+escapeHtml(v.title||'Video')+'">'
+        +'<span class="play-glyph"></span>'
+        +'</span>'
+        +'<span class="reel-edge"></span>'
+        +'<span class="reel-title" style="display:block;padding:.75rem .8rem;text-align:left;font-size:.9rem;color:var(--text);">'+escapeHtml(v.title||'Video')+'</span>'
         +'</button>';
     }).join('') || '<p style="color:var(--text-muted)">No featured videos yet.</p>';
   }
