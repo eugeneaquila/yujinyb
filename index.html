@@ -632,7 +632,7 @@
       <a href="#tos" data-i18n="nav_tos">TOS</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
       
-      <!-- User Auth Profile Widget / Login Button -->
+      <!-- User Auth Navigation Avatar Widget -->
       <div id="authNavContainer">
         <button type="button" class="btn btn-ghost btn-auth" onclick="openAuthModal()" style="padding:.45rem clamp(.8rem, 2vw, 1.1rem);font-size:.82rem;">🔑 <span data-i18n="nav_login">Login</span></button>
       </div>
@@ -1071,9 +1071,17 @@
 
 <script>
 // Supabase Auth Configuration
-const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co';
+const SUPABASE_URL = 'https://glbfboefoxoimjuwmokm.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+var supabase = null;
+
+try {
+  if (window.supabase && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch (e) {
+  console.warn('Supabase initialization skipped:', e);
+}
 
 var currentUser = JSON.parse(localStorage.getItem('yujin_logged_user') || 'null');
 
@@ -1172,11 +1180,15 @@ function loginAsYujinAdmin() {
 
 async function loginWithGoogle() {
   if (supabase) {
-    await supabase.auth.signInWithOAuth({ provider: 'google' });
-  } else {
-    // Fallback Admin Login
-    loginAsYujinAdmin();
+    try {
+      await supabase.auth.signInWithOAuth({ provider: 'google' });
+      return;
+    } catch (err) {
+      console.warn('Google OAuth login error:', err);
+    }
   }
+  // Fallback Admin / Client Local Session Login
+  loginAsYujinAdmin();
 }
 
 function loginWithEmail() {
@@ -1442,84 +1454,88 @@ function renderPayPalButtons(amount, label) {
   container.innerHTML = '';
 
   if (window.paypal) {
-    paypal.Buttons({
-      style: {
-        shape: 'rect',
-        color: 'gold',
-        layout: 'vertical',
-        label: 'paypal'
-      },
-      onClick: function(data, actions) {
-        if(!validateInquiryForm()) {
+    try {
+      paypal.Buttons({
+        style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'paypal'
+        },
+        onClick: function(data, actions) {
+          if(!validateInquiryForm()) {
+            var isJp = document.documentElement.lang === 'jp';
+            alert(isJp ? 'お名前、メールアドレス、SNSアカウントを入力し、利用規約に同意してください。' : 'Please fill out your Name, Email, Social Media Handle, and accept the Terms of Service before proceeding to payment.');
+            return actions.reject();
+          }
+          return actions.resolve();
+        },
+        createOrder: async function() {
+          const response = await fetch('/api/paypal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: amount,
+              service: label
+            })
+          });
+          const order = await response.json();
+          return order.id;
+        },
+        onApprove: async function(data, actions) {
+          const details = await actions.order.capture();
+          
+          var name = document.getElementById('inqName').value.trim();
+          var company = document.getElementById('inqCompany').value.trim();
+          var email = document.getElementById('inqEmail').value.trim();
+          var social = document.getElementById('inqSocial').value.trim();
+          var deadline = document.getElementById('inqDeadline').value;
+          var desc = document.getElementById('inqDesc').value.trim();
+
+          var addonsList = [];
+          if (document.getElementById('addonCommercial').checked) addonsList.push('Commercial');
+          if (document.getElementById('addonRush').checked) addonsList.push('Rush Fee');
+          if (document.getElementById('addonNda').checked) addonsList.push('Strict NDA');
+
+          var orderPayload = {
+            id: 'WL-' + Date.now().toString().slice(-5),
+            name: name,
+            company: company,
+            email: email,
+            social: social,
+            deadline: deadline || 'Flexible',
+            description: desc,
+            service: currentService,
+            addons: addonsList.join(', ') || 'None',
+            paidAmount: '$' + amount,
+            paymentType: isDepositMode ? '50% Deposit' : 'Full Payment',
+            date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+            phase: 1,
+            completed: false
+          };
+
+          waitlistEntries.push(orderPayload);
+          saveWaitlist();
+          renderWaitlist();
+          updateCommissionCounter();
+          if(typeof renderAdminList === 'function') renderAdminList();
+
+          // Dispatch Email Notification to yujinybwork@gmail.com
+          sendInquiryEmail(orderPayload);
+
           var isJp = document.documentElement.lang === 'jp';
-          alert(isJp ? 'お名前、メールアドレス、SNSアカウントを入力し、利用規約に同意してください。' : 'Please fill out your Name, Email, Social Media Handle, and accept the Terms of Service before proceeding to payment.');
-          return actions.reject();
+          alert(isJp 
+            ? 'お支払いが完了しました！ありがとうございます ' + details.payer.name.given_name + ' 様。ご依頼内容が yujinybwork@gmail.com に送信され、ウェイティングリストに登録されました。'
+            : 'Payment successful! Thank you ' + details.payer.name.given_name + '. Your commission inquiry and attachment have been dispatched to yujinybwork@gmail.com and added to the waitlist queue.');
+          closePaymentModal();
+        },
+        onError: function(err) {
+          console.error('PayPal Checkout Error:', err);
         }
-        return actions.resolve();
-      },
-      createOrder: async function() {
-        const response = await fetch('/api/paypal', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: amount,
-            service: label
-          })
-        });
-        const order = await response.json();
-        return order.id;
-      },
-      onApprove: async function(data, actions) {
-        const details = await actions.order.capture();
-        
-        var name = document.getElementById('inqName').value.trim();
-        var company = document.getElementById('inqCompany').value.trim();
-        var email = document.getElementById('inqEmail').value.trim();
-        var social = document.getElementById('inqSocial').value.trim();
-        var deadline = document.getElementById('inqDeadline').value;
-        var desc = document.getElementById('inqDesc').value.trim();
-
-        var addonsList = [];
-        if (document.getElementById('addonCommercial').checked) addonsList.push('Commercial');
-        if (document.getElementById('addonRush').checked) addonsList.push('Rush Fee');
-        if (document.getElementById('addonNda').checked) addonsList.push('Strict NDA');
-
-        var orderPayload = {
-          id: 'WL-' + Date.now().toString().slice(-5),
-          name: name,
-          company: company,
-          email: email,
-          social: social,
-          deadline: deadline || 'Flexible',
-          description: desc,
-          service: currentService,
-          addons: addonsList.join(', ') || 'None',
-          paidAmount: '$' + amount,
-          paymentType: isDepositMode ? '50% Deposit' : 'Full Payment',
-          date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
-          phase: 1,
-          completed: false
-        };
-
-        waitlistEntries.push(orderPayload);
-        saveWaitlist();
-        renderWaitlist();
-        updateCommissionCounter();
-        if(typeof renderAdminList === 'function') renderAdminList();
-
-        // Dispatch Email Notification to yujinybwork@gmail.com
-        sendInquiryEmail(orderPayload);
-
-        var isJp = document.documentElement.lang === 'jp';
-        alert(isJp 
-          ? 'お支払いが完了しました！ありがとうございます ' + details.payer.name.given_name + ' 様。ご依頼内容が yujinybwork@gmail.com に送信され、ウェイティングリストに登録されました。'
-          : 'Payment successful! Thank you ' + details.payer.name.given_name + '. Your commission inquiry and attachment have been dispatched to yujinybwork@gmail.com and added to the waitlist queue.');
-        closePaymentModal();
-      },
-      onError: function(err) {
-        console.error('PayPal Checkout Error:', err);
-      }
-    }).render('#paypal-button-container');
+      }).render('#paypal-button-container');
+    } catch(err) {
+      console.warn('PayPal initialization warning:', err);
+    }
   }
 }
 
