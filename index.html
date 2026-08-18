@@ -28,6 +28,7 @@
     --accent-moon:#C9B6FF;
     --accent-gold:#EFC17A;
     --accent-gold-dim:rgba(239,193,122,0.22);
+    --accent-green:#7AEFAD;
     --nav-h:68px;
     --container:1120px;
     --radius-lg:18px;
@@ -257,14 +258,32 @@
   .video-tag{font:500 .7rem 'IBM Plex Mono',monospace;padding:.35rem .65rem;border:1px solid rgba(201,182,255,0.3);border-radius:999px;color:var(--accent-moon);background:rgba(201,182,255,0.08);}
   .video-service{font:500 .72rem 'IBM Plex Mono',monospace;color:var(--accent-moon);margin-bottom:.35rem;letter-spacing:.04em;}.video-price{font-weight:700;color:var(--accent-gold);margin-bottom:1rem;}
   
-  /* Payment Modal Overrides */
-  .payment-modal-card{width:min(520px,100%);padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
+  /* Payment & Inquiry Form Modal */
+  .payment-modal-card{width:min(580px,100%);max-height:90vh;overflow-y:auto;padding:2rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;position:relative;}
   .payment-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:2rem;margin-bottom:.3rem;}
   .payment-subtitle{color:var(--text-muted);font-size:.88rem;margin-bottom:1.2rem;}
   
+  /* Form Controls inside Inquiry Modal */
+  .inquiry-form{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem;}
+  .inquiry-form .full{grid-column:1/-1;}
+  .inquiry-form input, .inquiry-form textarea{
+    width:100%;padding:.75rem .9rem;border-radius:12px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text);font:inherit;font-size:.88rem;
+  }
+  .inquiry-form input:focus, .inquiry-form textarea:focus{
+    border-color:var(--accent-gold);outline:none;
+  }
+  .tos-checkbox-label{
+    display:flex;align-items:flex-start;gap:.6rem;font-size:.82rem;color:var(--text-muted);
+    cursor:pointer;user-select:none;margin-top:.3rem;
+  }
+  .tos-checkbox-label input[type="checkbox"]{
+    accent-color:var(--accent-gold);width:16px;height:16px;margin-top:2px;cursor:pointer;
+  }
+
   /* Deposit Selector Toggle */
   .deposit-toggle-container{
-    display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.5rem;
+    display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem;
     background:rgba(0,0,0,0.25);padding:6px;border-radius:14px;border:1px solid var(--line);
   }
   .deposit-btn{
@@ -278,28 +297,43 @@
   }
   .deposit-btn.is-selected strong{color:var(--accent-gold);}
 
-  /* ---------- waitlist section ---------- */
+  /* ---------- waitlist section & WIP progress ---------- */
   .waitlist-card{
     background:var(--bg-panel);border:1px solid var(--line-active);border-radius:24px;
-    padding:2.5rem;box-shadow:var(--shadow-card);max-width:720px;margin:0 auto;
+    padding:2.2rem;box-shadow:var(--shadow-card);max-width:880px;margin:0 auto;
   }
-  .waitlist-form{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
-  .waitlist-form .full{grid-column:1/-1;}
-  .waitlist-form input, .waitlist-form select, .waitlist-form textarea{
-    width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);
-    background:var(--bg);color:var(--text);font:inherit;font-size:.9rem;
-  }
-  .waitlist-form input:focus, .waitlist-form select:focus, .waitlist-form textarea:focus{
-    border-color:var(--accent-gold);outline:none;
-  }
-  .waitlist-display{margin-top:2.5rem;display:grid;gap:.8rem;}
+  .waitlist-display{display:grid;gap:1rem;margin-top:1.5rem;}
   .waitlist-item{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:1rem 1.25rem;border-radius:14px;background:var(--bg-panel-2);border:1px solid var(--line);
-    font-family:'IBM Plex Mono',monospace;font-size:.85rem;
+    padding:1.2rem 1.4rem;border-radius:16px;background:var(--bg-panel-2);border:1px solid var(--line);
+    display:flex;flex-direction:column;gap:.8rem;
   }
-  .waitlist-item-num{color:var(--accent-gold);font-weight:700;margin-right:1rem;}
+  .waitlist-item-header{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+    font-family:'IBM Plex Mono',monospace;font-size:.88rem;
+  }
+  .waitlist-item-num{color:var(--accent-gold);font-weight:700;margin-right:.6rem;}
+  .waitlist-meta{font-size:.78rem;color:var(--text-muted);}
+
+  /* 3-Phase WIP Progress Bar */
+  .wip-tracker{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.2rem;}
+  .wip-step{
+    padding:.5rem .6rem;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--line);
+    text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--text-muted);
+  }
+  .wip-step.is-active{
+    background:rgba(201,182,255,0.12);border-color:var(--accent-moon);color:var(--accent-moon);font-weight:600;
+  }
+  .wip-step.is-complete{
+    background:rgba(122,239,173,0.12);border-color:var(--accent-green);color:var(--accent-green);font-weight:600;
+  }
   
+  /* Status Badges */
+  .status-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:.3rem .7rem;border-radius:999px;font-weight:600;
+  }
+  .status-badge.in-progress{background:rgba(239,193,122,0.15);color:var(--accent-gold);border:1px solid var(--accent-gold);}
+  .status-badge.completed{background:rgba(122,239,173,0.15);color:var(--accent-green);border:1px solid var(--accent-green);}
+
   /* ---------- Admin Panel Styles ---------- */
   .admin-panel{display:none;margin-top:2.5rem;padding:1.75rem;background:var(--bg-panel);border:1px solid var(--line-active);border-radius:20px;box-shadow:var(--shadow-card);}
   .admin-panel.is-open{display:block;}
@@ -321,7 +355,7 @@
   .admin-item small{color:var(--text-muted);display:block;margin-top:2px;}
   .admin-actions{display:flex;gap:.6rem;flex-wrap:wrap;}
   .admin-note{font-size:.78rem;color:var(--text-muted);margin-top:.8rem;}
-  @media(max-width:700px){.waitlist-form{grid-template-columns:1fr;}.waitlist-form .full{grid-column:auto;}.admin-grid{grid-template-columns:1fr}.admin-grid .full{grid-column:auto}.video-modal{padding:.6rem}.video-modal-info{padding:1.2rem}.video-modal-info h3{font-size:1.75rem;}}
+  @media(max-width:700px){.inquiry-form{grid-template-columns:1fr;}.inquiry-form .full{grid-column:auto;}.admin-grid{grid-template-columns:1fr}.admin-grid .full{grid-column:auto}.video-modal{padding:.6rem}.video-modal-info{padding:1.2rem}.video-modal-info h3{font-size:1.75rem;}}
 
   /* ---------- works / reel gallery ---------- */
   .works{background:var(--bg-panel);}
@@ -473,7 +507,7 @@
     <h1 class="hero-title"><em data-i18n="hero_title">Hello! It's me, Yujin.</em></h1>
     <p class="hero-tagline" data-i18n="hero_tagline">A space where dreams come to life through magic.</p>
     <div class="hero-actions">
-      <a href="#contact" class="btn btn-primary" data-i18n="hero_cta_order">Order Here</a>
+      <a href="#prices" class="btn btn-primary" data-i18n="hero_cta_order">Order Here</a>
       <a href="#works" class="btn btn-ghost" data-i18n="hero_cta_works">See Works</a>
     </div>
   </div>
@@ -549,9 +583,9 @@
       <div id="adminList" class="admin-list"></div>
 
       <hr style="border-color:var(--line);margin:1.5rem 0;">
-      <strong style="color:var(--accent-gold);">Waitlist Entries:</strong>
+      <strong style="color:var(--accent-gold);display:block;margin-bottom:.5rem;">Waitlist Management (Paid Commissions Only):</strong>
       <div id="adminWaitlist" class="admin-list"></div>
-      <p class="admin-note">Public visitors cannot modify videos or waitlist entries without unlocking admin mode.</p>
+      <p class="admin-note">Only clients who completed payment are automatically registered here. You can update WIP phases (Phase 1, Phase 2, Phase 3) or mark projects as Completed.</p>
     </div>
   </div>
 </section>
@@ -623,33 +657,16 @@
   </div>
 </section>
 
-<!-- Automatic Waitlist Section -->
+<!-- Automatic Public Waitlist Section (Shows Paid Commissions Only) -->
 <section id="waitlist" class="works">
   <div class="section-inner">
-    <span class="eyebrow">Queue &amp; Slot Reservation</span>
-    <h2 class="section-title">Commission Waitlist</h2>
+    <span class="eyebrow">Active Commission Queue</span>
+    <h2 class="section-title">Public Waitlist &amp; Progress</h2>
     
     <div class="waitlist-card">
-      <p style="color:var(--text-muted);font-size:.95rem;">Join the automatic waitlist to save your queue position for upcoming commission openings!</p>
+      <p style="color:var(--text-muted);font-size:.95rem;">This waitlist automatically updates when a client secures a slot via payment. Track WIP progress live across 3 production phases below!</p>
       
-      <form id="waitlistForm" class="waitlist-form">
-        <input type="text" id="wlName" placeholder="Your Name / Handle" required>
-        <input type="email" id="wlEmail" placeholder="Your Email address" required>
-        <select id="wlService" class="full" required>
-          <option value="">Select Desired Service</option>
-          <option value="MV Simple">MV Simple — $100</option>
-          <option value="MV Complex">MV Complex — $300</option>
-          <option value="Debut Trailer / PV / Lore">Debut Trailer / PV / Lore — $30</option>
-          <option value="Puppet Animation">Puppet Animation — $30</option>
-        </select>
-        <textarea id="wlNotes" class="full" placeholder="Project details or special requests (optional)"></textarea>
-        <button type="submit" class="btn btn-primary full">Join Automatic Waitlist</button>
-      </form>
-
-      <div style="margin-top:2.5rem;">
-        <strong style="font-size:1.1rem;color:var(--accent-gold);display:block;margin-bottom:1rem;">Current Public Queue:</strong>
-        <div id="waitlistPublicQueue" class="waitlist-display"></div>
-      </div>
+      <div id="waitlistPublicQueue" class="waitlist-display"></div>
     </div>
   </div>
 </section>
@@ -741,12 +758,29 @@
   </div>
 </div>
 
-<!-- Payment Checkout Modal with 50% Deposit Selector -->
+<!-- Inquiry Form & Payment Checkout Modal -->
 <div class="video-modal" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
   <div class="payment-modal-card">
     <button class="video-modal-close" id="paymentModalClose" type="button" aria-label="Close">×</button>
     <h3 class="payment-title" id="paymentModalTitle">Inquire &amp; Reserve Slot</h3>
-    <p class="payment-subtitle" id="paymentModalSubtitle">Select payment option:</p>
+    <p class="payment-subtitle" id="paymentModalSubtitle">Fill out your details and complete payment to automatically enter the waitlist queue.</p>
+
+    <!-- Client Inquiry Form -->
+    <div class="inquiry-form">
+      <input type="text" id="inqName" placeholder="Your Name / Handle *" required>
+      <input type="text" id="inqCompany" placeholder="Company Name (Optional)">
+      <input type="email" id="inqEmail" placeholder="Your Email Address *" required>
+      <input type="text" id="inqSocial" placeholder="Social Media e.g. @Twitter (Optional)">
+      <textarea id="inqDesc" class="full" placeholder="Project Description / Asset links (Optional)"></textarea>
+      
+      <!-- Required TOS Checkbox -->
+      <div class="full">
+        <label class="tos-checkbox-label">
+          <input type="checkbox" id="inqTosCheck" onchange="validateInquiryForm()">
+          <span>I have read and agree to the <a href="#tos" style="color:var(--accent-gold);text-decoration:underline;" target="_blank">Terms of Service</a> (Required)</span>
+        </label>
+      </div>
+    </div>
 
     <!-- 50% Deposit vs Full Payment Selector -->
     <div class="deposit-toggle-container">
@@ -760,12 +794,13 @@
       </button>
     </div>
 
+    <!-- PayPal Buttons Container -->
     <div id="paypal-button-container"></div>
   </div>
 </div>
 
 <script>
-// PayPal & Payment Modal State
+// PayPal & Inquiry Form Modal State
 var currentService = '';
 var currentFullPrice = 0;
 var isDepositMode = true;
@@ -776,6 +811,15 @@ function openPaymentModal(serviceName, priceNum) {
   isDepositMode = true;
 
   document.getElementById('paymentModalTitle').textContent = 'Inquire — ' + serviceName;
+  
+  // Reset Form
+  document.getElementById('inqName').value = '';
+  document.getElementById('inqCompany').value = '';
+  document.getElementById('inqEmail').value = '';
+  document.getElementById('inqSocial').value = '';
+  document.getElementById('inqDesc').value = '';
+  document.getElementById('inqTosCheck').checked = false;
+
   updateDepositUI();
 
   var modal = document.getElementById('paymentModal');
@@ -799,13 +843,21 @@ function updateDepositUI() {
   document.getElementById('btnDepositFull').classList.toggle('is-selected', !isDepositMode);
 
   var finalPayAmount = isDepositMode ? depositAmount : fullAmount;
-  var descriptionText = isDepositMode 
-    ? 'Pay 50% deposit to secure your slot for ' + currentService
-    : 'Pay full amount for ' + currentService;
-
-  document.getElementById('paymentModalSubtitle').textContent = descriptionText + ' — Total: $' + finalPayAmount + ' USD';
+  
+  document.getElementById('paymentModalSubtitle').textContent = 'Complete inquiry & pay $' + finalPayAmount + ' USD (' + (isDepositMode ? '50% Slot Deposit' : 'Full Payment') + ') to auto-register on the waitlist.';
 
   renderPayPalButtons(finalPayAmount, currentService + (isDepositMode ? ' (50% Deposit)' : ' (Full)'));
+}
+
+function validateInquiryForm() {
+  var name = document.getElementById('inqName').value.trim();
+  var email = document.getElementById('inqEmail').value.trim();
+  var tos = document.getElementById('inqTosCheck').checked;
+
+  if(!name || !email || !tos) {
+    return false;
+  }
+  return true;
 }
 
 function renderPayPalButtons(amount, label) {
@@ -819,6 +871,13 @@ function renderPayPalButtons(amount, label) {
         color: 'gold',
         layout: 'vertical',
         label: 'paypal'
+      },
+      onClick: function(data, actions) {
+        if(!validateInquiryForm()) {
+          alert('Please fill out your Name, Email, and accept the Terms of Service before proceeding to payment.');
+          return actions.reject();
+        }
+        return actions.resolve();
       },
       createOrder: async function() {
         const response = await fetch('/api/paypal', {
@@ -834,7 +893,34 @@ function renderPayPalButtons(amount, label) {
       },
       onApprove: async function(data, actions) {
         const details = await actions.order.capture();
-        alert('Thank you ' + details.payer.name.given_name + '! Your ' + (isDepositMode ? 'slot deposit' : 'payment') + ' of $' + amount + ' was received.');
+        
+        // Auto-add client to waitlist upon successful payment
+        var name = document.getElementById('inqName').value.trim();
+        var company = document.getElementById('inqCompany').value.trim();
+        var email = document.getElementById('inqEmail').value.trim();
+        var social = document.getElementById('inqSocial').value.trim();
+        var desc = document.getElementById('inqDesc').value.trim();
+
+        waitlistEntries.push({
+          id: 'WL-' + Date.now().toString().slice(-5),
+          name: name,
+          company: company,
+          email: email,
+          social: social,
+          description: desc,
+          service: currentService,
+          paidAmount: '$' + amount,
+          paymentType: isDepositMode ? '50% Deposit' : 'Full Payment',
+          date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+          phase: 1, // Phase 1: Storyboard & Roughs, Phase 2: Animation & Compositing, Phase 3: Final Polish
+          completed: false
+        });
+
+        saveWaitlist();
+        renderWaitlist();
+        if(typeof renderAdminList === 'function') renderAdminList();
+
+        alert('Payment successful! Thank you ' + details.payer.name.given_name + '. You have been automatically added to the waitlist queue.');
         closePaymentModal();
       },
       onError: function(err) {
@@ -854,7 +940,7 @@ function closePaymentModal() {
 document.getElementById('paymentModalClose').addEventListener('click', closePaymentModal);
 document.getElementById('paymentModal').addEventListener('click', function(e){ if(e.target===this) closePaymentModal(); });
 
-// Automatic Waitlist System
+// Automatic Waitlist System (Paid Clients Only)
 var waitlistEntries = JSON.parse(localStorage.getItem('yujin_waitlist_entries') || '[]');
 
 function saveWaitlist(){
@@ -866,42 +952,35 @@ function renderWaitlist(){
   if(!queue) return;
 
   if(!waitlistEntries.length){
-    queue.innerHTML = '<p style="color:var(--text-muted);">The waitlist is currently empty. Be the first to claim a spot!</p>';
+    queue.innerHTML = '<p style="color:var(--text-muted);">No active paid commissions in queue. Inquire above to claim the first slot!</p>';
     return;
   }
 
   queue.innerHTML = waitlistEntries.map(function(item, index){
+    var phase1Class = item.phase >= 1 ? (item.phase > 1 ? 'is-complete' : 'is-active') : '';
+    var phase2Class = item.phase >= 2 ? (item.phase > 2 ? 'is-complete' : 'is-active') : '';
+    var phase3Class = item.phase >= 3 ? (item.completed ? 'is-complete' : 'is-active') : '';
+
+    var statusBadge = item.completed 
+      ? '<span class="status-badge completed">✓ Completed</span>'
+      : '<span class="status-badge in-progress">⚡ In Progress (Phase '+item.phase+'/3)</span>';
+
     return '<div class="waitlist-item">'
-      + '<div><span class="waitlist-item-num">#'+(index+1)+'</span> <strong>'+escapeHtml(item.name)+'</strong> <span style="color:var(--text-muted);">('+escapeHtml(item.service)+')</span></div>'
-      + '<span style="color:var(--accent-moon);font-size:.78rem;">Saved Slot</span>'
+      + '<div class="waitlist-item-header">'
+      + '<div><span class="waitlist-item-num">#'+(index+1)+'</span> <strong>'+escapeHtml(item.name)+'</strong> '+ (item.company ? '<small style="color:var(--text-muted)">['+escapeHtml(item.company)+']</small>' : '') +'</div>'
+      + statusBadge
+      + '</div>'
+      + '<div class="waitlist-meta">'
+      + '<strong>Service:</strong> '+escapeHtml(item.service)+' &nbsp;|&nbsp; <strong>Commissioned:</strong> '+escapeHtml(item.date||'N/A')+' &nbsp;|&nbsp; <strong>Status:</strong> '+escapeHtml(item.paymentType||'Paid')
+      + '</div>'
+      + '<div class="wip-tracker">'
+      + '<div class="wip-step '+phase1Class+'">Phase 1: Concept &amp; Storyboard</div>'
+      + '<div class="wip-step '+phase2Class+'">Phase 2: Animation &amp; FX</div>'
+      + '<div class="wip-step '+phase3Class+'">Phase 3: Final Polish &amp; Render</div>'
+      + '</div>'
       + '</div>';
   }).join('');
 }
-
-document.getElementById('waitlistForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  var name = document.getElementById('wlName').value.trim();
-  var email = document.getElementById('wlEmail').value.trim();
-  var service = document.getElementById('wlService').value;
-  var notes = document.getElementById('wlNotes').value.trim();
-
-  if(!name || !email || !service) return;
-
-  waitlistEntries.push({
-    name: name,
-    email: email,
-    service: service,
-    notes: notes,
-    date: new Date().toLocaleDateString()
-  });
-
-  saveWaitlist();
-  renderWaitlist();
-  if(typeof renderAdminList === 'function') renderAdminList();
-
-  alert('You have successfully joined the waitlist! You are #' + waitlistEntries.length + ' in queue.');
-  this.reset();
-});
 
 renderWaitlist();
 
@@ -1121,7 +1200,7 @@ renderWaitlist();
     renderEmbedded();
   }
 
-  // ---------- private video manager ----------
+  // ---------- private video & waitlist manager ----------
   var adminPanel=document.getElementById('adminPanel');
   var ADMIN_PASSWORD='YujinAdmin-7Qm4!';
   function youtubeId(value){
@@ -1151,12 +1230,27 @@ renderWaitlist();
 
     list.innerHTML = embeddedItems + (defaultItems ? '<hr style="border-color:var(--line);margin:1.5rem 0;"><strong style="color:var(--accent-gold);display:block;margin-bottom:.5rem;">Edit Tags for Main Works Gallery (Hold Ctrl/Cmd for multiple):</strong>' + defaultItems : '');
 
-    // Admin waitlist list
+    // Admin waitlist manager
     var wlList = document.getElementById('adminWaitlist');
     if(wlList){
       wlList.innerHTML = waitlistEntries.map(function(item, i){
-        return '<div class="admin-item"><div><strong>#'+(i+1)+' '+escapeHtml(item.name)+' ('+escapeHtml(item.email)+')</strong><small>Service: '+escapeHtml(item.service)+' | Date: '+escapeHtml(item.date||'N/A')+'</small><small>Notes: '+escapeHtml(item.notes||'None')+'</small></div><button class="btn btn-ghost" type="button" data-remove-waitlist="'+i+'">Remove</button></div>';
-      }).join('') || '<p style="color:var(--text-muted);">No waitlist entries.</p>';
+        return '<div class="admin-item">'
+          + '<div>'
+          + '<strong>#'+(i+1)+' '+escapeHtml(item.name)+' ('+escapeHtml(item.email)+')</strong>'
+          + '<small>Company: '+escapeHtml(item.company||'None')+' | Social: '+escapeHtml(item.social||'None')+'</small>'
+          + '<small>Service: '+escapeHtml(item.service)+' | Paid: '+escapeHtml(item.paidAmount)+' ('+escapeHtml(item.paymentType)+') | Date: '+escapeHtml(item.date)+'</small>'
+          + '<small>Desc: '+escapeHtml(item.description||'None')+'</small>'
+          + '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
+          + '<span style="font-size:.75rem;color:var(--text-muted);">Set Progress:</span>'
+          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="1">Phase 1</button>'
+          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="2">Phase 2</button>'
+          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;" type="button" data-set-phase="'+i+'" data-phase-val="3">Phase 3</button>'
+          + '<button class="btn btn-ghost" style="padding:2px 8px;font-size:.7rem;border-color:var(--accent-green);color:var(--accent-green);" type="button" data-toggle-complete="'+i+'">'+(item.completed ? 'Mark In-Progress' : 'Mark Completed')+'</button>'
+          + '</div>'
+          + '</div>'
+          + '<button class="btn btn-ghost" type="button" data-remove-waitlist="'+i+'">Remove</button>'
+          + '</div>';
+      }).join('') || '<p style="color:var(--text-muted);">No paid waitlist entries currently.</p>';
     }
   }
 
@@ -1234,6 +1328,27 @@ renderWaitlist();
     var wlBtn = e.target.closest('[data-remove-waitlist]');
     if(wlBtn){
       waitlistEntries.splice(Number(wlBtn.dataset.removeWaitlist),1);
+      saveWaitlist();
+      renderWaitlist();
+      renderAdminList();
+      return;
+    }
+
+    var phaseBtn = e.target.closest('[data-set-phase]');
+    if(phaseBtn){
+      var idx = Number(phaseBtn.dataset.setPhase);
+      waitlistEntries[idx].phase = Number(phaseBtn.dataset.phaseVal);
+      saveWaitlist();
+      renderWaitlist();
+      renderAdminList();
+      return;
+    }
+
+    var completeBtn = e.target.closest('[data-toggle-complete]');
+    if(completeBtn){
+      var idx = Number(completeBtn.dataset.toggleComplete);
+      waitlistEntries[idx].completed = !waitlistEntries[idx].completed;
+      if(waitlistEntries[idx].completed) waitlistEntries[idx].phase = 3;
       saveWaitlist();
       renderWaitlist();
       renderAdminList();
