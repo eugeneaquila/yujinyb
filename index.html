@@ -813,7 +813,11 @@
         </div>
       </div>
 
-      <strong style="display:block;font-size:1.05rem;color:var(--text);margin-bottom:1rem;">Active Video Gallery</strong>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <strong style="display:block;font-size:1.05rem;color:var(--text);">Active Video Gallery</strong>
+        <button type="button" class="btn btn-ghost" id="copyTagsConfigBtn" title="Copy the current service tags as code to paste into index.html and deploy for everyone">📋 Copy Tags Config</button>
+      </div>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-top:-.6rem;margin-bottom:1rem;">Pick a tag from the dropdown on each work below to preview it here, then use "Copy Tags Config" and paste it into index.html so the change goes live for every visitor — tag changes made only in this panel stay local to this browser.</p>
       <div id="adminVideoGrid" class="admin-video-grid"></div>
     </div>
 
@@ -1215,6 +1219,42 @@ renderWaitlist();
     "Puppet Animation"
   ];
 
+  // Service tags for each main portfolio work, baked directly into the page.
+  // This is the single source of truth for the floating tag badges + filter
+  // bar, so every visitor sees the same tags — not just whoever's browser
+  // happened to have them saved in localStorage.
+  // To change a tag: open the Admin panel (Ctrl+Shift+A) -> Video Manager,
+  // pick a new tag from a work's dropdown, then click "Copy Tags Config" and
+  // paste the result over this object in index.html before redeploying.
+  var WORK_TAGS = {
+    "16WINlkPlS0": ["MV Simple"],
+    "NwRnEmjJ7ak": ["MV Simple"],
+    "kfwqchOXdQw": ["MV Simple"],
+    "SsYEiOru_Jc": ["MV Simple"],
+    "rIfANo1yyB0": ["MV Simple"],
+    "CFeyOj00IeI": ["MV Simple"],
+    "5E269noR-XQ": ["MV Simple"],
+    "CEKaqofk724": ["MV Simple"],
+    "qwSQep_MGYA": ["MV Simple"],
+    "dOJLJ1ZKbZA": ["MV Simple"],
+    "sl086KEDgkc": ["MV Simple"],
+    "9huQNtIPPSo": ["MV Simple"],
+    "AX8RwWD_qPY": ["MV Simple"],
+    "qIluf5UaLto": ["MV Simple"],
+    "Zxa_zHYC3Gg": ["MV Simple"],
+    "BLz32DZ7UyQ": ["MV Simple"],
+    "gXrc7fBdIoE": ["MV Simple"],
+    "pN3eaPwghnw": ["MV Simple"],
+    "3apE2XB31vY": ["MV Simple"],
+    "DgFNTIWB01c": ["MV Simple"],
+    "TgpJKNIXVTg": ["MV Simple"],
+    "WDi4V10TtQg": ["MV Simple"],
+    "iNo1h9zCsyo": ["MV Simple"],
+    "7Bj82MA62kc": ["MV Simple"],
+    "ELoZRxNhE5Y": ["MV Simple"],
+    "BLYdjq50ISE": ["MV Simple"]
+  };
+
   // ---------- mobile nav ----------
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
@@ -1252,13 +1292,12 @@ renderWaitlist();
   function renderWorks(){
     var filtered = videos.filter(function(id){
       if (activeFilterTag === 'all') return true;
-      var tags = (workMetadata[id] && workMetadata[id].tags) || [];
+      var tags = WORK_TAGS[id] || [];
       return tags.indexOf(activeFilterTag) !== -1;
     });
 
     gallery.innerHTML = filtered.map(function(id, i){
-      var meta = workMetadata[id] || {};
-      var tags = meta.tags || [];
+      var tags = WORK_TAGS[id] || [];
       var tagsOverlay = tags.map(function(t){ return '<span class="thumb-tag-badge">'+escapeHtml(t)+'</span>'; }).join('');
 
       return '<button class="reel-card" type="button" data-id="'+id+'" data-kind="work" aria-label="Open '+escapeHtml(workTitle(id,i))+'">'
@@ -1303,8 +1342,7 @@ renderWaitlist();
           title:data.title||'',
           description:data.description||'',
           publishedAt:data.publishedAt||'',
-          channelTitle:data.channelTitle||'',
-          tags: workMetadata[id] ? (workMetadata[id].tags || []) : []
+          channelTitle:data.channelTitle||''
         };
         workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
       });
@@ -1316,8 +1354,7 @@ renderWaitlist();
         var meta={
           title:info.title||'',
           description:'',
-          channelTitle:info.author_name||'',
-          tags: workMetadata[id] ? (workMetadata[id].tags || []) : []
+          channelTitle:info.author_name||''
         };
         workMetadata[id]=meta; saveWorkMetadata(); renderWorks(); renderTagFilterBar(); return meta;
       });
@@ -1377,9 +1414,10 @@ renderWaitlist();
     var card=e.target.closest('.reel-card'); if(!card) return;
     var id=card.dataset.id;
     var meta=workMetadata[id]||{};
-    var detectedService = (meta.tags && meta.tags[0]) || 'MV Simple';
+    var workTags = WORK_TAGS[id] || [];
+    var detectedService = workTags[0] || 'MV Simple';
 
-    openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:meta.tags||[],service:detectedService});
+    openVideoModal({id:id,title:meta.title||'Loading YouTube title…',description:meta.description||'Loading YouTube description…',tags:workTags,service:detectedService});
     fetchYouTubeMetadata(id).catch(function(){return fetchYouTubeTitleFallback(id);}).then(function(info){
       var modal=document.getElementById('videoModal');
       if(modal && modal.classList.contains('is-open')){
@@ -1449,13 +1487,15 @@ renderWaitlist();
 
       // Render Default Portfolio Works
       var mainWorksCards = videos.map(function(id, i){
-        var meta = workMetadata[id] || {};
-        var curTag = (meta.tags && meta.tags[0]) || 'MV Simple';
+        var curTag = (WORK_TAGS[id] && WORK_TAGS[id][0]) || 'MV Simple';
+        var tagSelectOptions = TAG_OPTIONS.map(function(t){
+          return '<option value="'+escapeHtml(t)+'" '+(t===curTag?'selected':'')+'>'+escapeHtml(t)+'</option>';
+        }).join('');
 
         return '<div class="admin-video-card">'
           + '<div class="admin-video-thumb"><img src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="'+escapeHtml(workTitle(id,i))+'"/></div>'
           + '<div class="admin-video-details">'
-          + '<span class="admin-video-badge">'+escapeHtml(curTag)+'</span>'
+          + '<select class="admin-video-badge" style="width:auto;padding:3px 8px;" data-main-work-tag="'+id+'">'+tagSelectOptions+'</select>'
           + '<strong>'+escapeHtml(workTitle(id, i))+'</strong>'
           + '<small style="color:var(--text-muted);font-family:\'IBM Plex Mono\',monospace;">ID: '+id+'</small>'
           + '</div>'
@@ -1531,6 +1571,40 @@ renderWaitlist();
       window.alert('Could not fetch YouTube metadata, but added video using default settings.');
     });
   });
+
+  // Live-update a work's service tag when the admin picks a new one from
+  // its dropdown. This updates WORK_TAGS in memory (so the change previews
+  // immediately in this browser), but it does NOT persist for other
+  // visitors on its own — use "Copy Tags Config" below to make it permanent.
+  document.getElementById('adminPanel').addEventListener('change', function(e){
+    var tagSelect = e.target.closest('[data-main-work-tag]');
+    if(!tagSelect) return;
+    var id = tagSelect.dataset.mainWorkTag;
+    WORK_TAGS[id] = [tagSelect.value];
+    renderWorks();
+    renderTagFilterBar();
+  });
+
+  // Export the current WORK_TAGS object as pasteable source code, so tag
+  // changes made here can be committed to index.html and redeployed —
+  // making them visible to every visitor, not just this browser.
+  var copyTagsBtn = document.getElementById('copyTagsConfigBtn');
+  if(copyTagsBtn){
+    copyTagsBtn.addEventListener('click', function(){
+      var lines = videos.map(function(id){
+        var tags = WORK_TAGS[id] || ['MV Simple'];
+        return '    "'+id+'": '+JSON.stringify(tags)+',';
+      });
+      var code = 'var WORK_TAGS = {\n' + lines.join('\n').replace(/,$/, '') + '\n  };';
+      var done = function(){ window.alert('Tags config copied! Paste it over the WORK_TAGS object in index.html and redeploy so every visitor sees these tags.'); };
+      var fail = function(){ window.prompt('Copy this and paste it over the WORK_TAGS object in index.html:', code); };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(code).then(done).catch(fail);
+      } else {
+        fail();
+      }
+    });
+  }
 
   // Admin Event Delegations for Deleting & Updating
   document.getElementById('adminPanel').addEventListener('click', function(e){
